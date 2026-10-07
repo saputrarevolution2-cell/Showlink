@@ -31,7 +31,16 @@ body.dashboard-page{
     var(--pl-bg);
   color:var(--pl-text);
 }
-.payment-create-main{padding:calc(var(--sl-nav-height,72px) + 30px) 20px 82px;min-height:100vh}
+.payment-link-create-page{
+  padding-top:0 !important;
+}
+.payment-link-create-page .payment-create-main{
+  display:block;
+  position:relative;
+  z-index:1;
+  padding:104px 20px 82px !important;
+  min-height:100vh;
+}
 .payment-create-container{max-width:940px;margin:0 auto;position:relative}
 
 .payment-page-head{
@@ -174,7 +183,9 @@ body.dashboard-page{
 }
 
 @media(max-width:680px){
-  .payment-create-main{padding:calc(var(--sl-nav-height,72px) + 18px) 13px 58px}
+  .payment-link-create-page .payment-create-main{
+    padding:92px 13px 58px !important;
+  }
   .payment-create-container{width:100%}
   .payment-page-head{gap:13px;margin-bottom:17px}
   .payment-title-icon{width:48px;height:48px;flex-basis:48px;border-radius:15px;font-size:18px;box-shadow:0 10px 24px rgba(109,93,252,.22)}
@@ -219,18 +230,33 @@ body.dashboard-page{
 .payment-form.payment-plan-locked textarea,
 .payment-form.payment-plan-locked button{cursor:not-allowed}
 
-/* Public Payment Link — stay below the shared fixed navbar. */
-.payment-public-page{
-  min-height:100vh;
-  padding:calc(var(--sl-nav-height,72px) + 24px) 16px 72px;
+/* Public Payment Link — same layout foundation as the Shortlink page. */
+.payment-link-public-page-body{
+  padding-top:0 !important;
 }
-.payment-public-page .pl-card{
+.payment-link-public-page-body .payment-public-page{
+  position:relative;
+  z-index:1;
+  box-sizing:border-box;
+  min-height:100vh;
+  padding:104px 16px 72px !important;
+}
+.payment-link-public-page-body .pl-card{
   max-width:860px;
   margin:0 auto;
   border-radius:24px;
   overflow:hidden;
 }
 @media(max-width:680px){
-  .payment-public-page{padding:calc(var(--sl-nav-height,72px) + 14px) 12px 52px}
-  .payment-public-page .pl-card{border-radius:20px}
+  .payment-link-public-page-body .payment-public-page{padding:92px 12px 52px !important;}
+  .payment-link-public-page-body .pl-card{border-radius:20px}
+}
+
+.payment-link-create-page .payment-create-card,
+.payment-link-public-page-body .pl-card{
+  isolation:isolate;
+}
+@media(max-width:680px){
+  .payment-link-create-page .payment-create-container{max-width:none;}
+  .payment-link-create-page .payment-create-card{margin-top:2px;}
 }
