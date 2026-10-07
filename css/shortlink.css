@@ -1,0 +1,439 @@
+/* ShowLink Shortlink — matching Payment Link create UI */
+:root{
+  --sl-bg:#f5f7fb;
+  --sl-card:#fff;
+  --sl-text:#172033;
+  --sl-muted:#6b7280;
+  --sl-border:#e6eaf1;
+  --sl-primary:#a855f7;
+  --sl-primary-2:#5748e8;
+  --sl-soft:#f0eeff;
+  --sl-shadow:0 18px 50px rgba(24,32,56,.08);
+}
+html[data-theme="dark"]{
+  --sl-bg:#0b1020;
+  --sl-card:#121a2c;
+  --sl-text:#f4f6fb;
+  --sl-muted:#9aa5bb;
+  --sl-border:#263149;
+  --sl-soft:#211d48;
+  --sl-shadow:0 20px 60px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+body.dashboard-page{
+  background:
+    radial-gradient(circle at 8% 0%,rgba(109,93,252,.10),transparent 32%),
+    radial-gradient(circle at 95% 12%,rgba(86,139,255,.08),transparent 28%),
+    var(--sl-bg);
+  color:var(--sl-text);
+}
+.sl-main{padding:42px 20px 72px}
+.sl-container{max-width:940px;margin:0 auto}
+.sl-main-hero{
+  display:flex;align-items:center;gap:18px;margin:0 0 24px;
+}
+.sl-main-hero:before{
+  content:"\f0c1";
+  width:58px;height:58px;flex:0 0 58px;border-radius:18px;
+  display:grid;place-items:center;color:#fff;font-family:"Font Awesome 6 Free";
+  font-weight:900;font-size:22px;
+  background:linear-gradient(135deg,var(--sl-primary),#8a7dff);
+  box-shadow:0 12px 28px rgba(109,93,252,.25);
+}
+.sl-main-kicker{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:11px;font-weight:800;letter-spacing:.13em;
+  color:var(--sl-primary);margin-bottom:6px;
+}
+.sl-main-kicker i{display:none}
+.sl-main-hero h1{
+  margin:0;font-size:clamp(27px,4vw,38px);line-height:1.1;
+  letter-spacing:-.035em;font-weight:900;
+}
+.sl-main-intro{
+  margin:8px 0 0;color:var(--sl-muted);font-size:14px;line-height:1.6;
+}
+.sl-main-card{
+  background:var(--sl-card);
+  border:1px solid var(--sl-border);
+  border-radius:24px;
+  box-shadow:var(--sl-shadow);
+  padding:30px;
+}
+.create-form{display:flex;flex-direction:column;gap:22px}
+.create-field{display:block}
+.create-field>span{
+  display:block;margin:0 0 9px;
+  font-size:13px;font-weight:800;color:var(--sl-text);
+}
+.create-field input,
+.create-field textarea{
+  width:100%;border:1px solid var(--sl-border);
+  background:var(--sl-card);color:var(--sl-text);
+  border-radius:14px;outline:none;
+  font:inherit;font-size:14px;
+  transition:border-color .18s,box-shadow .18s;
+}
+.create-field input{
+  height:50px;padding:0 15px;
+}
+.create-field textarea{
+  min-height:180px;padding:14px 15px;resize:vertical;line-height:1.55;
+}
+.create-field input::placeholder,
+.create-field textarea::placeholder{color:#9aa2b1}
+.create-field input:focus,
+.create-field textarea:focus{
+  border-color:var(--sl-primary);
+  box-shadow:0 0 0 4px rgba(109,93,252,.11);
+}
+.sl-primary-btn{
+  width:100%;min-height:52px;border:0;border-radius:15px;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  color:#fff;background:linear-gradient(135deg,var(--sl-primary),var(--sl-primary-2));
+  font:inherit;font-size:14px;font-weight:800;cursor:pointer;
+  box-shadow:0 12px 25px rgba(109,93,252,.22);
+  transition:transform .16s,box-shadow .16s,filter .16s;
+}
+.sl-primary-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 16px 30px rgba(109,93,252,.28);
+  filter:brightness(1.03);
+}
+.sl-primary-btn:active{transform:translateY(0)}
+.sl-primary-btn:disabled{opacity:.65;cursor:not-allowed;transform:none}
+.pf-status{
+  padding:14px 16px;border:1px solid var(--sl-border);
+  border-radius:14px;background:var(--sl-bg);
+  color:var(--sl-muted);font-size:12px;line-height:1.5;
+}
+@media(max-width:680px){
+  .sl-main{padding:24px 13px 52px}
+  .sl-main-hero{gap:13px;margin-bottom:17px}
+  .sl-main-hero:before{
+    width:48px;height:48px;flex-basis:48px;border-radius:15px;font-size:18px;
+  }
+  .sl-main-hero h1{font-size:26px}
+  .sl-main-intro{font-size:12.5px}
+  .sl-main-card{padding:22px 18px;border-radius:20px}
+  .create-form{gap:19px}
+  .create-field textarea{min-height:190px}
+}
+@media(max-width:420px){
+  .sl-main-hero{align-items:flex-start}
+  .sl-main-hero:before{margin-top:2px}
+  .sl-main-hero h1{font-size:23px}
+}
+
+
+.sl-info-panel{display:flex;gap:13px;align-items:flex-start;padding:15px 16px;margin-top:-3px;border:1px solid rgba(109,93,252,.18);border-radius:15px;background:linear-gradient(135deg,rgba(109,93,252,.09),rgba(109,93,252,.025));}
+.sl-info-icon{width:32px;height:32px;flex:0 0 32px;display:grid;place-items:center;border-radius:10px;color:var(--sl-primary);background:rgba(109,93,252,.13)}
+.sl-info-panel strong{display:block;font-size:12px;margin:1px 0 4px}.sl-info-panel p{margin:0;color:var(--sl-muted);font-size:11.5px;line-height:1.55}
+
+.shortlink-payment-link-field{margin-top:14px}
+.shortlink-payment-link-field small{display:block;margin-top:6px;opacity:.72;line-height:1.45}
+
+
+/* =========================================================
+   SHOWLINK HOLOGRAPHIC CREATE FORM
+   Direct Payment Link selector is a first-class card, not a
+   plain form-group. Uses the same pink → purple → blue → cyan
+   visual language as the ShowLink logo.
+   ========================================================= */
+:root{
+  --sl-pink:#ff4fb3;
+  --sl-purple:#9b5cff;
+  --sl-blue:#5278ff;
+  --sl-cyan:#22d9ff;
+  --sl-glass:rgba(255,255,255,.72);
+}
+html[data-theme="dark"]{--sl-glass:rgba(18,24,42,.78)}
+
+.sl-main-card{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 0% 0%,rgba(255,79,179,.10),transparent 28%),
+    radial-gradient(circle at 100% 0%,rgba(34,217,255,.10),transparent 30%),
+    var(--sl-card);
+}
+.sl-main-card:before{
+  content:"";position:absolute;inset:0 0 auto;height:2px;
+  background:linear-gradient(90deg,var(--sl-pink),var(--sl-purple),var(--sl-blue),var(--sl-cyan));
+  opacity:.95;
+}
+
+.sl-direct-access{
+  position:relative;
+  padding:20px;
+  border:1px solid transparent;
+  border-radius:20px;
+  background:
+    linear-gradient(var(--sl-glass),var(--sl-glass)) padding-box,
+    linear-gradient(110deg,rgba(255,79,179,.75),rgba(155,92,255,.65),rgba(82,120,255,.65),rgba(34,217,255,.75)) border-box;
+  box-shadow:0 14px 36px rgba(91,73,180,.10), inset 0 1px 0 rgba(255,255,255,.35);
+  backdrop-filter:blur(18px) saturate(135%);
+  -webkit-backdrop-filter:blur(18px) saturate(135%);
+  overflow:hidden;
+}
+.sl-direct-access:after{
+  content:"";position:absolute;width:180px;height:180px;right:-90px;top:-105px;
+  background:radial-gradient(circle,rgba(34,217,255,.20),transparent 68%);pointer-events:none;
+}
+.sl-direct-access-head{display:flex;align-items:flex-start;gap:13px;position:relative;z-index:1}
+.sl-direct-access-icon{
+  width:42px;height:42px;flex:0 0 42px;border-radius:14px;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(135deg,var(--sl-pink),var(--sl-purple) 45%,var(--sl-blue) 72%,var(--sl-cyan));
+  box-shadow:0 9px 22px rgba(133,82,230,.24);
+}
+.sl-direct-access-icon i{font-size:16px}
+.sl-direct-access-copy{min-width:0;flex:1}
+.sl-direct-access-eyebrow{font-size:9px;font-weight:900;letter-spacing:.16em;color:var(--sl-purple);margin:1px 0 3px}
+.sl-direct-access-copy h2{margin:0;font-size:17px;line-height:1.25;letter-spacing:-.02em;color:var(--sl-text)}
+.sl-direct-access-copy h2 span{font-size:12px;font-weight:600;color:var(--sl-muted)}
+.sl-direct-access-copy p{margin:5px 0 0;font-size:11.5px;line-height:1.55;color:var(--sl-muted);max-width:690px}
+.sl-direct-access-copy p strong{color:var(--sl-text);font-weight:800}
+.sl-optional-pill{
+  flex:0 0 auto;padding:6px 9px;border-radius:999px;font-size:8px;font-weight:900;letter-spacing:.08em;
+  color:var(--sl-purple);background:rgba(155,92,255,.10);border:1px solid rgba(155,92,255,.18)
+}
+.sl-payment-select-label{display:block;margin:18px 0 8px;font-size:11px;font-weight:850;color:var(--sl-text)}
+.sl-payment-select-wrap{position:relative;display:flex;align-items:center}
+.sl-payment-select-wrap>i:first-child{
+  position:absolute;left:15px;z-index:2;font-size:13px;
+  background:linear-gradient(135deg,var(--sl-pink),var(--sl-purple),var(--sl-blue),var(--sl-cyan));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.sl-payment-select-wrap select{
+  appearance:none;-webkit-appearance:none;width:100%;height:50px;padding:0 44px 0 42px;
+  border:1px solid var(--sl-border);border-radius:14px;background:rgba(255,255,255,.48);color:var(--sl-text);
+  outline:none;font:inherit;font-size:13px;font-weight:650;cursor:pointer;
+  transition:border-color .18s,box-shadow .18s,background .18s;
+}
+html[data-theme="dark"] .sl-payment-select-wrap select{background:rgba(7,12,25,.40)}
+.sl-payment-select-wrap select:hover{border-color:rgba(155,92,255,.42)}
+.sl-payment-select-wrap select:focus{border-color:var(--sl-purple);box-shadow:0 0 0 4px rgba(155,92,255,.12)}
+.sl-select-chevron{position:absolute;right:16px;pointer-events:none;color:var(--sl-muted);font-size:11px}
+.sl-payment-help,.sl-payment-empty{
+  display:flex;align-items:flex-start;gap:8px;margin-top:9px;padding:9px 11px;border-radius:11px;
+  font-size:10.5px;line-height:1.5;color:var(--sl-muted);
+}
+.sl-payment-help{background:rgba(34,217,255,.055);border:1px solid rgba(34,217,255,.10)}
+.sl-payment-help>i{margin-top:2px;color:#19cfa9}
+.sl-payment-help strong{color:var(--sl-text);font-weight:800}
+.sl-payment-empty{background:rgba(255,180,60,.07);border:1px solid rgba(255,180,60,.14)}
+.sl-payment-empty>i{margin-top:2px;color:#eaa43a}
+.sl-direct-access[aria-busy="true"] .sl-payment-select-wrap select{opacity:.6;pointer-events:none}
+
+.sl-warning{border-radius:16px!important}
+
+@media(max-width:680px){
+  .sl-direct-access{padding:17px;border-radius:17px}
+  .sl-direct-access-head{gap:10px}
+  .sl-direct-access-icon{width:38px;height:38px;flex-basis:38px;border-radius:12px}
+  .sl-optional-pill{display:none}
+  .sl-direct-access-copy h2{font-size:15px}
+  .sl-direct-access-copy p{font-size:10.8px}
+  .sl-payment-select-wrap select{height:48px;font-size:12px}
+}
+
+
+/* =========================================================
+   CREATE LINK POLISH — NAVBAR CLEARANCE / FORM / WARNING
+   ========================================================= */
+body.dashboard-page{
+  min-height:100vh;
+  overflow-x:hidden;
+}
+.sl-main{
+  position:relative;
+  z-index:1;
+  padding-top:calc(var(--sl-nav-height, 72px) + 34px);
+}
+.sl-container{
+  width:min(1120px,100%);
+  max-width:1120px;
+}
+.sl-main-hero{
+  margin-bottom:22px;
+}
+.sl-main-card{
+  padding:32px;
+}
+.create-form{
+  gap:20px;
+}
+
+/* Title, description and content use the same crystal field material. */
+.create-field{
+  width:100%;
+}
+.create-field>span{
+  display:flex;
+  align-items:center;
+  min-height:20px;
+  margin:0 0 8px;
+  font-size:12px;
+  font-weight:850;
+  letter-spacing:-.01em;
+}
+.create-field input,
+.create-field textarea{
+  display:block;
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid rgba(124,58,237,.16);
+  border-radius:14px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.78),rgba(248,250,255,.56));
+  color:var(--sl-text);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.72),
+    0 4px 18px rgba(70,58,150,.035);
+}
+html[data-theme="dark"] .create-field input,
+html[data-theme="dark"] .create-field textarea{
+  background:linear-gradient(135deg,rgba(12,20,45,.82),rgba(16,25,54,.68));
+  border-color:rgba(130,150,255,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.create-field input{
+  height:52px;
+  padding:0 16px;
+}
+.create-field textarea{
+  min-height:0;
+  padding:14px 16px;
+  resize:vertical;
+  line-height:1.6;
+}
+.create-field textarea[name="description"]{
+  height:140px;
+  min-height:140px;
+}
+.create-field textarea[name="content_text"]{
+  width:100%;
+  min-height:360px;
+  height:360px;
+  padding:17px 18px;
+  font-size:14px;
+  line-height:1.7;
+}
+.create-field input:hover,
+.create-field textarea:hover{
+  border-color:rgba(124,58,237,.30);
+}
+.create-field input:focus,
+.create-field textarea:focus{
+  border-color:rgba(124,58,237,.62);
+  box-shadow:
+    0 0 0 4px rgba(124,58,237,.09),
+    0 10px 28px rgba(124,58,237,.07);
+}
+.field-detail{
+  display:flex;
+  align-items:flex-start;
+  gap:7px;
+  margin-top:7px;
+  color:var(--sl-muted);
+  font-size:10.5px;
+  line-height:1.45;
+}
+.field-detail i{
+  margin-top:2px;
+  color:var(--sl-cyan);
+}
+
+/* Cleaner section separators. */
+.sl-info-panel,
+.sl-direct-access,
+.sl-warning{
+  position:relative;
+}
+.sl-info-panel{
+  margin-top:2px;
+  border-color:rgba(124,58,237,.14);
+  box-shadow:0 7px 24px rgba(70,58,150,.045);
+}
+.sl-direct-access{
+  margin-top:2px;
+}
+.sl-warning{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin-top:1px;
+  padding:10px 12px !important;
+  border:1px solid rgba(239,68,68,.18) !important;
+  border-radius:11px !important;
+  background:rgba(239,68,68,.045) !important;
+  box-shadow:none !important;
+  color:#b4232d;
+}
+html[data-theme="dark"] .sl-warning{
+  color:#ff9da5;
+  border-color:rgba(248,113,113,.22) !important;
+  background:rgba(239,68,68,.075) !important;
+}
+.sl-warning>i{
+  flex:0 0 auto;
+  margin-top:2px;
+  color:#ef4444;
+  font-size:13px;
+}
+.sl-warning strong{
+  display:block;
+  margin:0 0 2px;
+  font-size:10.5px;
+  font-weight:900;
+  letter-spacing:.01em;
+}
+.sl-warning p{
+  margin:0;
+  font-size:10px;
+  line-height:1.45;
+  color:inherit;
+  opacity:.88;
+}
+
+/* Make the direct-access copy itself translate cleanly without breaking emphasis. */
+.sl-direct-access-copy p strong,
+.sl-payment-help strong{
+  color:var(--sl-text);
+}
+
+/* Cleaner submit/result separation. */
+.sl-primary-btn{
+  margin-top:2px;
+}
+#create-result{
+  margin-top:12px !important;
+}
+
+@media(max-width:760px){
+  .sl-main{
+    padding:calc(var(--sl-nav-height,72px) + 22px) 14px 58px;
+  }
+  .sl-main-card{
+    padding:22px 17px;
+    border-radius:20px;
+  }
+  .create-field textarea[name="description"]{
+    height:125px;
+    min-height:125px;
+  }
+  .create-field textarea[name="content_text"]{
+    height:300px;
+    min-height:300px;
+  }
+}
+@media(max-width:460px){
+  .sl-main{
+    padding-top:calc(var(--sl-nav-height,72px) + 18px);
+  }
+  .sl-main-card{padding:19px 14px}
+  .create-field input{height:50px}
+  .create-field textarea[name="content_text"]{
+    height:260px;
+    min-height:260px;
+  }
+}
