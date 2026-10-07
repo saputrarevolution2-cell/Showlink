@@ -31,17 +31,18 @@ body.dashboard-page{
     var(--pl-bg);
   color:var(--pl-text);
 }
-.payment-create-main{padding:42px 20px 72px}
-.payment-create-container{max-width:940px;margin:0 auto}
+.payment-create-main{padding:calc(var(--sl-nav-height,72px) + 30px) 20px 82px;min-height:100vh}
+.payment-create-container{max-width:940px;margin:0 auto;position:relative}
 
 .payment-page-head{
-  display:flex;align-items:center;gap:18px;margin:0 0 24px;
+  display:flex;align-items:center;gap:18px;margin:0 0 26px;
+  padding:4px 2px;
 }
 .payment-title-icon{
-  width:58px;height:58px;flex:0 0 58px;border-radius:18px;
+  width:60px;height:60px;flex:0 0 60px;border-radius:19px;
   display:grid;place-items:center;color:#fff;font-size:22px;
   background:linear-gradient(135deg,var(--pl-primary),#8a7dff);
-  box-shadow:0 12px 28px rgba(109,93,252,.25);
+  box-shadow:0 14px 34px rgba(109,93,252,.25),0 0 0 7px rgba(109,93,252,.05);
 }
 .payment-eyebrow{
   display:inline-flex;align-items:center;gap:7px;
@@ -61,11 +62,17 @@ body.dashboard-page{
 }
 
 .payment-create-card{
+  position:relative;
   background:var(--pl-card);
   border:1px solid var(--pl-border);
   border-radius:var(--pl-radius);
   box-shadow:var(--pl-shadow);
   overflow:hidden;
+}
+
+.payment-create-card::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:3px;z-index:2;
+  background:linear-gradient(90deg,#ff2fb3,#c026d3,#7c3aed,#2563eb,#06d6ff);
 }
 .payment-form-head{
   padding:28px 30px 22px;
@@ -167,10 +174,10 @@ body.dashboard-page{
 }
 
 @media(max-width:680px){
-  .payment-create-main{padding:24px 13px 52px}
+  .payment-create-main{padding:calc(var(--sl-nav-height,72px) + 18px) 13px 58px}
   .payment-create-container{width:100%}
   .payment-page-head{gap:13px;margin-bottom:17px}
-  .payment-title-icon{width:48px;height:48px;flex-basis:48px;border-radius:15px;font-size:18px}
+  .payment-title-icon{width:48px;height:48px;flex-basis:48px;border-radius:15px;font-size:18px;box-shadow:0 10px 24px rgba(109,93,252,.22)}
   .payment-page-head h1{font-size:26px}
   .payment-page-head p{font-size:12.5px}
   .payment-form-head{padding:22px 18px 18px}
@@ -211,3 +218,19 @@ body.dashboard-page{
 .payment-form.payment-plan-locked input,
 .payment-form.payment-plan-locked textarea,
 .payment-form.payment-plan-locked button{cursor:not-allowed}
+
+/* Public Payment Link — stay below the shared fixed navbar. */
+.payment-public-page{
+  min-height:100vh;
+  padding:calc(var(--sl-nav-height,72px) + 24px) 16px 72px;
+}
+.payment-public-page .pl-card{
+  max-width:860px;
+  margin:0 auto;
+  border-radius:24px;
+  overflow:hidden;
+}
+@media(max-width:680px){
+  .payment-public-page{padding:calc(var(--sl-nav-height,72px) + 14px) 12px 52px}
+  .payment-public-page .pl-card{border-radius:20px}
+}
