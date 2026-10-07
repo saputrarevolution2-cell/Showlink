@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#6d5dfc">
+<meta name="description" content="Dashboard — ShowLink">
+<title>Dashboard — ShowLink</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<link rel="stylesheet" href="/css/dashboard.css">
+<script src="/js/supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-client.js"></script><script src="/js/showlink-components.js" defer></script><script src="/js/navbar.js" defer></script><script src="/js/footer.js" defer></script>
+<script>
+(function(){try{var t=localStorage.getItem('showlink-theme');if(t==='dark'||t==='light'){document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}}catch(e){}})();
+</script>
+<link rel="stylesheet" href="/css/showlink-components.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css"><link rel="icon" type="image/svg+xml" href="/assets/showlink-favicon.svg"><link rel="icon" type="image/png" sizes="512x512" href="/assets/showlink-favicon.png"><link rel="apple-touch-icon" href="/assets/showlink-favicon.png"></head>
+<body class="dashboard-page">
+<div data-showlink-navbar></div>
+
+<main class="sl-main dash-main">
+<div class="sl-container">
+  <section class="dash-welcome">
+    <div>
+      <span class="dash-kicker"><i class="fa-solid fa-gauge-high"></i><span data-i18n="dashboard">DASHBOARD</span></span>
+      <h1><span data-i18n="welcome">Selamat datang</span>, <strong data-user-name>—</strong></h1>
+      <p data-i18n="dashboardIntro">Pantau saldo, pendapatan, klik, dan performa semua layanan ShowLink dari satu tempat.</p>
+    </div>
+    <div class="dash-status-pill"><i class="fa-solid fa-circle-check"></i><span data-account-status>Free</span></div>
+  </section>
+
+  <section class="dash-balance-grid">
+    <article class="dash-card greeting-card">
+      <div class="card-glow glow-purple"></div>
+      <div class="card-top">
+        <div>
+          <span class="dash-label" data-i18n="accountGreeting">Salam sambutan</span>
+          <h2 data-user-name>—</h2>
+        </div>
+        <div class="dash-avatar" data-avatar><i class="fa-solid fa-user"></i></div>
+      </div>
+      <div class="account-meta">
+        <span class="plan-chip"><i class="fa-solid fa-crown"></i><span data-account-status>Free</span></span>
+        <span class="email-chip"><i class="fa-solid fa-envelope"></i><span data-user-email>—</span></span>
+      </div>
+      <div class="welcome-note"><i class="fa-solid fa-sparkles"></i><span data-i18n="welcomeNote">Semua ringkasan penghasilanmu ada di sini.</span></div>
+    </article>
+
+    <article class="dash-card balance-card">
+      <div class="card-glow glow-green"></div>
+      <span class="dash-label" data-i18n="availableBalance">Saldo tersedia saat ini</span>
+      <div class="balance-value" data-metric="available_balance">Rp 0</div>
+      <div class="balance-footer"><span><i class="fa-solid fa-wallet"></i><span data-i18n="readyToWithdraw">Siap digunakan/ditarik</span></span><i class="fa-solid fa-arrow-trend-up trend-green"></i></div>
+    </article>
+  </section>
+
+  <section class="dash-card wrapped-card" data-wrapped-card>
+    <button class="wrapped-toggle" type="button" data-wrapped-toggle aria-expanded="true">
+      <span class="wrapped-title">
+        <i class="fa-solid fa-box-open icon-purple"></i>
+        <span>
+          <b data-i18n="wrapped">Terbungkus</b>
+          <small data-i18n="wrappedSub">Ringkasan pendapatan yang masih menunggu settlement.</small>
+        </span>
+      </span>
+      <i class="fa-solid fa-chevron-up wrapped-chevron"></i>
+    </button>
+    <div class="wrapped-body" data-wrapped-body>
+      <div class="wrapped-item"><i class="fa-solid fa-link icon-green"></i><span data-i18n="wrappedShort">Shortlink pending</span><strong data-metric="short_pending">Rp 0</strong></div>
+      <div class="wrapped-item"><i class="fa-solid fa-credit-card icon-yellow"></i><span data-i18n="wrappedPay">Payment Link pending</span><strong data-metric="pay_pending">Rp 0</strong></div>
+      <div class="wrapped-item"><i class="fa-solid fa-clock icon-orange"></i><span data-i18n="wrappedSettlement">Settlement berikutnya</span><strong data-metric="next_settlement">—</strong></div>
+    </div>
+  </section>
+
+  <section class="income-section">
+    <div class="section-title">
+      <div><span class="dash-label"><i class="fa-solid fa-link section-icon green"></i><span data-i18n="shortlinkIncome">Pendapatan Shortlink</span></span><h2 data-i18n="shortlinkIncomeSub">Penghasilan dari iklan & CPM</h2></div>
+      <a class="section-link" href="/shortlink.html"><span data-i18n="viewDetails">Lihat detail</span><i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    <div class="metric-grid four">
+      <article class="metric-card"><i class="fa-solid fa-hourglass-half icon-orange"></i><span data-i18n="pendingSettlement">Saldo Pending Settlement H1</span><strong data-metric="short_pending">Rp 0</strong></article>
+      <article class="metric-card"><i class="fa-solid fa-calendar-day icon-blue"></i><span data-i18n="todayIncome">Pendapatan hari ini</span><strong data-metric="short_today">Rp 0</strong><small data-trend="short_today"><i class="fa-solid fa-minus"></i> 0%</small></article>
+      <article class="metric-card"><i class="fa-solid fa-calendar-days icon-purple"></i><span data-i18n="monthIncome">Pendapatan bulan ini</span><strong data-metric="short_month">Rp 0</strong><small data-trend="short_month"><i class="fa-solid fa-minus"></i> 0%</small></article>
+      <article class="metric-card"><i class="fa-solid fa-link icon-green"></i><span data-i18n="totalShortlinks">Total Shortlink</span><strong data-metric="short_total">0</strong><small data-trend="short_total"><i class="fa-solid fa-minus"></i> 0%</small></article>
+    </div>
+  </section>
+
+  <section class="income-section">
+    <div class="section-title">
+      <div><span class="dash-label"><i class="fa-solid fa-credit-card section-icon yellow"></i><span data-i18n="paymentIncome">Pendapatan Payment Link</span></span><h2 data-i18n="paymentIncomeSub">Pendapatan bersih dari penjualan link</h2></div>
+      <a class="section-link" href="/payment-link.html"><span data-i18n="viewDetails">Lihat detail</span><i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    <div class="metric-grid four">
+      <article class="metric-card"><i class="fa-solid fa-hourglass-half icon-orange"></i><span data-i18n="pendingSettlement">Saldo Pending Settlement H1</span><strong data-metric="pay_pending">Rp 0</strong></article>
+      <article class="metric-card"><i class="fa-solid fa-calendar-day icon-blue"></i><span data-i18n="todayIncome">Pendapatan hari ini</span><strong data-metric="pay_today">Rp 0</strong><small data-trend="pay_today"><i class="fa-solid fa-minus"></i> 0%</small></article>
+      <article class="metric-card"><i class="fa-solid fa-calendar-days icon-purple"></i><span data-i18n="monthIncome">Pendapatan bulan ini</span><strong data-metric="pay_month">Rp 0</strong><small data-trend="pay_month"><i class="fa-solid fa-minus"></i> 0%</small></article>
+      <article class="metric-card"><i class="fa-solid fa-cart-shopping icon-pink"></i><span data-i18n="totalPaymentLinks">Total Payment Link</span><strong data-metric="pay_total">0</strong><small data-trend="pay_total"><i class="fa-solid fa-minus"></i> 0%</small></article>
+    </div>
+  </section>
+
+  <section class="income-section">
+    <div class="section-title">
+      <div><span class="dash-label"><i class="fa-solid fa-unlock-keyhole section-icon orange"></i><span data-i18n="subIncome">Pendapatan Member Sub4unlock</span></span><h2 data-i18n="subIncomeSub">Hanya dari user yang menyelesaikan task Sub4Sub</h2></div>
+      <a class="section-link" href="/sub4unlock.html"><span data-i18n="viewDetails">Lihat detail</span><i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    <div class="metric-grid three">
+      <article class="metric-card"><i class="fa-solid fa-mouse-pointer icon-blue"></i><span data-i18n="clicksToday">Pendapatan klik hari ini</span><strong data-metric="sub_today">0</strong><small data-trend="sub_today"><i class="fa-solid fa-minus"></i> 0%</small></article>
+      <article class="metric-card"><i class="fa-solid fa-calendar-days icon-purple"></i><span data-i18n="monthIncome">Pendapatan bulan ini</span><strong data-metric="sub_month">0</strong><small data-trend="sub_month"><i class="fa-solid fa-minus"></i> 0%</small></article>
+      <article class="metric-card"><i class="fa-solid fa-lock-open icon-orange"></i><span data-i18n="totalSubLinks">Total Link Sub4unlock</span><strong data-metric="sub_total">0</strong><small data-trend="sub_total"><i class="fa-solid fa-minus"></i> 0%</small></article>
+    </div>
+  </section>
+
+  <section class="analytics-grid">
+<article class="dash-card donut-card">
+      <div class="card-heading"><div><span class="dash-label" data-i18n="incomeDistribution">Distribusi pendapatan</span><h2>Shortlink & Payment Link</h2></div></div>
+      <div class="donut-wrap">
+        <div class="donut" id="income-donut"><div><strong data-metric="income_total">Rp 0</strong><span data-i18n="totalIncome">Total pendapatan</span></div></div>
+        <div class="legend"><span><i class="legend-dot green"></i>Shortlink <b data-metric="income_short_pct">0%</b></span><span><i class="legend-dot yellow"></i>Payment Link <b data-metric="income_pay_pct">0%</b></span></div>
+      </div>
+    </article>
+  </section>
+
+  <section class="analytics-grid">
+    <article class="dash-card chart-card">
+      <div class="card-heading"><div><span class="dash-label"><i class="fa-solid fa-chart-line section-icon blue"></i><span data-i18n="shortlinkStats">Statistik Shortlink</span></span><h2 data-i18n="performanceTrend">Performa & tren</h2></div><span class="period-chip">30D</span></div>
+      <div class="line-chart" id="shortlink-chart"><div class="chart-placeholder"><i class="fa-solid fa-chart-line"></i><span data-i18n="chartData">Data akan mengikuti statistik Shortlink dari database.</span></div></div>
+      <div class="chart-summary"><span><i class="fa-solid fa-eye icon-blue"></i><b data-metric="short_views">0</b><small data-i18n="validViews">View valid</small></span><span><i class="fa-solid fa-coins icon-green"></i><b data-metric="short_earnings">Rp 0</b><small data-i18n="estimatedIncome">Estimasi pendapatan</small></span></div>
+    </article>
+
+    <article class="dash-card chart-card">
+      <div class="card-heading"><div><span class="dash-label"><i class="fa-solid fa-chart-column section-icon yellow"></i><span data-i18n="paymentStats">Statistik Payment Link</span></span><h2 data-i18n="salesTrend">Penjualan & tren</h2></div><span class="period-chip">30D</span></div>
+      <div class="line-chart" id="payment-chart"><div class="chart-placeholder"><i class="fa-solid fa-chart-column"></i><span data-i18n="chartData">Data akan mengikuti statistik Payment Link dari database.</span></div></div>
+      <div class="chart-summary"><span><i class="fa-solid fa-link icon-yellow"></i><b data-metric="pay_clicks">0</b><small data-i18n="paymentClicks">Klik/checkout</small></span><span><i class="fa-solid fa-coins icon-green"></i><b data-metric="pay_earnings">Rp 0</b><small data-i18n="netIncome">Pendapatan bersih</small></span></div>
+    </article>
+  </section>
+
+  <section class="analytics-grid">
+    <article class="dash-card donut-card">
+      <div class="card-heading"><div><span class="dash-label"><i class="fa-solid fa-chart-pie section-icon orange"></i><span data-i18n="subStats">Statistik Sub4unlock</span></span><h2 data-i18n="subUnlockStats">Klik & total link</h2></div></div>
+      <div class="sub-donut-row">
+        <div class="donut sub-donut" id="sub-donut"><div><strong data-metric="sub_clicks">0</strong><span data-i18n="validTasks">Task selesai</span></div></div>
+        <div class="sub-mini-stats"><div><i class="fa-solid fa-mouse-pointer icon-blue"></i><b data-metric="sub_clicks_month">0</b><span data-i18n="monthlyClicks">Klik bulan ini</span></div><div><i class="fa-solid fa-link icon-orange"></i><b data-metric="sub_links_active">0</b><span data-i18n="activeLinks">Link aktif</span></div></div>
+      </div>
+    </article>
+
+    <article class="dash-card detail-card">
+      <div class="card-heading"><div><span class="dash-label" data-i18n="details">Detail</span><h2 data-i18n="subDetails">Sub4unlock</h2></div><a href="/sub4unlock.html" class="icon-link"><i class="fa-solid fa-arrow-up-right-from-square"></i></a></div>
+      <div class="detail-list">
+        <div><span><i class="fa-solid fa-lock icon-orange"></i><span data-i18n="lockedContent">Konten terkunci</span></span><strong data-metric="sub_locked">0</strong></div>
+        <div><span><i class="fa-solid fa-unlock icon-green"></i><span data-i18n="unlockedContent">Konten terbuka</span></span><strong data-metric="sub_unlocked">0</strong></div>
+        <div><span><i class="fa-solid fa-users icon-blue"></i><span data-i18n="usersCompleted">User selesai task</span></span><strong data-metric="sub_users">0</strong></div>
+      </div>
+    </article>
+  </section>
+
+  <section class="detail-grid">
+    <article class="dash-card detail-card">
+      <div class="card-heading"><div><span class="dash-label" data-i18n="details">Detail</span><h2>Shortlink & Payment Link</h2></div></div>
+      <div class="detail-list">
+        <div><span><i class="fa-solid fa-link icon-green"></i>Shortlink</span><strong data-metric="short_total">0</strong></div>
+        <div><span><i class="fa-solid fa-eye icon-blue"></i><span data-i18n="validViews">View valid</span></span><strong data-metric="short_views">0</strong></div>
+        <div><span><i class="fa-solid fa-credit-card icon-yellow"></i>Payment Link</span><strong data-metric="pay_total">0</strong></div>
+        <div><span><i class="fa-solid fa-bag-shopping icon-pink"></i><span data-i18n="successfulSales">Penjualan berhasil</span></span><strong data-metric="pay_sales">0</strong></div>
+      </div>
+    </article>
+    <article class="dash-card info-card">
+      <div class="info-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <div><span class="dash-label" data-i18n="incomeRule">Aturan pendapatan</span><h2 data-i18n="incomeRuleTitle">Saldo tampil sebagai pendapatan bersih</h2><p data-i18n="incomeRuleText">Payment Link menampilkan bagian bersih yang menjadi milikmu. Fee platform tidak ditampilkan di Dashboard.</p></div>
+    </article>
+  </section>
+</div>
+</main>
+
+<div data-showlink-footer></div>
+
+<script src="/js/dashboard.js" defer></script>
+</body>
+</html>
