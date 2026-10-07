@@ -324,3 +324,240 @@ html[data-theme="dark"] .showcase-tags span{
   .showcase-card h3{font-size:18px}
   .showcase-card p{font-size:11px}
 }
+
+/* =========================================================
+   SHOWLINK INDEX — FINAL NAV OFFSET + PREMIUM LANDING POLISH
+   Page-local only: no new global CSS/JS file.
+   ========================================================= */
+
+/* The shared navbar is fixed. Give this page a clean breathing zone. */
+body.showlink-navbar-page > main{
+  padding-top:72px;
+}
+
+/* Keep the first viewport visually intentional instead of hiding behind nav. */
+body.showlink-navbar-page .hero{
+  min-height:calc(100svh - 72px);
+  display:flex;
+  align-items:center;
+  padding-top:72px;
+  padding-bottom:78px;
+}
+
+/* Premium atmospheric background. */
+body.showlink-navbar-page .hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.36),transparent 35%,rgba(255,255,255,.18)),
+    radial-gradient(circle at 76% 38%,rgba(124,58,237,.10),transparent 25%),
+    radial-gradient(circle at 42% 90%,rgba(6,214,255,.08),transparent 25%);
+}
+html[data-theme="dark"] body.showlink-navbar-page .hero{
+  background:
+    radial-gradient(circle at 12% 18%,rgba(255,47,179,.12),transparent 28%),
+    radial-gradient(circle at 82% 26%,rgba(124,58,237,.15),transparent 32%),
+    linear-gradient(135deg,#050817,#0a1027 48%,#061426);
+}
+html[data-theme="dark"] body.showlink-navbar-page .hero::before{
+  background:
+    radial-gradient(circle at 70% 45%,rgba(6,214,255,.09),transparent 28%),
+    linear-gradient(90deg,rgba(255,255,255,.015),transparent 55%);
+}
+
+/* Hero copy gets a slightly stronger visual hierarchy. */
+body.showlink-navbar-page .hero-copy{
+  position:relative;
+  z-index:2;
+}
+body.showlink-navbar-page .hero h1{
+  max-width:760px;
+  text-wrap:balance;
+  text-shadow:0 2px 30px rgba(91,72,170,.06);
+}
+body.showlink-navbar-page .hero-lead{
+  max-width:680px;
+  line-height:1.75;
+}
+body.showlink-navbar-page .hero-actions .btn{
+  min-height:54px;
+}
+body.showlink-navbar-page .trust-row{
+  padding-top:4px;
+}
+
+/* More dimensional product preview. */
+body.showlink-navbar-page .hero-preview{
+  position:relative;
+  z-index:2;
+}
+body.showlink-navbar-page .hero-preview::before{
+  content:"";
+  position:absolute;
+  width:310px;
+  height:310px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(168,85,247,.22),rgba(37,99,235,.08) 42%,transparent 70%);
+  filter:blur(10px);
+  z-index:-1;
+}
+body.showlink-navbar-page .preview-window{
+  border-color:rgba(124,58,237,.18);
+  box-shadow:
+    0 35px 90px rgba(66,46,150,.18),
+    0 8px 28px rgba(22,18,45,.08),
+    inset 0 1px 0 rgba(255,255,255,.85);
+  transform:perspective(1200px) rotateY(-3deg) rotateX(1deg) rotate(1deg);
+  transition:transform .35s ease,box-shadow .35s ease;
+}
+body.showlink-navbar-page .preview-window:hover{
+  transform:perspective(1200px) rotateY(0) rotateX(0) rotate(0) translateY(-5px);
+  box-shadow:0 42px 100px rgba(66,46,150,.22),0 12px 32px rgba(22,18,45,.10);
+}
+
+/* Showcase cards: stronger premium glass treatment. */
+body.showlink-navbar-page .showcase-section{
+  position:relative;
+  overflow:hidden;
+}
+body.showlink-navbar-page .showcase-section::before{
+  content:"";
+  position:absolute;
+  width:520px;height:520px;
+  left:-280px;top:40px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,47,179,.08),transparent 68%);
+  pointer-events:none;
+}
+body.showlink-navbar-page .showcase-card{
+  border:1px solid rgba(124,58,237,.14);
+  box-shadow:0 22px 70px rgba(55,45,120,.10);
+  background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(248,246,255,.82));
+  overflow:hidden;
+  transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+}
+body.showlink-navbar-page .showcase-card:hover{
+  transform:translateY(-5px);
+  border-color:rgba(124,58,237,.24);
+  box-shadow:0 30px 85px rgba(55,45,120,.15);
+}
+html[data-theme="dark"] body.showlink-navbar-page .showcase-card{
+  background:linear-gradient(145deg,rgba(12,21,48,.88),rgba(19,12,43,.82));
+  border-color:rgba(108,161,255,.18);
+  box-shadow:0 28px 80px rgba(0,0,0,.30);
+}
+
+/* Make section headings feel less cramped. */
+body.showlink-navbar-page .section-heading h2{
+  text-wrap:balance;
+}
+body.showlink-navbar-page .section-heading p{
+  max-width:700px;
+}
+
+/* Feature blocks get cleaner vertical rhythm. */
+body.showlink-navbar-page .section{
+  position:relative;
+}
+body.showlink-navbar-page .feature-layout{
+  min-height:560px;
+}
+body.showlink-navbar-page .feature-copy h2{
+  text-wrap:balance;
+}
+body.showlink-navbar-page .feature-list > div{
+  transition:transform .18s ease,background .18s ease;
+  border-radius:16px;
+  padding:4px 6px;
+}
+body.showlink-navbar-page .feature-list > div:hover{
+  transform:translateX(4px);
+  background:rgba(124,58,237,.035);
+}
+html[data-theme="dark"] body.showlink-navbar-page .feature-list > div:hover{
+  background:rgba(124,58,237,.08);
+}
+
+/* FAQ and CTA finish with more breathing room. */
+body.showlink-navbar-page .faq-section{
+  padding-bottom:100px;
+}
+body.showlink-navbar-page .final-cta{
+  padding-top:20px;
+  padding-bottom:86px;
+}
+
+/* Mobile: prevent the fixed navbar from visually colliding with hero content. */
+@media(max-width:760px){
+  body.showlink-navbar-page > main{padding-top:64px}
+  body.showlink-navbar-page .hero{
+    min-height:auto;
+    padding-top:54px;
+    padding-bottom:62px;
+  }
+  body.showlink-navbar-page .hero-grid{
+    grid-template-columns:1fr;
+    gap:42px;
+  }
+  body.showlink-navbar-page .hero h1{
+    font-size:clamp(42px,12vw,60px);
+    letter-spacing:-2.8px;
+  }
+  body.showlink-navbar-page .hero-lead{
+    font-size:15px;
+  }
+  body.showlink-navbar-page .hero-actions{
+    margin-top:24px;
+  }
+  body.showlink-navbar-page .hero-actions .btn{
+    flex:1 1 180px;
+  }
+  body.showlink-navbar-page .preview-window{
+    transform:none;
+  }
+  body.showlink-navbar-page .preview-window:hover{
+    transform:translateY(-3px);
+  }
+  body.showlink-navbar-page .showcase-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:430px){
+  body.showlink-navbar-page .hero{
+    padding-top:42px;
+  }
+  body.showlink-navbar-page .sl-container{
+    width:min(100% - 28px,var(--container));
+  }
+  body.showlink-navbar-page .hero h1{
+    font-size:clamp(38px,11.5vw,50px);
+  }
+  body.showlink-navbar-page .trust-row{
+    gap:10px 14px;
+  }
+  body.showlink-navbar-page .preview-body{
+    padding:20px;
+  }
+  body.showlink-navbar-page .preview-title{
+    font-size:27px;
+  }
+}
+
+/* Dark-mode page surfaces. */
+html[data-theme="dark"] body.showlink-navbar-page .preview-window{
+  background:rgba(8,15,35,.92);
+  border-color:rgba(108,161,255,.20);
+  color:#f7fbff;
+}
+html[data-theme="dark"] body.showlink-navbar-page .window-head,
+html[data-theme="dark"] body.showlink-navbar-page .preview-url,
+html[data-theme="dark"] body.showlink-navbar-page .payment-url{
+  border-color:rgba(108,161,255,.16);
+}
+html[data-theme="dark"] body.showlink-navbar-page .preview-url,
+html[data-theme="dark"] body.showlink-navbar-page .payment-url{
+  background:rgba(255,255,255,.035);
+}
