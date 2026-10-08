@@ -1,8 +1,54 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="ShowLink Payment Link"><title>Order — ShowLink</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css">
-<link rel="stylesheet" href="/css/order.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/js/supabase-config.js"></script>
-<script src="/js/supabase-client.js"></script><script src="/js/navbar.js" defer></script>
-<script src="/js/footer.js" defer></script>
-<script src="/js/language.js" defer></script>
-</head><body class="app-page"><div data-showlink-navbar></div><main class="app-wrap"><section class="app-hero"><div><span class="app-kicker"><i class="fa-solid fa-receipt"></i> PAYMENT LINK</span><h1>Order</h1><p>Semua pesanan dari Payment Link kamu.</p></div></section><section class="app-card"><div class="page-scroll-table"><table class="app-table"><thead><tr><th>Order</th><th>Payment Link</th><th>Amount</th><th>Status</th><th>Waktu</th></tr></thead><tbody id="orders-body"><tr><td colspan="5" class="app-empty">Memuat...</td></tr></tbody></table></div></section></main><div data-showlink-footer></div><script src="/js/order.js" defer></script>
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Kelola semua pesanan dari Payment Link ShowLink.">
+<title>Order — ShowLink</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css"><link rel="stylesheet" href="/css/order.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-config.js"></script><script src="/js/supabase-client.js"></script>
+<script src="/js/navbar.js" defer></script><script src="/js/footer.js" defer></script><script src="/js/language.js" defer></script>
+</head>
+<body class="app-page" data-page-title-id="Order — ShowLink" data-page-title-en="Orders — ShowLink" data-page-description-id="Kelola semua pesanan dari Payment Link ShowLink." data-page-description-en="Manage all orders from your ShowLink Payment Links.">
+<div data-showlink-navbar></div>
+<main class="order-page">
+  <section class="order-hero">
+    <div class="order-hero-copy">
+      <span class="order-kicker"><i class="fa-solid fa-receipt"></i><span data-i18n="orderKicker">PAYMENT LINK</span></span>
+      <h1 data-i18n="ordersTitle">Pesanan</h1>
+      <p data-i18n="ordersSubtitle">Pantau semua pesanan dari Payment Link kamu dalam satu tempat.</p>
+    </div>
+    <div class="order-hero-icon" aria-hidden="true"><i class="fa-solid fa-bag-shopping"></i></div>
+  </section>
+
+  <section class="order-card" aria-label="Orders">
+    <div class="order-toolbar">
+      <div>
+        <span class="order-section-label" data-i18n="orderOverview">ORDER OVERVIEW</span>
+        <h2 data-i18n="allOrders">Semua pesanan</h2>
+        <p data-i18n="orderOverviewSub">Lihat nominal, status, dan waktu setiap transaksi.</p>
+      </div>
+      <div class="order-summary" id="order-summary" aria-live="polite">
+        <span class="summary-dot"></span><b id="order-count">0</b><span data-i18n="ordersLabel">pesanan</span>
+      </div>
+    </div>
+
+    <div class="order-table-wrap">
+      <table class="order-table">
+        <thead><tr>
+          <th data-i18n="orderCol">Order</th><th data-i18n="paymentLinkCol">Payment Link</th><th data-i18n="amountCol">Nominal</th><th data-i18n="statusCol">Status</th><th data-i18n="timeCol">Waktu</th>
+        </tr></thead>
+        <tbody id="orders-body"><tr><td colspan="5" class="order-empty"><span class="loading-ring"></span><span data-i18n="loading">Memuat pesanan...</span></td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="order-mobile-list" id="orders-mobile" aria-live="polite"></div>
+    <div class="order-pagination" id="order-pagination" hidden></div>
+  </section>
+</main>
+<div data-showlink-footer></div>
+<script src="/js/order.js" defer></script>
 </body></html>
