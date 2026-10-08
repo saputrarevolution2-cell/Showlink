@@ -1,31 +1,31 @@
 /* ShowLink shared navbar — crystal glass / holographic theme. */
 :root{
-  --sl-nav-height:72px;
+  --sl-nav-height:68px;
   --sl-drawer-width:300px;
-  --sl-nav-bg:rgba(255,255,255,.68);
-  --sl-nav-text:#10162c;
-  --sl-nav-muted:#65718a;
-  --sl-drawer-bg:rgba(255,255,255,.84);
-  --sl-line:rgba(88,74,190,.16);
+  --sl-nav-bg:rgba(255,255,255,.88);
+  --sl-nav-text:#111827;
+  --sl-nav-muted:#64748b;
+  --sl-drawer-bg:rgba(255,255,255,.96);
+  --sl-line:rgba(15,23,42,.085);
 }
 html[data-theme="dark"]{
-  --sl-nav-bg:rgba(4,8,23,.72);
-  --sl-nav-text:#f7fbff;
-  --sl-nav-muted:#aab9d5;
-  --sl-drawer-bg:rgba(7,14,35,.88);
-  --sl-line:rgba(108,161,255,.22);
+  --sl-nav-bg:rgba(8,11,20,.90);
+  --sl-nav-text:#f5f7fb;
+  --sl-nav-muted:#9aa8bf;
+  --sl-drawer-bg:rgba(13,18,30,.97);
+  --sl-line:rgba(148,163,184,.16);
 }
 .sl-navbar{
   position:fixed !important;inset:0 0 auto 0;width:100%;height:var(--sl-nav-height);z-index:10000;
   background:var(--sl-nav-bg);border-bottom:1px solid var(--sl-line);
-  box-shadow:0 12px 42px rgba(45,42,110,.10);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  box-shadow:0 8px 30px rgba(15,23,42,.07);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
 }
 .sl-navbar::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(255,47,179,.06),transparent 35%,rgba(6,214,255,.07))}
 .sl-navbar::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:linear-gradient(90deg,transparent,#ff2fb3,#c026d3,#7c3aed,#2563eb,#06d6ff,transparent);opacity:.75;pointer-events:none}
 .sl-nav-shell{width:min(1180px,calc(100% - 28px));height:100%;margin:0 auto;display:flex;align-items:center;gap:12px;position:relative;z-index:1}
 .sl-brand{display:inline-flex;align-items:center;gap:10px;flex:none;text-decoration:none;color:var(--sl-nav-text);font-size:19px;font-weight:900;letter-spacing:-.7px}
 .sl-brand-text span{background:linear-gradient(90deg,#ff2fb3,#7c3aed,#06d6ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.sl-brand-mark{width:44px;height:44px;display:grid;place-items:center;overflow:hidden;border-radius:14px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.50);box-shadow:0 8px 30px rgba(124,58,237,.20),0 0 18px rgba(6,214,255,.08)}
+.sl-brand-mark{width:42px;height:42px;display:grid;place-items:center;overflow:hidden;border-radius:12px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.50);box-shadow:0 7px 22px rgba(15,23,42,.10)}
 .sl-brand-mark img{width:100%;height:100%;display:block;object-fit:contain}
 .sl-nav-links{display:none !important}
 .sl-nav-actions{display:flex;align-items:center;gap:7px;margin-left:auto}
@@ -34,7 +34,7 @@ html[data-theme="dark"]{
 .sl-nav-menu i{font-size:16px}
 .sl-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:0 13px;border-radius:12px;text-decoration:none;font-size:12px;font-weight:900;white-space:nowrap;transition:.18s ease}
 .sl-btn-ghost{color:var(--sl-nav-muted);background:var(--sl-drawer-bg);border:1px solid var(--sl-line);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-.sl-btn-primary{color:#fff;background:linear-gradient(135deg,#ff2fb3,#c026d3 32%,#7c3aed 52%,#2563eb 76%,#06d6ff);border:1px solid rgba(255,255,255,.24);box-shadow:0 9px 24px rgba(124,58,237,.22)}
+.sl-btn-primary{color:#fff;background:linear-gradient(135deg,#7c3aed,#4f46e5);border:1px solid rgba(255,255,255,.24);box-shadow:0 8px 22px rgba(79,70,229,.20)}
 .sl-btn:hover{transform:translateY(-1px)}
 .sl-icon-blue{color:#38bdf8}.sl-icon-purple{color:#a78bfa}.sl-icon-pink{color:#f472b6}.sl-icon-orange{color:#fb923c}.sl-icon-green{color:#34d399}.sl-icon-yellow{color:#fbbf24}.sl-icon-red{color:#f87171}
 .sl-nav-overlay{position:fixed;inset:0;z-index:10001;background:rgba(3,6,18,.48);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility .22s ease;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
