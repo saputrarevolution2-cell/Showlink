@@ -450,3 +450,46 @@ html[data-theme="dark"] .auth-input-wrap,html[data-theme="dark"] .input-wrap,htm
 
 /* Extracted from inline HTML style: page-scroll-table */
 .page-scroll-table{overflow:auto}
+
+/* ============================================================
+   WITHDRAW PREMIUM PAYOUT UI
+   ============================================================ */
+.withdraw-page .app-hero{margin-bottom:20px}
+.withdraw-page .app-card,.withdraw-page .app-stat{position:relative;overflow:hidden}
+.withdraw-page .app-card{border-radius:24px;padding:24px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-sm,0 12px 40px rgba(20,30,70,.08))}
+.withdraw-page .app-stat{background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-sm,0 10px 30px rgba(20,30,70,.06))}
+.withdraw-limit-card{margin-bottom:18px}
+.withdraw-limit-head,.withdraw-limit-meta,.withdraw-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.withdraw-limit-head h2,.withdraw-card-head h2{margin:5px 0 0;font-size:20px;letter-spacing:-.025em}
+.withdraw-limit-head>strong{font-size:17px;color:var(--primary)}
+.withdraw-eyebrow{font-size:10px;font-weight:900;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.withdraw-progress{height:11px;margin:20px 0 10px;border-radius:999px;overflow:hidden;background:rgba(124,58,237,.09)}
+.withdraw-progress span{display:block;height:100%;width:0;border-radius:inherit;background:var(--sl-gradient);transition:width .45s ease,background .25s ease}
+.withdraw-progress span.danger{background:linear-gradient(90deg,#f59e0b,#ef4444)}
+.withdraw-limit-meta{font-size:12px;color:var(--muted)}
+.withdraw-limit-meta strong{color:var(--text)}
+.withdraw-card-head p{margin:6px 0 0;color:var(--muted);line-height:1.6;font-size:12px}
+.withdraw-modes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+.withdraw-mode{display:flex;align-items:center;gap:11px;padding:14px;border:1px solid var(--border);border-radius:16px;background:var(--surface2);color:var(--text);cursor:pointer;text-align:left;transition:.2s ease}
+.withdraw-mode i{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--sl-gradient-soft);color:var(--primary);flex:none}
+.withdraw-mode span{display:grid;gap:3px}.withdraw-mode b{font-size:13px}.withdraw-mode small{font-size:10px;color:var(--muted)}
+.withdraw-mode:hover{transform:translateY(-1px);border-color:var(--border-strong)}
+.withdraw-mode.active{border-color:rgba(124,58,237,.4);box-shadow:0 8px 26px rgba(124,58,237,.10);background:var(--sl-gradient-soft)}
+.withdraw-closed{display:flex;align-items:center;gap:12px;padding:13px 14px;margin-top:18px;border:1px solid rgba(239,68,68,.22);background:rgba(239,68,68,.07);border-radius:14px;color:var(--text)}
+.withdraw-closed>i{color:#ef4444}.withdraw-closed div{display:grid;gap:3px}.withdraw-closed span{font-size:11px;color:var(--muted)}
+.withdraw-form.is-disabled{filter:blur(1.2px);opacity:.58;pointer-events:none;user-select:none}
+.account-head{align-items:center}.account-edit{border:0;background:transparent;color:var(--primary);font:inherit;font-size:12px;font-weight:900;cursor:pointer;padding:7px 9px;border-radius:9px}.account-edit:hover{background:var(--hover)}
+.payment-account{display:grid;gap:14px;margin-top:20px}.payment-account>div{display:grid;gap:5px;padding-bottom:13px;border-bottom:1px solid var(--border)}.payment-account span{font-size:11px;color:var(--muted)}.payment-account strong{font-size:14px}.payment-account p{display:flex;gap:8px;margin:0;padding:11px 12px;border-radius:12px;background:var(--sl-gradient-soft);color:var(--muted);font-size:10px;line-height:1.5}.payment-account p i{color:var(--primary)}
+.account-form{display:grid;gap:13px;margin-top:20px}.account-form label{display:grid;gap:7px;font-size:11px;font-weight:800}.account-form input{width:100%;box-sizing:border-box;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:13px;padding:12px 13px;outline:none}.account-form input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(124,58,237,.09)}.account-actions{display:flex;justify-content:flex-end;gap:8px}.account-actions .app-btn{justify-content:center}
+.app-message.success{background:rgba(16,185,129,.10);color:#047857}.app-message.error{background:rgba(239,68,68,.10);color:#b91c1c}
+.withdraw-mode-pill{display:inline-flex;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:900;background:var(--surface2);color:var(--muted)}.withdraw-mode-pill.instant{background:rgba(245,158,11,.12);color:#b45309}.withdraw-mode-pill.manual{background:rgba(124,58,237,.10);color:var(--primary)}
+html[data-theme="dark"] .withdraw-closed{background:rgba(239,68,68,.10)}
+html[data-theme="dark"] .app-message.success{color:#6ee7b7}html[data-theme="dark"] .app-message.error{color:#fca5a5}
+@media(max-width:850px){.withdraw-limit-head,.withdraw-limit-meta,.withdraw-card-head{flex-direction:column;align-items:flex-start}.withdraw-limit-head>strong{align-self:flex-start}.withdraw-modes{grid-template-columns:1fr}.withdraw-page .app-card{padding:19px}}
+
+/* Withdrawal V15 — fee preview, instant choices and confirmation surface. */
+.instant-options{display:grid;gap:9px;margin-bottom:2px}.form-caption{font-size:12px;font-weight:800;color:var(--muted)}
+.instant-amounts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.instant-amounts button{min-height:46px;border:1px solid var(--line);border-radius:13px;background:var(--surface2);color:var(--text);font-weight:800;cursor:pointer;transition:.18s ease}.instant-amounts button:hover,.instant-amounts button.active{border-color:var(--primary);background:var(--sl-gradient-soft);box-shadow:0 8px 22px rgba(124,58,237,.12)}
+.withdraw-calculation{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.withdraw-calculation>div{padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--surface2)}.withdraw-calculation span{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}.withdraw-calculation strong{font-size:14px}.amount-limit-hint{font-size:12px;color:var(--muted);font-weight:700}.withdraw-note{display:flex;gap:10px;align-items:flex-start;padding:12px 13px;border-radius:13px;border:1px solid rgba(245,158,11,.24);background:rgba(245,158,11,.08);font-size:12px;line-height:1.55;color:var(--text)}.withdraw-note i{color:#f59e0b;margin-top:2px}.withdraw-note.instant{border-color:rgba(6,214,255,.24);background:rgba(6,214,255,.07)}.withdraw-note.instant i{color:var(--sl-cyan)}
+.withdraw-modal[hidden]{display:none}.withdraw-modal{position:fixed;inset:0;z-index:20000;display:grid;place-items:center;padding:20px}.withdraw-modal-backdrop{position:absolute;inset:0;background:rgba(3,7,18,.55);backdrop-filter:blur(8px)}.withdraw-modal-card{position:relative;width:min(520px,100%);padding:24px;border:1px solid var(--line);border-radius:24px;background:var(--surface-strong);color:var(--text);box-shadow:0 30px 90px rgba(0,0,0,.28);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}.withdraw-modal-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:var(--sl-gradient-soft);color:var(--sl-purple);margin-bottom:12px}.withdraw-modal-card h2{margin:0 0 5px}.withdraw-modal-card>p{margin:0 0 18px;color:var(--muted);font-size:13px}.confirm-list{display:grid;gap:8px}.confirm-list>div{display:flex;justify-content:space-between;gap:16px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface2)}.confirm-list span{color:var(--muted);font-size:12px}.confirm-list strong{text-align:right;font-size:13px}.confirm-total{border-color:rgba(124,58,237,.24)!important;background:var(--sl-gradient-soft)!important}.withdraw-modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}.withdraw-reason{display:block;margin-top:4px;color:var(--muted)}
+@media(max-width:700px){.instant-amounts{grid-template-columns:repeat(2,1fr)}.withdraw-calculation{grid-template-columns:1fr}.withdraw-modal-card{padding:19px;border-radius:20px}.withdraw-modal-actions{display:grid;grid-template-columns:1fr 1fr}.withdraw-modal-actions .app-btn{width:100%}}
