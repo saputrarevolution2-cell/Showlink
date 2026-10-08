@@ -534,3 +534,12 @@ html[data-theme="dark"] body{
  #sl-edit-modal #sl-edit-form .sl-edit-actions{align-items:stretch!important;}
  #sl-edit-modal #sl-edit-form .sl-edit-actions .btn{width:100%!important;}
 }
+
+/* V23 — Edit modal scrolling: only the modal card content scrolls */
+body.sl-modal-open{overflow:hidden!important;touch-action:none!important}
+#sl-edit-modal{position:fixed!important;inset:0!important;z-index:10050!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;padding:24px!important;box-sizing:border-box!important}
+#sl-edit-modal .sl-modal-card{position:relative!important;width:min(760px,100%)!important;max-height:calc(100dvh - 48px)!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;box-sizing:border-box!important}
+#sl-edit-modal .sl-modal-head{flex:0 0 auto!important}
+#sl-edit-modal #sl-edit-form{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important;scrollbar-gutter:stable!important;box-sizing:border-box!important}
+#sl-edit-modal #sl-edit-form .sl-edit-actions{position:sticky!important;bottom:0!important;z-index:3!important;background:var(--sl-surface-strong)!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;box-shadow:0 -8px 20px color-mix(in srgb,var(--sl-text) 7%,transparent)!important}
+@media(max-width:720px){#sl-edit-modal{align-items:flex-end!important;padding:8px!important}#sl-edit-modal .sl-modal-card{max-height:calc(100dvh - 16px)!important;border-radius:24px 24px 16px 16px!important}#sl-edit-modal #sl-edit-form{padding-bottom:90px!important}}
