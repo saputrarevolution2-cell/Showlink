@@ -97,12 +97,12 @@ BEGIN
   IF NOT FOUND THEN RAISE EXCEPTION 'WITHDRAWAL_METHOD_NOT_FOUND'; END IF;
 
   SELECT * INTO w FROM public.wallets WHERE user_id=uid FOR UPDATE;
-  total_debit := p_amount + fee;
+  total_debit := p_amount;
   IF NOT FOUND OR w.available_balance < total_debit THEN
-    RAISE EXCEPTION 'INSUFFICIENT_AVAILABLE_BALANCE_WITH_FEE';
+    RAISE EXCEPTION 'INSUFFICIENT_AVAILABLE_BALANCE';
   END IF;
 
-  net_amount := p_amount;
+  net_amount := greatest(0,p_amount-fee);
   account_label := coalesce(m.method_type,'-') || ' • ' || coalesce(m.account_number,'-');
 
   INSERT INTO public.withdrawals(user_id,method_id,amount,fee,net_amount,status,metadata)
@@ -140,8 +140,8 @@ BEGIN
   INSERT INTO public.notifications(user_id,type,title,message,link_url,metadata)
   VALUES(
     uid,'withdrawal','Withdrawal diajukan',
-    format('Nominal %s • Rekening %s • Fee %s • Total saldo dipotong %s. Menunggu persetujuan admin.',
-      to_char(p_amount,'FM999G999G999G990D00'),account_label,to_char(fee,'FM999G999G999G990D00'),to_char(total_debit,'FM999G999G999G990D00')),
+    format('Nominal %s • Rekening %s • Fee %s • Total bersih %s. Menunggu persetujuan admin.',
+      to_char(p_amount,'FM999G999G999G990D00'),account_label,to_char(fee,'FM999G999G999G990D00'),to_char(net_amount,'FM999G999G999G990D00')),
     '/withdraw.html',jsonb_build_object('withdrawal_id',wid,'status','pending','mode',p_mode,'amount',p_amount,'fee',fee,'total_debit',total_debit)
   );
 
@@ -150,8 +150,8 @@ BEGIN
     INSERT INTO public.notifications(user_id,type,title,message,link_url,metadata)
     VALUES(
       admin_id,'admin_withdrawal','Withdrawal baru',
-      format('Withdrawal %s: %s • Rekening %s • Fee %s. Menunggu approval.',
-        to_char(p_amount,'FM999G999G999G990D00'),p_mode,account_label,to_char(fee,'FM999G999G999G990D00')),
+      format('Withdrawal %s: %s • Rekening %s • Fee %s • Bersih %s. Menunggu approval.',
+        to_char(p_amount,'FM999G999G999G990D00'),p_mode,account_label,to_char(fee,'FM999G999G999G990D00'),to_char(greatest(0,p_amount-fee),'FM999G999G999G990D00')),
       '/admin.html',jsonb_build_object('withdrawal_id',wid,'user_id',uid,'status','pending')
     );
   END LOOP;
@@ -185,7 +185,7 @@ BEGIN
   SELECT * INTO w FROM public.withdrawals WHERE id=p_withdrawal_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'WITHDRAWAL_NOT_FOUND'; END IF;
   before_status := w.status;
-  total_debit := coalesce((w.metadata->>'total_debit')::numeric, w.amount + w.fee);
+  total_debit := coalesce((w.metadata->>'total_debit')::numeric, w.amount);
 
   IF before_status IN ('paid','rejected','cancelled') THEN
     RAISE EXCEPTION 'WITHDRAWAL_ALREADY_FINAL';
