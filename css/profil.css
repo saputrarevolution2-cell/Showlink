@@ -446,3 +446,7 @@ html[data-theme="dark"] .auth-input-wrap,html[data-theme="dark"] .input-wrap,htm
 
 .withdraw-destinations{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}.withdraw-destinations span{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid var(--sl-border);border-radius:999px;background:var(--sl-surface-soft);color:var(--sl-muted);font-size:10px;font-weight:800}.withdraw-destinations i{color:var(--sl-purple)}
 
+
+
+/* Extracted from inline HTML style: profile-page-container */
+.profile-page-container{max-width:1180px;margin:0 auto 30px;padding:0 20px;display:none}

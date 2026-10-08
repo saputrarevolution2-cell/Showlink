@@ -1101,3 +1101,7 @@ html[data-theme="dark"] .auth-input:focus{
   box-shadow:0 0 0 3px rgba(129,116,255,.12) !important;
 }
 
+
+
+/* Extracted from inline HTML style: auth-callback-card */
+.auth-callback-card{max-width:460px;width:calc(100% - 32px);text-align:center}

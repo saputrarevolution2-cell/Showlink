@@ -121,3 +121,5 @@ html[data-theme="dark"]{
  color:#fff;background:linear-gradient(135deg,#ec4899,#7c3aed,#06b6d4);
  box-shadow:0 12px 30px rgba(80,40,130,.25);font-size:12px;font-weight:700;
 }
+
+.sl-drawer-brand-accent{color:var(--sl-primary)}

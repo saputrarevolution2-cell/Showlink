@@ -1725,3 +1725,7 @@ html[data-theme="dark"] .auth-input:focus{
   box-shadow:0 0 0 3px rgba(129,116,255,.12) !important;
 }
 
+
+
+/* Extracted from inline HTML style: page-profile-card */
+.page-profile-card{max-width:520px;margin:auto}
