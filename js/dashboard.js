@@ -1,31 +1,98 @@
 (() => {
-"use strict";
-const I18N={id:{dashboard:"Dashboard",welcome:"Selamat datang",dashboardIntro:"Pantau Payment Link, penjualan, dan penghasilanmu dari satu tempat.",availableBalance:"Saldo tersedia",paymentIncome:"Pendapatan Payment Link",paymentIncomeSub:"Pendapatan bersih dari penjualan",pendingSettlement:"Saldo pending",todayIncome:"Pendapatan hari ini",monthIncome:"Pendapatan bulan ini",totalPaymentLinks:"Total Payment Link",paymentSales:"Penjualan berhasil",paymentViews:"Total views",paymentStats:"Statistik Payment Link",salesTrend:"Penjualan & pendapatan",createPaymentLink:"Buat Payment Link",managePaymentLinks:"Kelola Payment Link",viewDetails:"Lihat detail",incomeRuleTitle:"Pendapatan bersih",incomeRuleText:"Saldo creator dihitung dari bagian bersih setelah pembagian platform.",noData:"Belum ada data Payment Link."},en:{dashboard:"Dashboard",welcome:"Welcome",dashboardIntro:"Monitor your Payment Links, sales, and earnings in one place.",availableBalance:"Available balance",paymentIncome:"Payment Link earnings",paymentIncomeSub:"Net earnings from sales",pendingSettlement:"Pending balance",todayIncome:"Today's earnings",monthIncome:"This month's earnings",totalPaymentLinks:"Total Payment Links",paymentSales:"Successful sales",paymentViews:"Total views",paymentStats:"Payment Link statistics",salesTrend:"Sales & earnings",createPaymentLink:"Create Payment Link",managePaymentLinks:"Manage Payment Links",viewDetails:"View details",incomeRuleTitle:"Net earnings",incomeRuleText:"Creator balance reflects the net amount after the platform split.",noData:"No Payment Link data yet."}};
-const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
-const lang=()=>localStorage.getItem("showlink-language")==="en"?"en":"id", t=k=>I18N[lang()][k]||k;
-const money=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0), num=n=>new Intl.NumberFormat("id-ID").format(Number(n)||0);
-function translate(){document.documentElement.lang=lang();$$('[data-i18n]').forEach(e=>{const k=e.dataset.i18n;if(I18N[lang()][k]!==undefined)e.textContent=t(k)});}
-function metric(k,v){$$(`[data-metric="${k}"]`).forEach(e=>e.textContent=/balance|income|pending|today|month|earnings/.test(k)?money(v):num(v));}
-function day0(d){const x=new Date(d);x.setHours(0,0,0,0);return x;}
-function sum(a,k){return a.reduce((n,x)=>n+Number(x?.[k]||0),0)}
-async function load(){
- const sb=await window.ShowLinkSupabase.load(); const {data:{session}}=await sb.auth.getSession();
- if(!session)return location.replace('/login.html?redirect='+encodeURIComponent(location.pathname));
- const u=session.user;
- try{const {data:p}=await sb.from('profiles').select('username,display_name,auth_email,plan,avatar_url').eq('id',u.id).maybeSingle(); const q=p||{}; const name=q.username||q.display_name||u.user_metadata?.username||u.email?.split('@')[0]||'User'; $$('[data-user-name]').forEach(e=>e.textContent=name);$$('[data-user-email]').forEach(e=>e.textContent=q.auth_email||u.email||'—');$$('[data-account-status]').forEach(e=>e.textContent=(q.plan||'free').toUpperCase()); const a=$('[data-avatar]');if(a&&q.avatar_url)a.innerHTML=`<img src="${String(q.avatar_url).replace(/"/g,'&quot;')}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`;}catch(e){}
- const today=day0(new Date()), month=new Date(today.getFullYear(),today.getMonth(),1);
- const [w,links,orders,tx]=await Promise.all([
-   sb.from('wallets').select('available_balance,pending_balance,lifetime_earned').eq('user_id',u.id).maybeSingle(),
-   sb.from('payment_links').select('id,status,views,unique_views,sales_count,created_at').eq('owner_id',u.id),
-   sb.from('orders').select('id,payment_link_id,amount,status,created_at,paid_at,completed_at').eq('seller_id',u.id),
-   sb.from('wallet_transactions').select('amount,order_id,type,direction,created_at').eq('user_id',u.id).eq('type','earning').eq('direction','credit')
- ]);
- const l=links.data||[], o=orders.data||[], e=tx.data||[];
- const paid=o.filter(x=>['paid','processing','completed'].includes(String(x.status||'').toLowerCase()));
- const earnings=sum(e,'amount');
- metric('available_balance',w.data?.available_balance||0); metric('pendingSettlement',w.data?.pending_balance||0); metric('paymentIncome',earnings); metric('todayIncome',e.filter(x=>new Date(x.created_at)>=today).reduce((n,x)=>n+Number(x.amount||0),0)); metric('monthIncome',e.filter(x=>new Date(x.created_at)>=month).reduce((n,x)=>n+Number(x.amount||0),0)); metric('totalPaymentLinks',l.length); metric('paymentSales',paid.length); metric('paymentViews',sum(l,'views'));
- const active=l.filter(x=>x.status==='active').length; $('[data-active-links]')?.replaceChildren(document.createTextNode(`${active} active`));
- const recent=paid.sort((a,b)=>new Date(b.paid_at||b.created_at)-new Date(a.paid_at||a.created_at)).slice(0,8); const tbody=$('#payment-recent-body'); if(tbody) tbody.innerHTML=recent.length?recent.map(x=>`<tr><td>${new Date(x.paid_at||x.created_at).toLocaleString(lang()==='id'?'id-ID':'en-US')}</td><td>${money(x.amount)}</td><td><span class="status-chip ${x.status}">${x.status}</span></td></tr>`).join(''):`<tr><td colspan="3">${t('noData')}</td></tr>`;
-}
-document.addEventListener('DOMContentLoaded',()=>{translate();load().catch(e=>console.warn(e));window.addEventListener('showlink:language-change',translate);});
+  "use strict";
+  const I18N = {
+    id: {
+      welcomeBack:"selamat datang", dashboardIntro:"Pantau Payment Link, penjualan, views, dan pendapatanmu dari satu tempat.", createPaymentLink:"Buat Payment Link", managePaymentLinks:"Kelola Link", totalLinks:"Total Payment Link", totalViews:"Total Views", totalSales:"Total Terjual", netIncome:"Pendapatan Bersih", availableBalance:"Saldo Tersedia", pendingBalance:"Saldo Pending", afterPlatform:"Sudah setelah potongan platform", readyToWithdraw:"Siap dicairkan", pendingSettlement:"Menunggu settlement", statistics:"STATISTIK", sevenDayStats:"Aktivitas 7 hari terakhir", sevenDayStatsSub:"Ringkasan penjualan dan pendapatan bersih berdasarkan transaksi berhasil.", sales7d:"Terjual", income7d:"Pendapatan", yourLinks:"Payment Link kamu", yourLinksSub:"Kelola performa link dan lihat pendapatan bersih dari setiap link.", manageAll:"Kelola semua", link:"Link", price:"Harga", created:"Dibuat", views:"Views", sold:"Terjual", income:"Pendapatan", status:"Status", loading:"Memuat data...", noLinks:"Belum ada Payment Link.", createFirst:"Buat sekarang", active:"Aktif", draft:"Draft", paused:"Dijeda", expired:"Kedaluwarsa", deleted:"Dihapus", open:"Buka", copy:"Salin", copied:"Tersalin", page:"Halaman", createNewLink:"Buat Payment Link baru", createNewLinkSub:"Tambahkan produk dan mulai menerima pembayaran.", withdraw:"Withdraw", withdrawSub:"Cairkan saldo yang tersedia.", noSales:"Belum ada penjualan" ,uniqueViews:"unique views",activeLinks:"aktif",successfulSales:"transaksi berhasil", error:"Gagal memuat data dashboard."
+    },
+    en: {
+      welcomeBack:"welcome back", dashboardIntro:"Monitor your Payment Links, sales, views, and earnings in one place.", createPaymentLink:"Create Payment Link", managePaymentLinks:"Manage Links", totalLinks:"Total Payment Links", totalViews:"Total Views", totalSales:"Total Sold", netIncome:"Net Earnings", availableBalance:"Available Balance", pendingBalance:"Pending Balance", afterPlatform:"After platform deduction", readyToWithdraw:"Ready to withdraw", pendingSettlement:"Awaiting settlement", statistics:"STATISTICS", sevenDayStats:"Last 7 days activity", sevenDayStatsSub:"Sales and net earnings from successful transactions.", sales7d:"Sold", income7d:"Earnings", yourLinks:"Your Payment Links", yourLinksSub:"Track performance and net earnings for each link.", manageAll:"Manage all", link:"Link", price:"Price", created:"Created", views:"Views", sold:"Sold", income:"Earnings", status:"Status", loading:"Loading data...", noLinks:"No Payment Links yet.", createFirst:"Create one", active:"Active", draft:"Draft", paused:"Paused", expired:"Expired", deleted:"Deleted", open:"Open", copy:"Copy", copied:"Copied", page:"Page", createNewLink:"Create a new Payment Link", createNewLinkSub:"Add a product and start accepting payments.", withdraw:"Withdraw", withdrawSub:"Withdraw your available balance.", noSales:"No sales yet", uniqueViews:"unique views",activeLinks:"active",successfulSales:"successful transactions", error:"Failed to load dashboard data."
+    }
+  };
+  const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+  const currentLang=()=>localStorage.getItem("showlink-language")==="en"?"en":"id";
+  const t=k=>I18N[currentLang()][k]||k;
+  const money=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0);
+  const num=n=>new Intl.NumberFormat(currentLang()==="id"?"id-ID":"en-US").format(Number(n)||0);
+  const dateTime=v=>new Intl.DateTimeFormat(currentLang()==="id"?"id-ID":"en-US",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}).format(new Date(v));
+  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+  let state={links:[],page:1,pageSize:5};
+
+  function translate(){
+    document.documentElement.lang=currentLang();
+    $$('[data-i18n]').forEach(e=>{const k=e.dataset.i18n;if(I18N[currentLang()][k]!==undefined)e.textContent=t(k);});
+  }
+  function metric(k,v,isMoney=false){
+    $$(`[data-metric="${k}"]`).forEach(e=>e.textContent=isMoney?money(v):num(v));
+  }
+  function statusLabel(s){return t({active:"active",draft:"draft",paused:"paused",expired:"expired",deleted:"deleted"}[s]||s);}
+  function dayKey(d){const x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`;}
+  function renderPagination(){
+    const box=$("#links-pagination"); const pages=Math.ceil(state.links.length/state.pageSize);
+    if(!box)return;
+    if(pages<=1){box.hidden=true;box.innerHTML="";return;}
+    box.hidden=false;
+    let html=`<button type="button" class="page-btn" data-page="prev" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>`;
+    for(let p=1;p<=pages;p++) html+=`<button type="button" class="page-btn ${p===state.page?"is-active":""}" data-page="${p}">${p}</button>`;
+    html+=`<button type="button" class="page-btn" data-page="next" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button>`;
+    html+=`<span class="page-info">${t("page")} ${state.page}/${pages}</span>`;
+    box.innerHTML=html;
+    box.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>{
+      const v=b.dataset.page; if(v==="prev")state.page=Math.max(1,state.page-1); else if(v==="next")state.page=Math.min(pages,state.page+1); else state.page=Number(v); renderLinks();
+    }));
+  }
+  function renderLinks(){
+    const body=$("#dashboard-links-body"); if(!body)return;
+    if(!state.links.length){body.innerHTML=`<tr><td colspan="8" class="empty-row"><i class="fa-solid fa-link-slash"></i><span>${t("noLinks")}</span><a href="/payment-link.html">${t("createFirst")}</a></td></tr>`;renderPagination();return;}
+    const start=(state.page-1)*state.pageSize, rows=state.links.slice(start,start+state.pageSize);
+    body.innerHTML=rows.map(x=>{
+      const url=`${location.origin}/p/${encodeURIComponent(x.slug)}`;
+      return `<tr>
+        <td><div class="link-cell"><span class="link-icon"><i class="fa-solid fa-link"></i></span><span><strong>${esc(x.title)}</strong><small>/p/${esc(x.slug)}</small></span></div></td>
+        <td>${money(x.price)}</td>
+        <td><span class="date-cell"><b>${dateTime(x.created_at).split(",")[0]}</b><small>${dateTime(x.created_at).split(",").slice(1).join(",").trim()}</small></span></td>
+        <td>${num(x.views)}</td><td>${num(x.sales_count)}</td><td><strong class="income-cell">${money(x.income)}</strong></td>
+        <td><span class="status-chip status-${esc(x.status)}">${esc(statusLabel(x.status))}</span></td>
+        <td><div class="row-actions"><a class="mini" href="/p/${encodeURIComponent(x.slug)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>${t("open")}</a><button class="mini" data-copy="${esc(url)}"><i class="fa-regular fa-copy"></i>${t("copy")}</button></div></td>
+      </tr>`;
+    }).join("");
+    body.querySelectorAll("[data-copy]").forEach(b=>b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(b.dataset.copy);b.innerHTML=`<i class="fa-solid fa-check"></i>${t("copied")}`;setTimeout(()=>{b.innerHTML=`<i class="fa-regular fa-copy"></i>${t("copy")}`},1400)}catch(_){prompt("Copy URL:",b.dataset.copy)}}));
+    renderPagination();
+  }
+  function renderChart(orders){
+    const box=$("#seven-day-chart"); if(!box)return;
+    const now=new Date(); const days=[];
+    for(let i=6;i>=0;i--){const d=new Date(now);d.setHours(0,0,0,0);d.setDate(d.getDate()-i);days.push({key:dayKey(d),date:d,sales:0,income:0});}
+    for(const o of orders){if(!["paid","processing","completed"].includes(String(o.status||"").toLowerCase()))continue;const d=days.find(x=>x.key===dayKey(o.paid_at||o.completed_at||o.created_at));if(d){d.sales++;d.income+=Number(o.seller_amount||0);}}
+    const max=Math.max(1,...days.map(x=>x.sales));
+    box.innerHTML=days.map(d=>`<div class="chart-day"><div class="chart-bar-wrap"><span class="chart-bar" style="height:${Math.max(7,(d.sales/max)*100)}%" title="${num(d.sales)} ${t("sold")} · ${money(d.income)}"></span></div><b>${new Intl.DateTimeFormat(currentLang()==="id"?"id-ID":"en-US",{weekday:"short"}).format(d.date)}</b><small>${num(d.sales)}</small></div>`).join("");
+    metric("sales7d",days.reduce((n,x)=>n+x.sales,0)); metric("income7d",days.reduce((n,x)=>n+x.income,0),true);
+  }
+  async function load(){
+    const sb=await window.ShowLinkSupabase.load();
+    const {data:{session}}=await sb.auth.getSession();
+    if(!session)return location.replace("/login.html?redirect="+encodeURIComponent(location.pathname));
+    const uid=session.user.id;
+    try{
+      const {data:p}=await sb.from("profiles").select("username,display_name").eq("id",uid).maybeSingle();
+      const name=p?.username||p?.display_name||session.user.user_metadata?.username||session.user.email?.split("@")[0]||"User";
+      $$('[data-user-name]').forEach(e=>e.textContent=name);
+    }catch{}
+    const [walletQ,linksQ,ordersQ]=await Promise.all([
+      sb.from("wallets").select("available_balance,pending_balance,lifetime_earned").eq("user_id",uid).maybeSingle(),
+      sb.from("payment_links").select("id,slug,title,price,status,views,unique_views,sales_count,created_at,updated_at").eq("owner_id",uid).order("created_at",{ascending:false}),
+      sb.from("orders").select("id,payment_link_id,amount,seller_amount,status,created_at,paid_at,completed_at").eq("seller_id",uid).order("created_at",{ascending:false})
+    ]);
+    if(linksQ.error)throw linksQ.error;
+    const links=linksQ.data||[], orders=ordersQ.data||[], wallet=walletQ.data||{};
+    const paid=orders.filter(o=>["paid","processing","completed"].includes(String(o.status||"").toLowerCase()));
+    const income=paid.reduce((n,o)=>n+Number(o.seller_amount||0),0);
+    const views=links.reduce((n,x)=>n+Number(x.views||0),0), unique=links.reduce((n,x)=>n+Number(x.unique_views||0),0), sales=links.reduce((n,x)=>n+Number(x.sales_count||0),0);
+    metric("totalPaymentLinks",links.length);metric("paymentViews",views);metric("paymentSales",sales);metric("paymentIncome",income,true);metric("availableBalance",wallet.available_balance||0,true);metric("pendingBalance",wallet.pending_balance||0,true);
+    $$('[data-stat-sub="activeLinks"]').forEach(e=>e.textContent=`${num(links.filter(x=>x.status==="active").length)} ${t("activeLinks")}`);
+    $$('[data-stat-sub="uniqueViews"]').forEach(e=>e.textContent=`${num(unique)} ${t("uniqueViews")}`);
+    $$('[data-stat-sub="successfulSales"]').forEach(e=>e.textContent=`${num(paid.length)} ${t("successfulSales")}`);
+    const incomeByLink={}; for(const o of paid)incomeByLink[o.payment_link_id]=(incomeByLink[o.payment_link_id]||0)+Number(o.seller_amount||0);
+    state.links=links.map(x=>({...x,income:incomeByLink[x.id]||0}));state.page=1;renderLinks();renderChart(orders);
+  }
+  document.addEventListener("DOMContentLoaded",()=>{translate();load().catch(e=>{console.error(e);const b=$("#dashboard-links-body");if(b)b.innerHTML=`<tr><td colspan="8" class="empty-row error-row"><i class="fa-solid fa-triangle-exclamation"></i>${t("error")}</td></tr>`;});window.addEventListener("showlink:language-change",()=>{translate();renderLinks();});});
 })();
