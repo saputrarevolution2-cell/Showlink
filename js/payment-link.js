@@ -71,25 +71,8 @@
     return value.replace("/d/", "/p/");
   }
 
-
-  async function assertPaymentLinkPlan(sb) {
-    const { data: sessionData, error: sessionError } = await sb.auth.getSession();
-    if (sessionError || !sessionData?.session?.user?.id) {
-      throw new Error(t("payment.session_error"));
-    }
-    const uid = sessionData.session.user.id;
-    const { data: profile, error } = await sb.from("profiles").select("plan").eq("id", uid).maybeSingle();
-    if (error) throw error;
-    const plan = String(profile?.plan || "free").toLowerCase();
-    if (plan !== "vip" && plan !== "premium") {
-      throw new Error(t("payment.plan_locked"));
-    }
-    return plan;
-  }
-
   async function createPaymentLink(form) {
     const sb = await window.ShowLinkSupabase.load();
-    await assertPaymentLinkPlan(sb);
     const { data: sessionData, error: sessionError } = await sb.auth.getSession();
     if (sessionError || !sessionData?.session) {
       throw new Error(t("payment.session_error"));
@@ -152,38 +135,7 @@
     });
   }
 
-  async function applyPaymentPlanGate() {
-    const form = $("#create-link-form");
-    if (!form) return;
-    try {
-      const sb = await window.ShowLinkSupabase.load();
-      const { data: sessionData } = await sb.auth.getSession();
-      const uid = sessionData?.session?.user?.id;
-      if (!uid) return;
-      const { data: profile } = await sb.from("profiles").select("plan").eq("id", uid).maybeSingle();
-      const plan = String(profile?.plan || "free").toLowerCase();
-      const allowed = plan === "vip" || plan === "premium";
-      form.classList.toggle("payment-plan-locked", !allowed);
-      form.querySelectorAll("input,textarea,select,button").forEach(el => { el.disabled = !allowed; });
-      let gate = document.getElementById("payment-plan-gate");
-      if (!allowed) {
-        if (!gate) {
-          gate = document.createElement("div");
-          gate.id = "payment-plan-gate";
-          gate.className = "payment-plan-gate";
-          form.parentElement?.insertBefore(gate, form);
-        }
-        gate.innerHTML = `<div class="payment-plan-gate-icon"><i class="fa-solid fa-lock"></i></div><div><strong>${t("payment.plan_locked_title")}</strong><p>${t("payment.plan_locked")}</p></div>`;
-        gate.hidden = false;
-      } else if (gate) {
-        gate.hidden = true;
-      }
-    } catch (e) {
-      console.warn("[ShowLink] Payment plan check failed", e);
-    }
-  }
-
-
+  async function applyPaymentPlanGate() { return; }
 
   function init() {
     const form = $("#create-link-form");
