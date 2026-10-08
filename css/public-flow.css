@@ -168,3 +168,11 @@ html[data-theme="dark"] .pf-short-info{color:#d0c8ff}
 @media (max-width:600px){
   .showlink-unlocked-content{padding:16px;border-radius:17px}
 }
+
+/* Owner Payment Link notice + preview */
+.pl-owner-notice{display:flex;gap:12px;align-items:flex-start;padding:14px 15px;margin:16px 0;border:1px solid rgba(59,130,246,.24);border-radius:15px;background:rgba(59,130,246,.07)}
+.pl-owner-notice-icon{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:11px;background:rgba(59,130,246,.14);color:#2563eb}
+.pl-owner-notice strong{display:block;font-size:13px}.pl-owner-notice p{margin:4px 0 0;color:var(--pl-muted);font-size:11.5px;line-height:1.5}
+.pl-owner-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.pl-secondary-buy{background:transparent!important;color:inherit!important;border:1px solid var(--pl-border)!important;box-shadow:none!important}
+.pl-owner-inline-status,.pl-owner-preview-status{display:flex;gap:8px;align-items:flex-start;margin-top:11px;padding:11px 12px;border-radius:12px;background:rgba(59,130,246,.07);color:var(--pl-muted);font-size:11.5px;line-height:1.45}.pl-owner-inline-status.error{background:rgba(239,68,68,.08);color:#dc2626}.pl-owner-preview-status{margin:0 0 15px;color:#15803d;background:rgba(34,197,94,.08)}
+@media(max-width:520px){.pl-owner-actions{grid-template-columns:1fr}}

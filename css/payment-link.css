@@ -260,3 +260,21 @@ body.dashboard-page{
   .payment-link-create-page .payment-create-container{max-width:none;}
   .payment-link-create-page .payment-create-card{margin-top:2px;}
 }
+
+/* Final Payment Link creation result card */
+.payment-result.success{padding:20px;border:1px solid rgba(34,197,94,.24);background:linear-gradient(145deg,rgba(34,197,94,.10),rgba(34,197,94,.035));}
+.payment-result-head{display:flex;align-items:center;gap:13px;margin-bottom:16px;}
+.payment-result-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:14px;background:rgba(34,197,94,.15);color:#16a34a;font-size:20px;}
+.payment-result-head strong{display:block;font-size:15px;line-height:1.3;}
+.payment-result-head span{display:block;margin-top:3px;color:var(--pl-muted);font-size:11.5px;line-height:1.45;}
+.payment-result-price{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;margin-bottom:12px;border:1px solid var(--pl-border);border-radius:13px;background:var(--pl-card,#fff);}
+.payment-result-price span{font-size:11px;color:var(--pl-muted);}
+.payment-result-price strong{font-size:15px;}
+.payment-result-url-wrap{padding:12px 13px;border:1px solid var(--pl-border);border-radius:13px;background:var(--pl-card,#fff);}
+.payment-result-label{display:block;margin-bottom:7px;font-size:10.5px;font-weight:800;color:var(--pl-muted);text-transform:uppercase;letter-spacing:.06em;}
+.payment-result-url{font-size:12.5px;font-weight:700;line-height:1.5;word-break:break-all;overflow-wrap:anywhere;}
+.payment-result-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:11px;}
+.payment-result-btn{min-height:43px;border:1px solid var(--pl-border);border-radius:12px;background:var(--pl-card,#fff);color:inherit;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:7px;font:inherit;font-size:12px;font-weight:800;cursor:pointer;}
+.payment-result-btn.primary{border-color:transparent;color:#fff;background:linear-gradient(135deg,var(--pl-primary),var(--pl-primary-2));}
+.payment-result-btn.copied{background:#16a34a;color:#fff;border-color:#16a34a;}
+@media(max-width:520px){.payment-result-actions{grid-template-columns:1fr}.payment-result{padding:15px}.payment-result-price{align-items:flex-start;flex-direction:column;gap:4px}}
