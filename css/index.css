@@ -405,3 +405,57 @@ html[data-theme="dark"] .index-page .hero-art-frame { background: linear-gradien
   .index-page .marquee-right .logo-track { animation: none !important; }
   .index-page .text-link i { transition: none; }
 }
+
+/* ============================================================
+   INDEX FINAL POLISH / LAYOUT SAFETY
+   Prevent the fixed navbar from covering hero content and
+   remove browser-default spacing that caused visible gaps.
+============================================================ */
+html:has(body.index-page){scroll-behavior:smooth}
+body.index-page{
+  margin:0;
+  min-width:0;
+  overflow-x:hidden;
+  background:var(--idx-bg);
+}
+body.index-page .sl-main{margin:0;}
+.index-page .hero-section{
+  padding-top:calc(78px + var(--sl-nav-height, 72px));
+}
+.index-page .hero-art-frame{
+  overflow:hidden;
+}
+.index-page .hero-art-frame img{
+  width:100%;
+  max-width:100%;
+  height:auto;
+  object-fit:contain;
+}
+.index-page .anime-media img{
+  max-width:none;
+}
+.index-page .showcase-card img,
+.index-page .withdraw-visual img,
+.index-page .logo-card img{
+  max-width:100%;
+}
+.index-page a,
+.index-page button{
+  -webkit-tap-highlight-color:transparent;
+}
+.index-page :focus-visible{
+  outline:3px solid rgba(124,58,237,.28);
+  outline-offset:3px;
+}
+
+@media (max-width:820px){
+  .index-page .hero-section{
+    padding-top:calc(50px + var(--sl-nav-height, 72px));
+  }
+}
+
+@media (max-width:600px){
+  .index-page .hero-section{
+    padding-top:calc(36px + var(--sl-nav-height, 72px));
+  }
+}
