@@ -761,11 +761,9 @@ CREATE OR REPLACE FUNCTION public.create_payment_link(
 RETURNS jsonb
 LANGUAGE plpgsql SECURITY INVOKER SET search_path = public, extensions
 AS $$
-DECLARE v_id uuid; v_slug text; v_plan text;
+DECLARE v_id uuid; v_slug text;
 BEGIN
   IF auth.uid() IS NULL THEN RAISE EXCEPTION 'AUTH_REQUIRED'; END IF;
-  SELECT lower(coalesce(plan,'free')) INTO v_plan FROM public.profiles WHERE id=auth.uid();
-  IF coalesce(v_plan,'free') NOT IN ('vip','premium') THEN RAISE EXCEPTION 'PLAN_REQUIRED: Payment Link hanya tersedia untuk akun VIP dan Premium'; END IF;
   IF p_title IS NULL OR length(trim(p_title))=0 THEN RAISE EXCEPTION 'INVALID_TITLE'; END IF;
   IF p_content_text IS NULL OR length(trim(p_content_text))=0 THEN RAISE EXCEPTION 'INVALID_CONTENT'; END IF;
   IF p_price IS NULL OR p_price < 2000 OR p_price > 100000 THEN RAISE EXCEPTION 'INVALID_PRICE: Payment Link price must be between Rp2,000 and Rp100,000'; END IF;
