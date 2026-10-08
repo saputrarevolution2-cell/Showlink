@@ -12,23 +12,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <link rel="stylesheet" href="/css/navbar.css">
   <link rel="stylesheet" href="/css/footer.css">
-  <script>
-    (() => {
-      try {
-        const saved = localStorage.getItem('showlink-theme');
-        const dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-        document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
-      } catch (_) {}
-    })();
-  </script>
-  
-  
-  
-  
 <link rel="stylesheet" href="/css/index.css">
+  <script src="/js/theme.js"></script>
 <script src="/js/navbar.js" defer></script>
 <script src="/js/footer.js" defer></script>
+<script src="/js/language.js" defer></script>
 </head>
 <body class="index-page">
   <div data-showlink-navbar></div>

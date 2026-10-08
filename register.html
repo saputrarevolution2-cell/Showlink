@@ -11,9 +11,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="icon" href="/assets/showlink-favicon.png">
-<script>(function(){try{var t=localStorage.getItem('showlink-theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t;}}catch(e){}})();</script><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css"><link rel="icon" type="image/svg+xml" href="/assets/showlink-favicon.svg"><link rel="icon" type="image/png" sizes="512x512" href="/assets/showlink-favicon.png"><link rel="apple-touch-icon" href="/assets/showlink-favicon.png"><link rel="stylesheet" href="/css/register.css">
+<link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css">
+<link rel="stylesheet" href="/css/register.css"><link rel="icon" type="image/svg+xml" href="/assets/showlink-favicon.svg"><link rel="icon" type="image/png" sizes="512x512" href="/assets/showlink-favicon.png"><link rel="apple-touch-icon" href="/assets/showlink-favicon.png"><script src="/js/theme.js"></script>
 <script src="/js/navbar.js" defer></script>
 <script src="/js/footer.js" defer></script>
+<script src="/js/language.js" defer></script>
 </head>
 <body class="auth-page" data-page-title-id="Register — ShowLink" data-page-title-en="Register — ShowLink" data-page-description-id="Buat akun ShowLink untuk membuat dan mengelola link." data-page-description-en="Create a ShowLink account to create and manage links.">
 <div data-showlink-navbar></div>
@@ -98,17 +100,12 @@
 <div data-showlink-footer></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-config.js"></script>
+<script src="/js/supabase-client.js"></script>
 
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
- const host=document.querySelector("[data-recent-usernames]"),input=document.getElementById("register-username");
- let names=[];try{names=JSON.parse(localStorage.getItem("showlink_usernames")||"[]")}catch{}
- if(host&&input&&names.length){host.hidden=false;host.innerHTML='<span class="auth-hint">Akun yang pernah digunakan di perangkat ini:</span>'+names.map(n=>`<button type="button" class="auth-user-chip" data-name="${String(n).replace(/"/g,"&quot;")}"><i class="fa-regular fa-user"></i> ${String(n).replace(/</g,"&lt;")}</button>`).join("");host.querySelectorAll("[data-name]").forEach(b=>b.onclick=()=>{input.value=b.dataset.name;input.focus()})}
-});
-</script>
-<script src="/js/auth-pages.js" defer></script>
+<script src="/js/register.js" defer></script>
 </body>
 </html>

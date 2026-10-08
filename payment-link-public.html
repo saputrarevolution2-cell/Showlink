@@ -10,20 +10,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
+<script src="/js/theme.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-config.js"></script>
+<script src="/js/supabase-client.js"></script>
 <link rel="stylesheet" href="/css/navbar.css">
 <link rel="stylesheet" href="/css/footer.css">
-<script>
-(function(){
- try{
-   const t=localStorage.getItem('showlink-theme');
-   if(t==='dark'||t==='light'){document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}
- }catch(e){}
-})();
-</script>
-<link rel="icon" type="image/svg+xml" href="/assets/showlink-favicon.svg"><link rel="icon" type="image/png" sizes="512x512" href="/assets/showlink-favicon.png"><link rel="apple-touch-icon" href="/assets/showlink-favicon.png"><link rel="stylesheet" href="/css/payment-link-public.css">
-<script src="/js/navbar.js" defer></script>
+<link rel="stylesheet" href="/css/payment-link-public.css">
+<link rel="icon" type="image/svg+xml" href="/assets/showlink-favicon.svg"><link rel="icon" type="image/png" sizes="512x512" href="/assets/showlink-favicon.png"><link rel="apple-touch-icon" href="/assets/showlink-favicon.png"><script src="/js/navbar.js" defer></script>
 <script src="/js/footer.js" defer></script>
+<script src="/js/language.js" defer></script>
 </head>
 <body class="payment-link-public-page-body">
 <div data-showlink-navbar></div>
