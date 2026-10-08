@@ -1258,773 +1258,66 @@ GRANT EXECUTE ON FUNCTION public.get_pastelink_by_slug(text) TO anon, authentica
 
 CREATE OR REPLACE FUNCTION public.get_payment_link_by_slug(p_slug text)
 RETURNS jsonb
-LANGUAGE sql
+LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
-SET search_path = public
-AS $$
-  SELECT jsonb_build_object(
-    'id', p.id,
-    'slug', p.slug,
-    'title', p.title,
-    'description', p.description,
-    'thumbnail_url', p.thumbnail_url,
-    'price', p.price,
-    'currency', p.currency,
-    'status', p.status,
-    'sales_count', p.sales_count,
-    'views', p.views,
-    'checkout_url', 'https://showlink.my.id/p/' || p.slug,
-    'requires_payment', true
-  )
-  FROM public.payment_links p
-  WHERE p.slug = p_slug
-    AND p.status = 'active'
-    AND (p.expires_at IS NULL OR p.expires_at > now())
-    AND (p.max_sales IS NULL OR p.sales_count < p.max_sales);
-$$;
-
--- ============================================================
--- ORDER NUMBER
--- ============================================================
-
-CREATE OR REPLACE FUNCTION public.showlink_order_number()
-RETURNS text
-LANGUAGE sql
-AS $$
-  SELECT 'SL-' ||
-    to_char(now(), 'YYYYMMDD') || '-' ||
-    upper(substr(replace(gen_random_uuid()::text,'-',''),1,10));
-$$;
-
--- ============================================================
--- CREATE CHECKOUT ORDER
--- ============================================================
-
-CREATE OR REPLACE FUNCTION public.create_checkout_order(
-  p_payment_link_id uuid,
-  p_guest_access_token text DEFAULT NULL
-)
-RETURNS jsonb
-LANGUAGE plpgsql
-SECURITY DEFINER
 SET search_path = public, extensions
 AS $$
 DECLARE
-  v_link public.payment_links%ROWTYPE;
-  v_order_id uuid;
-  v_order_number text;
-  v_buyer uuid;
+  p public.payment_links%ROWTYPE;
+  v_plan text := 'guest';
+  v_percent numeric := 100.00;
+  v_buyer_amount numeric;
+  v_platform_percent numeric := 20.00;
 BEGIN
-  IF auth.uid() IS NULL AND coalesce(trim(p_guest_access_token),'') = '' THEN
-    RAISE EXCEPTION 'AUTH_OR_GUEST_TOKEN_REQUIRED';
-  END IF;
-
-  SELECT * INTO v_link
+  SELECT * INTO p
   FROM public.payment_links
-  WHERE id = p_payment_link_id
+  WHERE slug = trim(p_slug)
     AND status = 'active'
     AND (expires_at IS NULL OR expires_at > now())
-    AND (max_sales IS NULL OR sales_count < max_sales);
-
-  IF NOT FOUND THEN
-    RAISE EXCEPTION 'PAYMENT_LINK_NOT_AVAILABLE';
-  END IF;
-
-  v_buyer := auth.uid();
-
-  v_order_number := public.showlink_order_number();
-
-  INSERT INTO public.orders (
-    buyer_id, seller_id, payment_link_id,
-    order_number, item_title, amount, currency,
-    status, guest_access_token, expires_at
-  )
-  VALUES (
-    v_buyer, v_link.owner_id, v_link.id,
-    v_order_number, v_link.title, v_link.price, v_link.currency,
-    'pending', p_guest_access_token, now() + interval '30 minutes'
-  )
-  RETURNING id INTO v_order_id;
-
-  RETURN jsonb_build_object(
-    'order_id', v_order_id,
-    'order_number', v_order_number,
-    'amount', v_link.price,
-    'currency', v_link.currency,
-    'payment_link_id', v_link.id,
-    'checkout_url', 'https://showlink.my.id/p/' || v_link.slug
-  );
-END;
-$$;
-
--- ============================================================
--- GRANT ACCESS AFTER PAYMENT
--- ============================================================
-
-CREATE OR REPLACE FUNCTION public.grant_payment_access(
-  p_order_id uuid
-)
-RETURNS jsonb
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, extensions
-AS $$
-DECLARE
-  v_order public.orders%ROWTYPE;
-  v_link public.payment_links%ROWTYPE;
-  v_access uuid;
-BEGIN
-  SELECT * INTO v_order
-  FROM public.orders
-  WHERE id = p_order_id
-    AND status IN ('paid','completed');
-
-  IF NOT FOUND THEN
-    RAISE EXCEPTION 'ORDER_NOT_PAID';
-  END IF;
-
-  SELECT * INTO v_link
-  FROM public.payment_links
-  WHERE id = v_order.payment_link_id;
-
-  IF NOT FOUND THEN
-    RAISE EXCEPTION 'PAYMENT_LINK_NOT_FOUND';
-  END IF;
-
-  IF v_order.buyer_id IS NOT NULL THEN
-    INSERT INTO public.content_access (
-      buyer_id, guest_access_token, payment_link_id,
-      pastelink_id, order_id, access_type
-    )
-    VALUES (
-      v_order.buyer_id, v_order.guest_access_token, v_link.id,
-      v_link.pastelink_id, v_order.id, 'paid'
-    )
-    ON CONFLICT (buyer_id, payment_link_id)
-    DO UPDATE SET
-      granted_at = now(),
-      order_id = excluded.order_id,
-      pastelink_id = excluded.pastelink_id
-    RETURNING id INTO v_access;
-  ELSE
-    SELECT id INTO v_access
-    FROM public.content_access
-    WHERE guest_access_token = v_order.guest_access_token
-      AND payment_link_id = v_link.id
-    LIMIT 1;
-
-    IF v_access IS NULL THEN
-      INSERT INTO public.content_access (
-        buyer_id, guest_access_token, payment_link_id,
-        pastelink_id, order_id, access_type
-      )
-      VALUES (
-        NULL, v_order.guest_access_token, v_link.id,
-        v_link.pastelink_id, v_order.id, 'paid'
-      )
-      RETURNING id INTO v_access;
-    ELSE
-      UPDATE public.content_access
-      SET granted_at = now(),
-          order_id = v_order.id,
-          pastelink_id = v_link.pastelink_id
-      WHERE id = v_access;
-    END IF;
-  END IF;
-
-  RETURN jsonb_build_object(
-    'access_id', v_access,
-    'order_id', v_order.id,
-    'payment_link_id', v_link.id,
-    'pastelink_id', v_link.pastelink_id,
-    'unlocked', true
-  );
-END;
-$$;
-
--- ============================================================
--- PUBLIC PAID CONTENT ACCESS
--- ============================================================
-
-CREATE OR REPLACE FUNCTION public.get_paid_content(
-  p_payment_link_slug text,
-  p_guest_access_token text DEFAULT NULL
-)
-RETURNS jsonb
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, extensions
-AS $$
-DECLARE
-  v_link public.payment_links%ROWTYPE;
-  v_allowed boolean := false;
-  v_content_html text := '';
-  v_content_text text := '';
-BEGIN
-  SELECT * INTO v_link
-  FROM public.payment_links
-  WHERE slug = p_payment_link_slug
-    AND status IN ('active','paused')
+    AND (max_sales IS NULL OR sales_count < max_sales)
   LIMIT 1;
 
   IF NOT FOUND THEN
-    RAISE EXCEPTION 'PAYMENT_LINK_NOT_FOUND';
+    RETURN jsonb_build_object('ok',false,'error','PAYMENT_LINK_NOT_FOUND');
   END IF;
 
   IF auth.uid() IS NOT NULL THEN
-    SELECT EXISTS (
-      SELECT 1
-      FROM public.content_access a
-      WHERE a.payment_link_id = v_link.id
-        AND a.buyer_id = auth.uid()
-    ) INTO v_allowed;
+    SELECT lower(coalesce(plan,'free')) INTO v_plan
+    FROM public.profiles WHERE id = auth.uid();
+    v_plan := coalesce(v_plan,'free');
+    IF v_plan NOT IN ('free','vip','premium') THEN v_plan := 'free'; END IF;
   END IF;
 
-  IF NOT v_allowed AND coalesce(p_guest_access_token,'') <> '' THEN
-    SELECT EXISTS (
-      SELECT 1
-      FROM public.content_access a
-      WHERE a.payment_link_id = v_link.id
-        AND a.guest_access_token = p_guest_access_token
-    ) INTO v_allowed;
-  END IF;
+  SELECT
+    CASE v_plan
+      WHEN 'vip' THEN vip_percent
+      WHEN 'premium' THEN premium_percent
+      WHEN 'free' THEN free_percent
+      ELSE guest_percent
+    END,
+    platform_fee_percent
+  INTO v_percent, v_platform_percent
+  FROM public.payment_link_pricing_config
+  WHERE id = true;
 
-  IF NOT v_allowed THEN
-    RETURN jsonb_build_object(
-      'unlocked', false,
-      'requires_payment', true,
-      'id', v_link.id,
-      'slug', v_link.slug,
-      'title', v_link.title,
-      'description', v_link.description,
-      'thumbnail_url', v_link.thumbnail_url,
-      'price', v_link.price,
-      'currency', v_link.currency,
-      'checkout_url', 'https://showlink.my.id/p/' || v_link.slug
-    );
-  END IF;
-
-  IF v_link.pastelink_id IS NOT NULL THEN
-    SELECT p.content_html, p.content_text
-    INTO v_content_html, v_content_text
-    FROM public.pastelinks p
-    WHERE p.id = v_link.pastelink_id;
-  ELSE
-    v_content_html := v_link.content_html;
-    v_content_text := v_link.content_text;
-  END IF;
+  v_percent := coalesce(v_percent,100.00);
+  v_platform_percent := coalesce(v_platform_percent,20.00);
+  v_buyer_amount := round(p.price * v_percent / 100.00, 2);
 
   RETURN jsonb_build_object(
-    'unlocked', true,
-    'requires_payment', true,
-    'id', v_link.id,
-    'slug', v_link.slug,
-    'title', v_link.title,
-    'description', v_link.description,
-    'content_html', coalesce(v_content_html,''),
-    'content_text', coalesce(v_content_text,''),
-    'price', v_link.price,
-    'currency', v_link.currency
+    'ok',true,
+    'id',p.id,'slug',p.slug,'title',p.title,'description',p.description,
+    'thumbnail_url',p.thumbnail_url,'price',p.price,'original_price',p.price,
+    'buyer_amount',v_buyer_amount,'buyer_plan',v_plan,
+    'buyer_price_percent',v_percent,'platform_fee_percent',v_platform_percent,
+    'currency',p.currency,'status',p.status,'sales_count',p.sales_count,'views',p.views,
+    'checkout_url','https://showlink.my.id/p/'||p.slug,'requires_payment',true
   );
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.get_paid_content(text, text) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.get_paid_content(text, text) TO anon, authenticated;
-
--- ============================================================
--- INTERNAL PAYMENT SETTLEMENT
--- Called only by trusted payment webhook/admin backend.
--- ============================================================
-
-CREATE OR REPLACE FUNCTION public.settle_paid_order(
-  p_order_id uuid,
-  p_provider text DEFAULT NULL,
-  p_provider_payment_id text DEFAULT NULL,
-  p_provider_payload jsonb DEFAULT '{}'::jsonb
-)
-RETURNS jsonb
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, extensions
-AS $$
-DECLARE
-  v_order public.orders%ROWTYPE;
-  v_cfg public.platform_finance_config%ROWTYPE;
-  v_fee numeric(18,2);
-  v_seller numeric(18,2);
-  v_platform numeric(18,2);
-BEGIN
-  SELECT * INTO v_order
-  FROM public.orders
-  WHERE id = p_order_id
-  FOR UPDATE;
-
-  IF NOT FOUND THEN
-    RAISE EXCEPTION 'ORDER_NOT_FOUND';
-  END IF;
-
-  IF v_order.status IN ('paid','completed') THEN
-    RETURN jsonb_build_object('ok', true, 'already_settled', true, 'order_id', v_order.id);
-  END IF;
-
-  SELECT * INTO v_cfg
-  FROM public.platform_finance_config
-  WHERE id = 1;
-
-  v_fee := 0;
-  v_seller := round((v_order.amount - v_fee) * v_cfg.seller_share_percent / 100, 2);
-  v_platform := round((v_order.amount - v_fee) * v_cfg.platform_share_percent / 100, 2);
-
-  UPDATE public.orders
-  SET status = 'paid',
-      paid_at = now(),
-      updated_at = now(),
-      payment_reference = coalesce(payment_reference, p_provider_payment_id),
-      provider = coalesce(p_provider, provider),
-      gateway_payload = coalesce(p_provider_payload, '{}'::jsonb)
-  WHERE id = v_order.id;
-
-  INSERT INTO public.order_settlements (
-    order_id, seller_id, gross_amount, payment_fee,
-    seller_amount, platform_amount, status, available_at, released_at
-  )
-  VALUES (
-    v_order.id, v_order.seller_id, v_order.amount, v_fee,
-    v_seller, v_platform, 'released', now(), now()
-  )
-  ON CONFLICT (order_id) DO UPDATE
-  SET seller_amount = excluded.seller_amount,
-      platform_amount = excluded.platform_amount,
-      status = 'released',
-      released_at = now(),
-      updated_at = now();
-
-  INSERT INTO public.platform_earnings (
-    order_id, amount, source, description
-  )
-  VALUES (
-    v_order.id, v_platform, 'payment_link', 'Platform settlement'
-  );
-
-  IF v_order.seller_id IS NOT NULL THEN
-    INSERT INTO public.wallets (user_id)
-    VALUES (v_order.seller_id)
-    ON CONFLICT (user_id) DO NOTHING;
-
-    UPDATE public.wallets
-    SET available_balance = available_balance + v_seller,
-        lifetime_earned = lifetime_earned + v_seller,
-        updated_at = now()
-    WHERE user_id = v_order.seller_id;
-
-    UPDATE public.profiles
-    SET balance = balance + v_seller,
-        total_earned = total_earned + v_seller,
-        updated_at = now()
-    WHERE id = v_order.seller_id;
-
-    INSERT INTO public.wallet_transactions (
-      user_id, type, direction, amount,
-      balance_before, balance_after, order_id, description
-    )
-    SELECT
-      v_order.seller_id,
-      'earning',
-      'credit',
-      v_seller,
-      w.available_balance - v_seller,
-      w.available_balance,
-      v_order.id,
-      'Payment Link sale'
-    FROM public.wallets w
-    WHERE w.user_id = v_order.seller_id;
-  END IF;
-
-  UPDATE public.payment_links
-  SET sales_count = sales_count + 1,
-      updated_at = now()
-  WHERE id = v_order.payment_link_id;
-
-  PERFORM public.grant_payment_access(v_order.id);
-
-  RETURN jsonb_build_object(
-    'ok', true,
-    'order_id', v_order.id,
-    'settled', true
-  );
-END;
-$$;
-
--- ============================================================
--- VIEW COUNTERS
--- ============================================================
-
-CREATE OR REPLACE FUNCTION public.record_pastelink_view(
-  p_pastelink_id uuid,
-  p_visitor_hash text DEFAULT NULL
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY INVOKER
-SET search_path = public
-AS $$
-BEGIN
-  UPDATE public.pastelinks
-  SET views = views + 1,
-      unique_views = unique_views +
-        CASE
-          WHEN p_visitor_hash IS NOT NULL AND NOT EXISTS (
-            SELECT 1 FROM public.link_views
-            WHERE pastelink_id = p_pastelink_id
-              AND visitor_hash = p_visitor_hash
-          ) THEN 1
-          ELSE 0
-        END,
-      updated_at = now()
-  WHERE id = p_pastelink_id;
-
-  INSERT INTO public.link_views (
-    user_id, pastelink_id, visitor_hash
-  )
-  VALUES (auth.uid(), p_pastelink_id, p_visitor_hash);
-END;
-$$;
-
-CREATE OR REPLACE FUNCTION public.record_payment_link_view(
-  p_payment_link_id uuid,
-  p_visitor_hash text DEFAULT NULL
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY INVOKER
-SET search_path = public
-AS $$
-BEGIN
-  UPDATE public.payment_links
-  SET views = views + 1,
-      unique_views = unique_views +
-        CASE
-          WHEN p_visitor_hash IS NOT NULL AND NOT EXISTS (
-            SELECT 1 FROM public.link_views
-            WHERE payment_link_id = p_payment_link_id
-              AND visitor_hash = p_visitor_hash
-          ) THEN 1
-          ELSE 0
-        END,
-      updated_at = now()
-  WHERE id = p_payment_link_id;
-
-  INSERT INTO public.link_views (
-    user_id, payment_link_id, visitor_hash
-  )
-  VALUES (auth.uid(), p_payment_link_id, p_visitor_hash);
-END;
-$$;
-
--- ============================================================
--- RLS
--- ============================================================
-
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.payment_settings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.platform_finance_config ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.pastelinks ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.pastelink_drafts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.pastelink_steps ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.payment_links ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.content_access ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.guest_buyers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.order_settlements ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.platform_earnings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.wallets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.wallet_transactions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.withdrawal_methods ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.withdrawals ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.link_views ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.analytics_events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.content_comments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.content_likes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.creator_followers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.admin_logs ENABLE ROW LEVEL SECURITY;
-
--- Drop known policies to keep reruns clean.
-DO $$
-DECLARE
-  r record;
-BEGIN
-  FOR r IN
-    SELECT schemaname, tablename, policyname
-    FROM pg_policies
-    WHERE schemaname = 'public'
-      AND tablename IN (
-        'profiles','site_settings','payment_settings','platform_finance_config',
-        'pastelinks','pastelink_drafts','pastelink_steps','payment_links',
-        'content_access','guest_buyers','orders','payments','order_settlements',
-        'platform_earnings','wallets','wallet_transactions','withdrawal_methods',
-        'withdrawals','link_views','analytics_events','content_comments',
-        'content_likes','creator_followers','notifications','admin_logs'
-      )
-  LOOP
-    EXECUTE format('DROP POLICY IF EXISTS %I ON %I.%I',
-      r.policyname, r.schemaname, r.tablename);
-  END LOOP;
-END $$;
-
--- Profiles: public-safe fields are readable; private fields are not returned
--- by public RPCs. Owner can manage own profile.
-CREATE POLICY profiles_select_own
-ON public.profiles FOR SELECT TO authenticated
-USING (id = auth.uid() OR public.is_current_user_admin());
-
-CREATE POLICY profiles_update_own
-ON public.profiles FOR UPDATE TO authenticated
-USING (id = auth.uid())
-WITH CHECK (id = auth.uid());
-
-CREATE POLICY profiles_insert_own
-ON public.profiles FOR INSERT TO authenticated
-WITH CHECK (id = auth.uid());
-
--- Pastelinks
-CREATE POLICY pastelinks_owner_all
-ON public.pastelinks FOR ALL TO authenticated
-USING (owner_id = auth.uid() OR public.is_current_user_admin())
-WITH CHECK (owner_id = auth.uid() OR public.is_current_user_admin());
-
--- Drafts and steps
-CREATE POLICY pastelink_drafts_owner_all
-ON public.pastelink_drafts FOR ALL TO authenticated
-USING (owner_id = auth.uid() OR public.is_current_user_admin())
-WITH CHECK (owner_id = auth.uid() OR public.is_current_user_admin());
-
-CREATE POLICY pastelink_steps_owner_all
-ON public.pastelink_steps FOR ALL TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM public.pastelink_drafts d
-    WHERE d.id = draft_id
-      AND (d.owner_id = auth.uid() OR public.is_current_user_admin())
-  )
-)
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM public.pastelink_drafts d
-    WHERE d.id = draft_id
-      AND (d.owner_id = auth.uid() OR public.is_current_user_admin())
-  )
-);
-
--- Payment links: only public checkout metadata is intended to be read.
--- Content is returned by RPC only after access.
-CREATE POLICY payment_links_owner_all
-ON public.payment_links FOR ALL TO authenticated
-USING (owner_id = auth.uid() OR public.is_current_user_admin())
-WITH CHECK (owner_id = auth.uid() OR public.is_current_user_admin());
-
--- Access
-CREATE POLICY content_access_owner_read
-ON public.content_access FOR SELECT TO authenticated
-USING (buyer_id = auth.uid() OR public.is_current_user_admin());
-
--- Orders
-CREATE POLICY orders_buyer_read
-ON public.orders FOR SELECT TO authenticated
-USING (buyer_id = auth.uid() OR seller_id = auth.uid() OR public.is_current_user_admin());
-
--- Payments
-CREATE POLICY payments_owner_read
-ON public.payments FOR SELECT TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM public.orders o
-    WHERE o.id = order_id
-      AND (o.buyer_id = auth.uid() OR o.seller_id = auth.uid() OR public.is_current_user_admin())
-  )
-);
-
--- Private finance tables: no direct browser access.
--- Admin/backend should use SECURITY DEFINER functions.
-CREATE POLICY platform_finance_admin_only
-ON public.platform_finance_config FOR ALL TO authenticated
-USING (public.is_current_user_admin())
-WITH CHECK (public.is_current_user_admin());
-
-CREATE POLICY order_settlements_admin_only
-ON public.order_settlements FOR SELECT TO authenticated
-USING (public.is_current_user_admin());
-
-CREATE POLICY platform_earnings_admin_only
-ON public.platform_earnings FOR SELECT TO authenticated
-USING (public.is_current_user_admin());
-
-CREATE POLICY wallets_owner_read
-ON public.wallets FOR SELECT TO authenticated
-USING (user_id = auth.uid() OR public.is_current_user_admin());
-
-CREATE POLICY wallet_transactions_owner_read
-ON public.wallet_transactions FOR SELECT TO authenticated
-USING (user_id = auth.uid() OR public.is_current_user_admin());
-
-CREATE POLICY withdrawal_methods_owner_all
-ON public.withdrawal_methods FOR ALL TO authenticated
-USING (user_id = auth.uid() OR public.is_current_user_admin())
-WITH CHECK (user_id = auth.uid() OR public.is_current_user_admin());
-
-CREATE POLICY withdrawals_owner_read
-ON public.withdrawals FOR SELECT TO authenticated
-USING (user_id = auth.uid() OR public.is_current_user_admin());
-
--- Analytics: owner/admin only for raw event data.
-CREATE POLICY analytics_owner_read
-ON public.analytics_events FOR SELECT TO authenticated
-USING (user_id = auth.uid() OR public.is_current_user_admin());
-
-CREATE POLICY link_views_owner_read
-ON public.link_views FOR SELECT TO authenticated
-USING (
-  public.is_current_user_admin()
-  OR EXISTS (
-    SELECT 1 FROM public.pastelinks p
-    WHERE p.id = pastelink_id AND p.owner_id = auth.uid()
-  )
-  OR EXISTS (
-    SELECT 1 FROM public.payment_links p
-    WHERE p.id = payment_link_id AND p.owner_id = auth.uid()
-  )
-);
-
--- Comments
-CREATE POLICY comments_public_read
-ON public.content_comments FOR SELECT TO anon, authenticated
-USING (is_deleted = false);
-
-CREATE POLICY comments_authenticated_insert
-ON public.content_comments FOR INSERT TO authenticated
-WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY comments_owner_update
-ON public.content_comments FOR UPDATE TO authenticated
-USING (user_id = auth.uid() OR public.is_current_user_admin())
-WITH CHECK (user_id = auth.uid() OR public.is_current_user_admin());
-
--- Likes/follows
-CREATE POLICY likes_public_read
-ON public.content_likes FOR SELECT TO anon, authenticated
-USING (true);
-
-CREATE POLICY likes_owner_write
-ON public.content_likes FOR ALL TO authenticated
-USING (user_id = auth.uid())
-WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY followers_public_read
-ON public.creator_followers FOR SELECT TO anon, authenticated
-USING (true);
-
-CREATE POLICY followers_owner_write
-ON public.creator_followers FOR ALL TO authenticated
-USING (follower_id = auth.uid())
-WITH CHECK (follower_id = auth.uid());
-
--- Notifications
-CREATE POLICY notifications_owner_all
-ON public.notifications FOR ALL TO authenticated
-USING (user_id = auth.uid() OR public.is_current_user_admin())
-WITH CHECK (user_id = auth.uid() OR public.is_current_user_admin());
-
--- Site/payment public settings
-CREATE POLICY site_settings_public_read
-ON public.site_settings FOR SELECT TO anon, authenticated
-USING (is_public = true);
-
-CREATE POLICY site_settings_admin_write
-ON public.site_settings FOR ALL TO authenticated
-USING (public.is_current_user_admin())
-WITH CHECK (public.is_current_user_admin());
-
-CREATE POLICY payment_settings_admin_only
-ON public.payment_settings FOR ALL TO authenticated
-USING (public.is_current_user_admin())
-WITH CHECK (public.is_current_user_admin());
-
-CREATE POLICY admin_logs_admin_only
-ON public.admin_logs FOR ALL TO authenticated
-USING (public.is_current_user_admin())
-WITH CHECK (public.is_current_user_admin());
-
--- ============================================================
--- PUBLIC PROFILE RPC
--- ============================================================
-
-CREATE OR REPLACE FUNCTION public.get_public_profile(p_username text)
-RETURNS jsonb
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path = public
-AS $$
-  SELECT jsonb_build_object(
-    'id', p.id,
-    'username', p.username,
-    'display_name', p.display_name,
-    'avatar_url', p.avatar_url,
-    'bio', p.bio,
-    'country', p.country
-  )
-  FROM public.profiles p
-  WHERE lower(p.username) = lower(p_username)
-    AND p.is_banned = false
-  LIMIT 1;
-$$;
-
-GRANT EXECUTE ON FUNCTION public.get_public_profile(text) TO anon, authenticated;
-
--- ============================================================
--- GRANTS
--- ============================================================
-
-GRANT USAGE ON SCHEMA public TO anon, authenticated;
-
-GRANT SELECT ON public.pastelinks TO authenticated;
-GRANT SELECT ON public.payment_links TO authenticated;
-GRANT SELECT ON public.content_comments TO anon, authenticated;
-GRANT SELECT ON public.content_likes TO anon, authenticated;
-GRANT SELECT ON public.creator_followers TO anon, authenticated;
-GRANT SELECT ON public.site_settings TO anon, authenticated;
-
-GRANT SELECT, INSERT, UPDATE, DELETE
-ON public.profiles,
-   public.pastelinks,
-   public.pastelink_drafts,
-   public.pastelink_steps,
-   public.payment_links,
-   public.content_access,
-   public.orders,
-   public.payments,
-   public.wallets,
-   public.wallet_transactions,
-   public.withdrawal_methods,
-   public.withdrawals,
-   public.analytics_events,
-   public.content_comments,
-   public.content_likes,
-   public.creator_followers,
-   public.notifications
-TO authenticated;
-
-GRANT EXECUTE ON FUNCTION public.is_current_user_admin() TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.create_pastelink_draft() TO authenticated;
-GRANT EXECUTE ON FUNCTION public.save_pastelink_step(uuid,text,text,text,text,jsonb,boolean) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.publish_pastelink_draft(uuid,text,text,text,text[],text) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.create_pastelink(text,text,text,text,text,text[],text,text) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.create_payment_link(text,text,numeric,uuid,text,text,text) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.get_pastelink_by_slug(text) TO anon, authenticated;
+REVOKE ALL ON FUNCTION public.get_payment_link_by_slug(text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.get_payment_link_by_slug(text) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.create_checkout_order(uuid,text) TO anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.get_paid_content(text,text) TO anon, authenticated;
@@ -2654,5 +1947,91 @@ USING (public.is_current_user_admin());
 -- create_checkout_order().
 --
 -- ============================================================
+
+
+
+
+-- ============================================================
+-- SHOWLINK SUB4UNLOCK — CANONICAL COMPATIBILITY LAYER
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.showlink_sub4unlock_links (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  slug text NOT NULL UNIQUE,
+  title text NOT NULL,
+  destination_url text NOT NULL DEFAULT '',
+  tasks jsonb NOT NULL DEFAULT '[]'::jsonb,
+  status text NOT NULL DEFAULT 'active' CHECK (status IN ('draft','active','paused','expired','deleted')),
+  views bigint NOT NULL DEFAULT 0 CHECK (views >= 0),
+  unique_views bigint NOT NULL DEFAULT 0 CHECK (unique_views >= 0),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS showlink_sub4unlock_links_owner_idx ON public.showlink_sub4unlock_links(owner_id);
+CREATE INDEX IF NOT EXISTS showlink_sub4unlock_links_status_idx ON public.showlink_sub4unlock_links(status);
+ALTER TABLE public.showlink_sub4unlock_links ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS showlink_sub4unlock_links_owner_select ON public.showlink_sub4unlock_links;
+DROP POLICY IF EXISTS showlink_sub4unlock_links_owner_insert ON public.showlink_sub4unlock_links;
+DROP POLICY IF EXISTS showlink_sub4unlock_links_owner_update ON public.showlink_sub4unlock_links;
+DROP POLICY IF EXISTS showlink_sub4unlock_links_owner_delete ON public.showlink_sub4unlock_links;
+CREATE POLICY showlink_sub4unlock_links_owner_select ON public.showlink_sub4unlock_links FOR SELECT TO authenticated USING (owner_id=auth.uid());
+CREATE POLICY showlink_sub4unlock_links_owner_insert ON public.showlink_sub4unlock_links FOR INSERT TO authenticated WITH CHECK (owner_id=auth.uid());
+CREATE POLICY showlink_sub4unlock_links_owner_update ON public.showlink_sub4unlock_links FOR UPDATE TO authenticated USING (owner_id=auth.uid()) WITH CHECK (owner_id=auth.uid());
+CREATE POLICY showlink_sub4unlock_links_owner_delete ON public.showlink_sub4unlock_links FOR DELETE TO authenticated USING (owner_id=auth.uid());
+
+CREATE TABLE IF NOT EXISTS public.showlink_sub4unlock_completions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  owner_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  link_id uuid NOT NULL REFERENCES public.showlink_sub4unlock_links(id) ON DELETE CASCADE,
+  visitor_hash text NOT NULL,
+  status text NOT NULL DEFAULT 'completed' CHECK (status IN ('started','completed')),
+  earning_amount numeric(18,2) NOT NULL DEFAULT 0 CHECK (earning_amount >= 0),
+  completed_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE(link_id, visitor_hash)
+);
+CREATE INDEX IF NOT EXISTS showlink_sub4unlock_completions_owner_idx ON public.showlink_sub4unlock_completions(owner_id, created_at DESC);
+ALTER TABLE public.showlink_sub4unlock_completions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS showlink_sub4unlock_completions_owner_select ON public.showlink_sub4unlock_completions;
+CREATE POLICY showlink_sub4unlock_completions_owner_select ON public.showlink_sub4unlock_completions FOR SELECT TO authenticated USING (owner_id=auth.uid());
+
+CREATE OR REPLACE FUNCTION public.get_public_sub4unlock(p_slug text)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,extensions AS $$
+DECLARE r public.showlink_sub4unlock_links%ROWTYPE;
+BEGIN
+  SELECT * INTO r FROM public.showlink_sub4unlock_links
+  WHERE slug=trim(p_slug) AND status='active' LIMIT 1;
+  IF NOT FOUND THEN RETURN jsonb_build_object('ok',false,'error','SUB4UNLOCK_NOT_FOUND'); END IF;
+  UPDATE public.showlink_sub4unlock_links SET views=views+1, updated_at=now() WHERE id=r.id;
+  RETURN jsonb_build_object('ok',true,'id',r.id,'slug',r.slug,'title',r.title,'tasks',coalesce(r.tasks,'[]'::jsonb));
+END; $$;
+GRANT EXECUTE ON FUNCTION public.get_public_sub4unlock(text) TO anon,authenticated;
+
+CREATE OR REPLACE FUNCTION public.get_public_sub4unlock_content(p_slug text)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,extensions AS $$
+DECLARE r public.showlink_sub4unlock_links%ROWTYPE;
+BEGIN
+  SELECT * INTO r FROM public.showlink_sub4unlock_links WHERE slug=trim(p_slug) AND status='active' LIMIT 1;
+  IF NOT FOUND THEN RETURN jsonb_build_object('ok',false,'error','SUB4UNLOCK_NOT_FOUND'); END IF;
+  RETURN jsonb_build_object('ok',true,'id',r.id,'slug',r.slug,'title',r.title,'destination_url',r.destination_url);
+END; $$;
+GRANT EXECUTE ON FUNCTION public.get_public_sub4unlock_content(text) TO anon,authent
+CREATE OR REPLACE FUNCTION public.complete_sub4unlock_visit(p_slug text, p_visitor_hash text)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,extensions AS $$
+DECLARE r public.showlink_sub4unlock_links%ROWTYPE; inserted boolean:=false;
+BEGIN
+  IF coalesce(length(trim(p_visitor_hash)),0) < 8 OR length(trim(p_visitor_hash)) > 128 THEN
+    RETURN jsonb_build_object('ok',false,'error','INVALID_VISITOR_HASH');
+  END IF;
+  SELECT * INTO r FROM public.showlink_sub4unlock_links WHERE slug=trim(p_slug) AND status='active' LIMIT 1;
+  IF NOT FOUND THEN RETURN jsonb_build_object('ok',false,'error','SUB4UNLOCK_NOT_FOUND'); END IF;
+  INSERT INTO public.showlink_sub4unlock_completions(owner_id,link_id,visitor_hash,status,earning_amount,completed_at)
+  VALUES(r.owner_id,r.id,trim(p_visitor_hash),'completed',0,now())
+  ON CONFLICT(link_id,visitor_hash) DO NOTHING;
+  inserted := FOUND;
+  RETURN jsonb_build_object('ok',true,'completed',true,'new_completion',inserted,'link_id',r.id);
+END; $$;
+GRANT EXECUTE ON FUNCTION public.complete_sub4unlock_visit(text,text) TO anon,authenticated;
+
 
 COMMIT;
