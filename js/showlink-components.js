@@ -10,14 +10,13 @@
   const translations = {
     id: {
       platformInfo:"Informasi Platform", howItWorks:"Cara Kerja", help:"Bantuan",
-      login:"Login", register:"Register", dashboard:"Dashboard", pasteLink:"PasteLink",
-      paymentLink:"Payment Link", analytics:"Analytics", settings:"Pengaturan", manageLinks:"Kelola tautan", shortlink:"Shortlink", sub4unlock:"Sub4unlock", notifications:"Notifikasi", payment:"Payment", profile:"Profil", about:"About", comingSoon:"Segera hadir", sectionPlaceholder:"Halaman sudah disiapkan dengan fondasi yang sama. Fitur detail akan kita kerjakan satu per satu.", manageLinksIntro:"Kelola semua jenis tautan ShowLink dari satu tempat.", shortlinkIntro:"Buat dan kelola Shortlink ShowLink. Fitur akan kita isi bertahap.", paymentLinkIntro:"Buat dan kelola tautan pembayaran. Fitur akan kita isi bertahap.", sub4unlockIntro:"Kelola akses konten berbasis aksi pengguna.", notificationsIntro:"Lihat notifikasi akun, transaksi, dan aktivitas ShowLink.", paymentIntro:"Kelola pembayaran, saldo, dan aktivitas transaksi akun.", profileIntro:"Kelola informasi profil akun ShowLink.", settingsIntro:"Kelola preferensi akun, bahasa, tema, dan pengaturan ShowLink.", aboutIntro:"Informasi tentang ShowLink dan layanan yang tersedia.",
+      login:"Login", register:"Register", dashboard:"Dashboard", paymentLink:"Payment Link", settings:"Pengaturan", manageLinks:"My Payment Link", notifications:"Notifikasi", payment:"Withdraw", profile:"Profil", about:"About", comingSoon:"Segera hadir", sectionPlaceholder:"Halaman sudah disiapkan dengan fondasi yang sama. Fitur detail akan kita kerjakan satu per satu.", manageLinksIntro:"Kelola semua Payment Link yang kamu buat.", paymentLinkIntro:"Buat dan kelola tautan pembayaran.", notificationsIntro:"Lihat notifikasi akun, transaksi, dan aktivitas ShowLink.", paymentIntro:"Kelola pembayaran, saldo, dan aktivitas transaksi akun.", profileIntro:"Kelola informasi profil akun ShowLink.", settingsIntro:"Kelola preferensi akun, bahasa, tema, dan pengaturan ShowLink.", aboutIntro:"Informasi tentang ShowLink dan layanan yang tersedia.",
       openMenu:"Buka menu", mainNavigation:"Navigasi utama", displayOptions:"Opsi tampilan",
       theme:"Tema", light:"Terang", dark:"Gelap", language:"Bahasa",
       indonesia:"Indonesia", english:"Inggris", terms:"Terms of Service",
       privacy:"Privacy Policy", contact:"Contact Person", footerNavigation:"Navigasi footer",
       footerTagline:"Simple digital links.", copyright:"Copyright © {year} ShowLink. All Rights Reserved.",
-      themeLight:"Tema terang", themeDark:"Tema gelap", chooseLanguage:"Pilih bahasa", authWelcome:"Selamat datang kembali", authWelcomeSub:"Masuk untuk melanjutkan ke akun ShowLink.", authCreate:"Buat akun ShowLink", authCreateSub:"Daftar untuk mulai membuat dan mengelola link.", email:"Email", username:"Username", usernameHint:"3–30 karakter, hanya huruf, angka, dan underscore.", usernameInvalid:"Username 3–30 karakter, hanya huruf, angka, dan underscore.", password:"Password", confirmPassword:"Konfirmasi password", rememberMe:"Ingat saya", forgotPassword:"Lupa password?", signIn:"Masuk", signUp:"Daftar", noAccount:"Belum punya akun?", haveAccount:"Sudah punya akun?", createAccount:"Buat akun", backHome:"Kembali ke beranda", orContinue:"atau lanjutkan dengan", secureAuth:"Akses akun yang aman", authTerms:"Dengan melanjutkan, kamu menyetujui Ketentuan Layanan dan Kebijakan Privasi ShowLink.", authManage:"Kelola PasteLink dan Payment Link", authAnalytics:"Lihat performa dan aktivitas akun", authSecure:"Akses akun dengan aman", passwordHint:"Minimal 8 karakter", passwordMismatch:"Password tidak sama.", invalidEmail:"Masukkan email yang valid.", requiredField:"Kolom ini wajib diisi.", showPassword:"Tampilkan password", hidePassword:"Sembunyikan password", loginTitle:"Login — ShowLink", registerTitle:"Register — ShowLink", loginDescription:"Masuk ke akun ShowLink untuk mengelola konten dan link.",
+      themeLight:"Tema terang", themeDark:"Tema gelap", chooseLanguage:"Pilih bahasa", authWelcome:"Selamat datang kembali", authWelcomeSub:"Masuk untuk melanjutkan ke akun ShowLink.", authCreate:"Buat akun ShowLink", authCreateSub:"Daftar untuk mulai membuat dan mengelola link.", email:"Email", username:"Username", usernameHint:"3–30 karakter, hanya huruf, angka, dan underscore.", usernameInvalid:"Username 3–30 karakter, hanya huruf, angka, dan underscore.", password:"Password", confirmPassword:"Konfirmasi password", rememberMe:"Ingat saya", forgotPassword:"Lupa password?", signIn:"Masuk", signUp:"Daftar", noAccount:"Belum punya akun?", haveAccount:"Sudah punya akun?", createAccount:"Buat akun", backHome:"Kembali ke beranda", orContinue:"atau lanjutkan dengan", secureAuth:"Akses akun yang aman", authTerms:"Dengan melanjutkan, kamu menyetujui Ketentuan Layanan dan Kebijakan Privasi ShowLink.", authManage:"Kelola Payment Link", authAnalytics:"Lihat performa dan aktivitas akun", authSecure:"Akses akun dengan aman", passwordHint:"Minimal 8 karakter", passwordMismatch:"Password tidak sama.", invalidEmail:"Masukkan email yang valid.", requiredField:"Kolom ini wajib diisi.", showPassword:"Tampilkan password", hidePassword:"Sembunyikan password", loginTitle:"Login — ShowLink", registerTitle:"Register — ShowLink", loginDescription:"Masuk ke akun ShowLink untuk mengelola konten dan link.",
       loginSuccess:"Login berhasil. Mengalihkan ke dashboard...", loginFailed:"Email atau password salah.",
       registerSuccess:"Akun berhasil dibuat. Mengalihkan ke dashboard...", registerFailed:"Pendaftaran gagal.",
       confirmEmail:"Akun berhasil dibuat. Silakan cek email untuk konfirmasi akun sebelum login.",
@@ -26,7 +25,7 @@
       authConfigError:"Supabase belum dikonfigurasi.", dashboardWelcome:"Selamat datang",
       accountOverview:"Ringkasan akun", accountEmail:"Email akun", accountPlan:"Paket",
       accountCreated:"Bergabung sejak", signOut:"Keluar", editProfile:"Edit profil",
-      quickActions:"Aksi cepat", createPasteLink:"Buat PasteLink", createPaymentLink:"Buat Payment Link",
+      quickActions:"Aksi cepat", createPaymentLink:"Buat Payment Link",
       totalLinks:"Total link", totalViews:"Total views", totalSales:"Total penjualan",
       recentActivity:"Aktivitas terbaru", noActivity:"Belum ada aktivitas.",
       dashboardIntro:"Kelola akun dan aktivitas ShowLink kamu dari satu tempat.",
@@ -39,14 +38,13 @@
     },
     en: {
       platformInfo:"Platform Information", howItWorks:"How It Works", help:"Help",
-      login:"Login", register:"Register", dashboard:"Dashboard", pasteLink:"PasteLink",
-      paymentLink:"Payment Link", analytics:"Analytics", settings:"Settings", manageLinks:"Manage links", shortlink:"Shortlink", sub4unlock:"Sub4unlock", notifications:"Notifications", payment:"Payment", profile:"Profile", about:"About", comingSoon:"Coming soon", sectionPlaceholder:"This page is prepared with the same foundation. We will build the detailed features one by one.", manageLinksIntro:"Manage all ShowLink link types from one place.", shortlinkIntro:"Create and manage ShowLink Shortlinks. We will build the features step by step.", paymentLinkIntro:"Create and manage payment links. We will build the features step by step.", sub4unlockIntro:"Manage content access based on user actions.", notificationsIntro:"View account, transaction, and ShowLink activity notifications.", paymentIntro:"Manage payments, balance, and account transaction activity.", profileIntro:"Manage your ShowLink profile information.", settingsIntro:"Manage account preferences, language, theme, and ShowLink settings.", aboutIntro:"Information about ShowLink and the available service.",
+      login:"Login", register:"Register", dashboard:"Dashboard", paymentLink:"Payment Link", settings:"Settings", manageLinks:"My Payment Link", notifications:"Notifications", payment:"Withdraw", profile:"Profile", about:"About", comingSoon:"Coming soon", sectionPlaceholder:"This page is prepared with the same foundation. We will build the detailed features one by one.", manageLinksIntro:"Manage all Payment Links you create.", paymentLinkIntro:"Create and manage payment links.", notificationsIntro:"View account, transaction, and ShowLink activity notifications.", paymentIntro:"Manage payments, balance, and account transaction activity.", profileIntro:"Manage your ShowLink profile information.", settingsIntro:"Manage account preferences, language, theme, and ShowLink settings.", aboutIntro:"Information about ShowLink and the available service.",
       openMenu:"Open menu", mainNavigation:"Main navigation", displayOptions:"Display options",
       theme:"Theme", light:"Light", dark:"Dark", language:"Language",
       indonesia:"Indonesian", english:"English", terms:"Terms of Service",
       privacy:"Privacy Policy", contact:"Contact Person", footerNavigation:"Footer navigation",
       footerTagline:"Simple digital links.", copyright:"Copyright © {year} ShowLink. All Rights Reserved.",
-      themeLight:"Light theme", themeDark:"Dark theme", chooseLanguage:"Choose language", authWelcome:"Welcome back", authWelcomeSub:"Sign in to continue to your ShowLink account.", authCreate:"Create your ShowLink account", authCreateSub:"Register to start creating and managing links.", email:"Email", username:"Username", usernameHint:"3–30 characters, letters, numbers, and underscores only.", usernameInvalid:"Username must be 3–30 characters using only letters, numbers, and underscores.", password:"Password", confirmPassword:"Confirm password", rememberMe:"Remember me", forgotPassword:"Forgot password?", signIn:"Sign in", signUp:"Sign up", noAccount:"Don't have an account?", haveAccount:"Already have an account?", createAccount:"Create account", backHome:"Back to home", orContinue:"or continue with", secureAuth:"Secure account access", authTerms:"By continuing, you agree to the ShowLink Terms of Service and Privacy Policy.", authManage:"Manage PasteLink and Payment Link", authAnalytics:"View account performance and activity", authSecure:"Secure account access", passwordHint:"At least 8 characters", passwordMismatch:"Passwords do not match.", invalidEmail:"Enter a valid email address.", requiredField:"This field is required.", showPassword:"Show password", hidePassword:"Hide password", loginTitle:"Login — ShowLink", registerTitle:"Register — ShowLink", loginDescription:"Sign in to your ShowLink account to manage content and links.",
+      themeLight:"Light theme", themeDark:"Dark theme", chooseLanguage:"Choose language", authWelcome:"Welcome back", authWelcomeSub:"Sign in to continue to your ShowLink account.", authCreate:"Create your ShowLink account", authCreateSub:"Register to start creating and managing links.", email:"Email", username:"Username", usernameHint:"3–30 characters, letters, numbers, and underscores only.", usernameInvalid:"Username must be 3–30 characters using only letters, numbers, and underscores.", password:"Password", confirmPassword:"Confirm password", rememberMe:"Remember me", forgotPassword:"Forgot password?", signIn:"Sign in", signUp:"Sign up", noAccount:"Don't have an account?", haveAccount:"Already have an account?", createAccount:"Create account", backHome:"Back to home", orContinue:"or continue with", secureAuth:"Secure account access", authTerms:"By continuing, you agree to the ShowLink Terms of Service and Privacy Policy.", authManage:"Manage Payment Link", authAnalytics:"View account performance and activity", authSecure:"Secure account access", passwordHint:"At least 8 characters", passwordMismatch:"Passwords do not match.", invalidEmail:"Enter a valid email address.", requiredField:"This field is required.", showPassword:"Show password", hidePassword:"Hide password", loginTitle:"Login — ShowLink", registerTitle:"Register — ShowLink", loginDescription:"Sign in to your ShowLink account to manage content and links.",
       loginSuccess:"Login successful. Redirecting to dashboard...", loginFailed:"Incorrect email or password.",
       registerSuccess:"Account created. Redirecting to dashboard...", registerFailed:"Registration failed.",
       confirmEmail:"Account created. Check your email to confirm your account before signing in.",
@@ -55,7 +53,7 @@
       authConfigError:"Supabase is not configured.", dashboardWelcome:"Welcome",
       accountOverview:"Account overview", accountEmail:"Account email", accountPlan:"Plan",
       accountCreated:"Joined", signOut:"Sign out", editProfile:"Edit profile",
-      quickActions:"Quick actions", createPasteLink:"Create PasteLink", createPaymentLink:"Create Payment Link",
+      quickActions:"Quick actions", createPaymentLink:"Create Payment Link", createPaymentLink:"Create Payment Link",
       totalLinks:"Total links", totalViews:"Total views", totalSales:"Total sales",
       recentActivity:"Recent activity", noActivity:"No activity yet.",
       dashboardIntro:"Manage your ShowLink account and activity from one place.",
@@ -75,7 +73,7 @@
       "Bagikan konten lewat":"Bagikan konten lewat",
       "atau buat":"atau buat",
       "untuk menjual akses. Satu link, satu pengalaman yang simpel.":"untuk menjual akses. Satu link, satu pengalaman yang simpel.",
-      "Buat PasteLink":"Buat PasteLink","Buat Payment Link":"Buat Payment Link",
+      "Buat Payment Link":"Buat Payment Link","Buat Payment Link":"Buat Payment Link",
       "Mudah dibuat":"Mudah dibuat","Akses terkontrol":"Akses terkontrol","Mobile friendly":"Mobile friendly",
       "Your content.":"Your content.","Your link.":"Your link.","Live":"Live",
       "PUBLIC LINK":"PUBLIC LINK","Share your content":"Share your content","Sell access":"Sell access",
@@ -86,7 +84,7 @@
       "Buat halaman yang berisi teks, link, informasi, panduan, atau konten lain. Setelah selesai, ShowLink memberikan URL pendek yang mudah dibagikan.":"Buat halaman yang berisi teks, link, informasi, panduan, atau konten lain. Setelah selesai, ShowLink memberikan URL pendek yang mudah dibagikan.",
       "Edit seluruh isi":"Edit seluruh isi","Konten, judul, deskripsi, dan pengaturan tetap bisa dikelola setelah dibuat.":"Konten, judul, deskripsi, dan pengaturan tetap bisa dikelola setelah dibuat.",
       "URL pendek":"URL pendek","Statistik":"Statistik","Pantau kunjungan dan performa halaman.":"Pantau kunjungan dan performa halaman.",
-      "Mulai membuat PasteLink":"Mulai membuat PasteLink",
+      "Mulai membuat Payment Link":"Mulai membuat Payment Link",
       "Jual akses dengan satu link pembayaran.":"Jual akses dengan satu link pembayaran.",
       "Buat Payment Link, tentukan harga, lalu bagikan link. Pengunjung akan diarahkan ke pembayaran terlebih dahulu. Konten dibuka setelah pembayaran berhasil diverifikasi.":"Buat Payment Link, tentukan harga, lalu bagikan link. Pengunjung akan diarahkan ke pembayaran terlebih dahulu. Konten dibuka setelah pembayaran berhasil diverifikasi.",
       "Tentukan harga":"Tentukan harga","Atur harga produk atau akses sesuai kebutuhanmu.":"Atur harga produk atau akses sesuai kebutuhanmu.",
@@ -97,7 +95,7 @@
       "Payment verified before content access":"Payment verified before content access",
       "Semudah membuat dan membagikan link.":"Semudah membuat dan membagikan link.",
       "ShowLink dibuat supaya creator tidak perlu melewati alur yang rumit.":"ShowLink dibuat supaya creator tidak perlu melewati alur yang rumit.",
-      "Buat":"Buat","Pilih PasteLink atau Payment Link lalu isi konten yang ingin kamu publikasikan.":"Pilih PasteLink atau Payment Link lalu isi konten yang ingin kamu publikasikan.",
+      "Buat":"Buat","Pilih Payment Link atau Payment Link lalu isi konten yang ingin kamu publikasikan.":"Pilih Payment Link atau Payment Link lalu isi konten yang ingin kamu publikasikan.",
       "Dapatkan Link":"Dapatkan Link","Setelah dibuat, kamu mendapatkan URL pendek ShowLink yang mudah dibagikan.":"Setelah dibuat, kamu mendapatkan URL pendek ShowLink yang mudah dibagikan.",
       "Bagikan":"Bagikan","Kirim link ke WhatsApp, Telegram, Instagram, website, atau platform lainnya.":"Kirim link ke WhatsApp, Telegram, Instagram, website, atau platform lainnya.",
       "Kelola":"Kelola","Lihat performa, transaksi, dan penghasilan dari dashboard akunmu.":"Lihat performa, transaksi, dan penghasilan dari dashboard akunmu.",
@@ -108,15 +106,15 @@
       "Controlled":"Controlled","Payment Link menggunakan status transaksi sebagai dasar pemberian akses.":"Payment Link menggunakan status transaksi sebagai dasar pemberian akses.",
       "Trackable":"Trackable","Performa link dan transaksi bisa dipantau dari dashboard.":"Performa link dan transaksi bisa dipantau dari dashboard.",
       "Pertanyaan umum.":"Pertanyaan umum.","Informasi dasar sebelum kamu mulai menggunakan ShowLink.":"Informasi dasar sebelum kamu mulai menggunakan ShowLink.",
-      "Apakah PasteLink bisa dibuka tanpa login?":"Apakah PasteLink bisa dibuka tanpa login?",
+      "Apakah Payment Link bisa dibuka tanpa login?":"Apakah Payment Link bisa dibuka tanpa login?",
       "Ya. Link publik dapat dibuka melalui URL ShowLink. Login digunakan untuk membuat dan mengelola konten.":"Ya. Link publik dapat dibuka melalui URL ShowLink. Login digunakan untuk membuat dan mengelola konten.",
       "Bagaimana Payment Link bekerja?":"Bagaimana Payment Link bekerja?",
       "Pengunjung membuka Payment Link, melihat informasi checkout, melakukan pembayaran, lalu konten diberikan setelah pembayaran berhasil diverifikasi.":"Pengunjung membuka Payment Link, melihat informasi checkout, melakukan pembayaran, lalu konten diberikan setelah pembayaran berhasil diverifikasi.",
-      "Apakah saya bisa mengedit PasteLink?":"Apakah saya bisa mengedit PasteLink?",
+      "Apakah saya bisa mengedit Payment Link?":"Apakah saya bisa mengedit Payment Link?",
       "Konten yang dibuat disimpan sebagai satu kesatuan sehingga nantinya dapat diedit kembali, bukan hanya judulnya.":"Konten yang dibuat disimpan sebagai satu kesatuan sehingga nantinya dapat diedit kembali, bukan hanya judulnya.",
       "Seperti apa URL ShowLink?":"Seperti apa URL ShowLink?",
       "Mulai dengan satu link.":"Mulai dengan satu link.",
-      "Buat PasteLink untuk berbagi konten atau Payment Link untuk menjual akses.":"Buat PasteLink untuk berbagi konten atau Payment Link untuk menjual akses.",
+      "Buat Payment Link untuk berbagi konten atau Payment Link untuk menjual akses.":"Buat Payment Link untuk berbagi konten atau Payment Link untuk menjual akses.",
       "Mulai Gratis":"Mulai Gratis","READY TO CREATE?":"READY TO CREATE?"
     },
     en: {
@@ -124,7 +122,7 @@
       "Buat link yang":"Create a link with a", "punya tujuan.":"purpose.",
       "Bagikan konten lewat":"Share content with", "atau buat":"or create a",
       "untuk menjual akses. Satu link, satu pengalaman yang simpel.":"to sell access. One link, one simple experience.",
-      "Buat PasteLink":"Create PasteLink","Buat Payment Link":"Create Payment Link",
+      "Buat Payment Link":"Create Payment Link","Buat Payment Link":"Create Payment Link",
       "Mudah dibuat":"Easy to create","Akses terkontrol":"Controlled access","Mobile friendly":"Mobile friendly",
       "Your content.":"Your content.","Your link.":"Your link.","Live":"Live",
       "PUBLIC LINK":"PUBLIC LINK","Share your content":"Share your content","Sell access":"Sell access",
@@ -135,7 +133,7 @@
       "Buat halaman yang berisi teks, link, informasi, panduan, atau konten lain. Setelah selesai, ShowLink memberikan URL pendek yang mudah dibagikan.":"Create a page with text, links, information, guides, or other content. When finished, ShowLink gives you a short URL that is easy to share.",
       "Edit seluruh isi":"Edit everything","Konten, judul, deskripsi, dan pengaturan tetap bisa dikelola setelah dibuat.":"Content, title, description, and settings can still be managed after creation.",
       "URL pendek":"Short URL","Statistik":"Analytics","Pantau kunjungan dan performa halaman.":"Track visits and page performance.",
-      "Mulai membuat PasteLink":"Start creating PasteLink",
+      "Mulai membuat Payment Link":"Start creating Payment Link",
       "Jual akses dengan satu link pembayaran.":"Sell access with one payment link.",
       "Buat Payment Link, tentukan harga, lalu bagikan link. Pengunjung akan diarahkan ke pembayaran terlebih dahulu. Konten dibuka setelah pembayaran berhasil diverifikasi.":"Create a Payment Link, set a price, and share it. Visitors are sent to checkout first. Content opens after payment is successfully verified.",
       "Tentukan harga":"Set a price","Atur harga produk atau akses sesuai kebutuhanmu.":"Set the product or access price you need.",
@@ -146,7 +144,7 @@
       "Payment verified before content access":"Payment verified before content access",
       "Semudah membuat dan membagikan link.":"As easy as creating and sharing a link.",
       "ShowLink dibuat supaya creator tidak perlu melewati alur yang rumit.":"ShowLink keeps the creator flow simple.",
-      "Buat":"Create","Pilih PasteLink atau Payment Link lalu isi konten yang ingin kamu publikasikan.":"Choose PasteLink or Payment Link and add the content you want to publish.",
+      "Buat":"Create","Pilih Payment Link atau Payment Link lalu isi konten yang ingin kamu publikasikan.":"Choose Payment Link or Payment Link and add the content you want to publish.",
       "Dapatkan Link":"Get the Link","Setelah dibuat, kamu mendapatkan URL pendek ShowLink yang mudah dibagikan.":"After creation, you get a short ShowLink URL that is easy to share.",
       "Bagikan":"Share","Kirim link ke WhatsApp, Telegram, Instagram, website, atau platform lainnya.":"Send the link to WhatsApp, Telegram, Instagram, your website, or other platforms.",
       "Kelola":"Manage","Lihat performa, transaksi, dan penghasilan dari dashboard akunmu.":"View performance, transactions, and earnings from your dashboard.",
@@ -157,15 +155,15 @@
       "Controlled":"Controlled","Payment Link menggunakan status transaksi sebagai dasar pemberian akses.":"Payment Links use transaction status as the basis for access.",
       "Trackable":"Trackable","Performa link dan transaksi bisa dipantau dari dashboard.":"Link and transaction performance can be tracked from the dashboard.",
       "Pertanyaan umum.":"Frequently asked questions.","Informasi dasar sebelum kamu mulai menggunakan ShowLink.":"Basic information before you start using ShowLink.",
-      "Apakah PasteLink bisa dibuka tanpa login?":"Can PasteLink be opened without login?",
+      "Apakah Payment Link bisa dibuka tanpa login?":"Can Payment Link be opened without login?",
       "Ya. Link publik dapat dibuka melalui URL ShowLink. Login digunakan untuk membuat dan mengelola konten.":"Yes. Public links can be opened through their ShowLink URL. Login is used to create and manage content.",
       "Bagaimana Payment Link bekerja?":"How does Payment Link work?",
       "Pengunjung membuka Payment Link, melihat informasi checkout, melakukan pembayaran, lalu konten diberikan setelah pembayaran berhasil diverifikasi.":"Visitors open a Payment Link, view checkout information, pay, and receive the content after payment is verified.",
-      "Apakah saya bisa mengedit PasteLink?":"Can I edit a PasteLink?",
+      "Apakah saya bisa mengedit Payment Link?":"Can I edit a Payment Link?",
       "Konten yang dibuat disimpan sebagai satu kesatuan sehingga nantinya dapat diedit kembali, bukan hanya judulnya.":"Created content is stored as one complete piece so it can be edited later, not just the title.",
       "Seperti apa URL ShowLink?":"What does a ShowLink URL look like?",
       "Mulai dengan satu link.":"Start with one link.",
-      "Buat PasteLink untuk berbagi konten atau Payment Link untuk menjual akses.":"Create a PasteLink to share content or a Payment Link to sell access.",
+      "Buat Payment Link untuk berbagi konten atau Payment Link untuk menjual akses.":"Create a Payment Link to share content or a Payment Link to sell access.",
       "Mulai Gratis":"Start Free","READY TO CREATE?":"READY TO CREATE?"
     }
   };
@@ -255,15 +253,15 @@
     } else if (lang === "en") {
       document.title = "ShowLink — Create. Share. Get Paid.";
       document.querySelector('meta[name="description"]')?.setAttribute("content",
-        "ShowLink — create PasteLinks and Payment Links. Share content, sell access, and manage earnings in one platform.");
+        "ShowLink — create Payment Links. Share content, sell access, and manage earnings in one platform.");
       document.querySelector('meta[property="og:title"]')?.setAttribute("content","ShowLink — Create. Share. Get Paid.");
-      document.querySelector('meta[property="og:description"]')?.setAttribute("content","Create PasteLinks and Payment Links easily with ShowLink.");
+      document.querySelector('meta[property="og:description"]')?.setAttribute("content","Create Payment Links easily with ShowLink.");
     } else {
       document.title = "ShowLink — Create. Share. Get Paid.";
       document.querySelector('meta[name="description"]')?.setAttribute("content",
-        "ShowLink — buat PasteLink dan Payment Link. Bagikan konten, jual akses, dan kelola penghasilan dalam satu platform.");
+        "ShowLink — buat Payment Link. Bagikan konten, jual akses, dan kelola penghasilan dalam satu platform.");
       document.querySelector('meta[property="og:title"]')?.setAttribute("content","ShowLink — Create. Share. Get Paid.");
-      document.querySelector('meta[property="og:description"]')?.setAttribute("content","Buat PasteLink dan Payment Link dengan mudah di ShowLink.");
+      document.querySelector('meta[property="og:description"]')?.setAttribute("content","Buat Payment Link dengan mudah di ShowLink.");
     }
   }
 

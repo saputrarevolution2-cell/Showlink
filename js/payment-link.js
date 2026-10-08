@@ -106,7 +106,6 @@
       p_title: title,
       p_description: description || null,
       p_price: price,
-      p_pastelink_id: null,
       p_content_html: contentHtml,
       p_content_text: content,
       p_thumbnail_url: null

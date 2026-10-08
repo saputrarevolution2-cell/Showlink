@@ -37,10 +37,17 @@
     if (!currentData) return;
     if (currentView === 'locked') renderLocked(currentData);
     else if (currentView === 'unlocked') renderUnlocked(currentData);
-    else if (currentView === 'payment') renderCashiPayment(
-      currentData.data, currentData.result, currentData.sb,
-      currentData.orderId, currentData.token, currentData.isUser
-    );
+    else if (currentView === 'gateway') renderGatewaySelection(currentData);
+    else if (currentView === 'payment') {
+      if (currentData.provider === 'BAYAR_GG') renderBayarGGPayment(
+        currentData.data, currentData.result, currentData.sb,
+        currentData.orderId, currentData.token, currentData.isUser
+      );
+      else renderCashiPayment(
+        currentData.data, currentData.result, currentData.sb,
+        currentData.orderId, currentData.token, currentData.isUser
+      );
+    }
     else if (currentView === 'error') renderError(currentData);
   }
 
@@ -60,6 +67,10 @@
     id: {
       kicker:'PAYMENT LINK', locked:'Konten terkunci. Lakukan pembayaran untuk membuka konten.',
       buy:'Beli & Bayar', verified:'Pembayaran terverifikasi. Konten sudah terbuka.',
+      chooseGateway:'Pilih Server Pembayaran', gatewayDesc:'Pilih server pembayaran terlebih dahulu sebelum melanjutkan.',
+      server1:'Server 1', server2:'Server 2', cashi:'Cashi', bayarGG:'BayarGG',
+      continuePayment:'Lanjut Pembayaran', back:'Kembali', opening:'Menyiapkan pembayaran…',
+      gatewaySecure:'Pembayaran diproses melalui server pembayaran yang kamu pilih.' ,
       titleLabel:'Judul', priceLabel:'Harga', empty:'Konten kosong.',
       notAvailable:'Payment Link tidak tersedia',
       notFound:'Payment Link tidak ditemukan atau sudah tidak aktif.',
@@ -83,6 +94,10 @@
     en: {
       kicker:'PAYMENT LINK', locked:'Content is locked. Complete payment to unlock it.',
       buy:'Buy & Pay', verified:'Payment verified. Content is now unlocked.',
+      chooseGateway:'Choose Payment Server', gatewayDesc:'Choose a payment server before continuing.',
+      server1:'Server 1', server2:'Server 2', cashi:'Cashi', bayarGG:'BayarGG',
+      continuePayment:'Continue Payment', back:'Back', opening:'Preparing payment…',
+      gatewaySecure:'Payment is processed through your selected payment server.',
       titleLabel:'Title', priceLabel:'Price', empty:'Content is empty.',
       notAvailable:'Payment Link unavailable',
       notFound:'Payment Link was not found or is no longer active.',
@@ -203,6 +218,42 @@
     return result;
   }
 
+
+  function renderGatewaySelection(data) {
+    currentView = 'gateway';
+    currentData = data;
+    const amount = Number(data.buyer_amount ?? data.price ?? 0);
+    app.innerHTML = `
+      ${data.thumbnail_url ? `<div class="pl-cover"><img src="${esc(data.thumbnail_url)}" alt=""></div>` : `<div class="pl-cover"><i class="fa-solid fa-server"></i></div>`}
+      <div class="pl-body">
+        <span class="pl-kicker"><i class="fa-solid fa-credit-card"></i> PAYMENT LINK</span>
+        <h1 class="pl-title">${esc(t('chooseGateway'))}</h1>
+        <p class="pl-desc">${esc(t('gatewayDesc'))}</p>
+        <div class="pl-meta">
+          <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('titleLabel'))}</span><span class="pl-meta-value">${esc(data.title || 'Payment Link')}</span></div>
+          <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('priceLabel'))}</span><span class="pl-meta-value">${money(amount, data.currency || 'IDR')}</span></div>
+        </div>
+        <div class="pl-gateway-grid">
+          <button class="pl-gateway-card" data-gateway="CASHI" type="button">
+            <span class="pl-gateway-icon"><i class="fa-solid fa-bolt"></i></span>
+            <span class="pl-gateway-copy"><strong>${esc(t('server1'))}</strong><b>${esc(t('cashi'))}</b><small>QRIS &amp; payment gateway</small></span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+          <button class="pl-gateway-card" data-gateway="BAYAR_GG" type="button">
+            <span class="pl-gateway-icon"><i class="fa-solid fa-qrcode"></i></span>
+            <span class="pl-gateway-copy"><strong>${esc(t('server2'))}</strong><b>${esc(t('bayarGG'))}</b><small>QRIS &amp; hosted checkout</small></span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+        <div class="pl-gateway-note"><i class="fa-solid fa-shield-halved"></i> ${esc(t('gatewaySecure'))}</div>
+        <button class="pl-buy pl-back-gateway" id="back-to-link" type="button"><i class="fa-solid fa-arrow-left"></i> ${esc(t('back'))}</button>
+      </div>`;
+    document.querySelectorAll('[data-gateway]').forEach(btn => {
+      btn.addEventListener('click', () => proceedWithGateway(data, btn.dataset.gateway));
+    });
+    document.getElementById('back-to-link')?.addEventListener('click', () => renderLocked(data));
+  }
+
   function renderPaymentError(message) {
     currentView = 'error';
     currentData = message || '';
@@ -256,6 +307,97 @@
     });
 
     pollCashiPayment(orderId, sb, token, isUser);
+  }
+
+
+  async function createBayarGGPayment(orderId, sb, token, isUser) {
+    const fn = `${window.SHOWLINK_SUPABASE.url}/functions/v1/bayar-gg-create-payment`;
+    const resp = await fetch(fn, {
+      method: 'POST',
+      headers: await apiHeaders(sb),
+      body: JSON.stringify({
+        order_id: orderId,
+        guest_access_token: isUser ? undefined : token
+      })
+    });
+    const raw = await resp.text();
+    let result = {};
+    try { result = raw ? JSON.parse(raw) : {}; } catch (_) { result = { message: raw }; }
+    if (!resp.ok || result.success === false) {
+      throw new Error(result.error || result.message || `BayarGG create payment gagal (${resp.status})`);
+    }
+    if (result.already_paid) return result;
+    if (!result.payment_url && !result.checkout_url) {
+      throw new Error('BayarGG tidak mengembalikan halaman pembayaran.');
+    }
+    return result;
+  }
+
+  function renderBayarGGPayment(data, result, sb, orderId, token, isUser) {
+    currentView = 'payment';
+    currentData = { provider:'BAYAR_GG', data, result, sb, orderId, token, isUser };
+    const amount = Number(result.amount ?? result.final_amount ?? data.buyer_amount ?? data.price ?? 0);
+    const checkout = result.payment_url || result.checkout_url || '';
+    app.innerHTML = `
+      ${data.thumbnail_url ? `<div class="pl-cover"><img src="${esc(data.thumbnail_url)}" alt=""></div>` : `<div class="pl-cover"><i class="fa-solid fa-qrcode"></i></div>`}
+      <div class="pl-body">
+        <span class="pl-kicker"><i class="fa-solid fa-qrcode"></i> BAYAR GG</span>
+        <h1 class="pl-title">${esc(currentLang()==='en'?'Complete payment':'Lanjutkan pembayaran')}</h1>
+        <p class="pl-desc">${esc(currentLang()==='en'
+          ? 'Open the BayarGG checkout and complete your payment. Return here to verify the payment.'
+          : 'Buka halaman pembayaran BayarGG dan selesaikan pembayaran. Setelah selesai, kembali ke sini untuk verifikasi.')}</p>
+        <div class="pl-meta">
+          <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('titleLabel'))}</span><span class="pl-meta-value">${esc(data.title || 'Payment Link')}</span></div>
+          <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('priceLabel'))}</span><span class="pl-meta-value">${money(amount, data.currency || 'IDR')}</span></div>
+        </div>
+        ${checkout ? `<a class="pl-buy" href="${esc(checkout)}" target="_blank" rel="noopener noreferrer" style="display:flex;text-decoration:none;justify-content:center;align-items:center;gap:8px">
+          ${esc(currentLang()==='en'?'Open BayarGG':'Buka BayarGG')} <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>` : ''}
+        <button class="pl-buy" id="check-payment" type="button" style="margin-top:10px"><i class="fa-solid fa-circle-check"></i> ${esc(currentLang()==='en'?'Check Payment':'Cek Pembayaran')}</button>
+        <div class="pl-status" id="payment-status">${esc(currentLang()==='en'?'Waiting for payment confirmation…':'Menunggu konfirmasi pembayaran…')}</div>
+        <button class="pl-buy pl-back-gateway" id="back-to-gateway" type="button"><i class="fa-solid fa-arrow-left"></i> ${esc(t('back'))}</button>
+      </div>`;
+    document.getElementById('check-payment')?.addEventListener('click', () => checkBayarGGPayment(orderId, sb, token, isUser));
+    document.getElementById('back-to-gateway')?.addEventListener('click', () => renderGatewaySelection(data));
+    pollBayarGGPayment(orderId, sb, token, isUser);
+  }
+
+  async function checkBayarGGPayment(orderId, sb, token, isUser) {
+    const status = document.getElementById('payment-status');
+    if (status) status.textContent = currentLang()==='en' ? 'Checking payment…' : 'Memeriksa pembayaran…';
+    try {
+      const fn = `${window.SHOWLINK_SUPABASE.url}/functions/v1/bayar-gg-check-status`;
+      const resp = await fetch(fn, {
+        method: 'POST',
+        headers: await apiHeaders(sb),
+        body: JSON.stringify({ order_id: orderId, guest_access_token: isUser ? undefined : token })
+      });
+      const raw = await resp.text();
+      let result = {};
+      try { result = raw ? JSON.parse(raw) : {}; } catch (_) { result = { message: raw }; }
+      if (!resp.ok || result.success === false) throw new Error(result.error || result.message || `Cek BayarGG gagal (${resp.status})`);
+      if (result.paid === true) {
+        if (status) status.textContent = currentLang()==='en' ? 'Payment verified. Unlocking content…' : 'Pembayaran berhasil. Membuka konten…';
+        await unlockAfterPayment(sb, token);
+        return true;
+      }
+      if (status) status.textContent = `${currentLang()==='en'?'Payment status':'Status pembayaran'}: ${result.status || 'PENDING'}. ${currentLang()==='en'?'Waiting…':'Menunggu…'}`;
+      return false;
+    } catch (error) {
+      if (status) {
+        status.className = 'pl-status error';
+        status.textContent = error?.message || 'Cek pembayaran gagal.';
+      }
+      return false;
+    }
+  }
+
+  async function pollBayarGGPayment(orderId, sb, token, isUser) {
+    for (let i=0;i<100;i++) {
+      await new Promise(resolve => setTimeout(resolve, 4000));
+      if (currentView !== 'payment' || currentData?.provider !== 'BAYAR_GG') return;
+      if (await checkBayarGGPayment(orderId, sb, token, isUser)) return;
+    }
   }
 
   async function unlockAfterPayment(sb, token) {
@@ -326,11 +468,23 @@
     }
   }
 
-  async function startPayment(data) {
-    const btn = document.getElementById('buy');
+  function proceedWithGateway(data, gateway) {
+    startPayment(data, gateway).catch(error => {
+      dbg.error(`${gateway} PAYMENT FAILED`, error);
+      renderPaymentError(error?.message || 'Pembayaran gagal dibuat.');
+    });
+  }
+
+  async function startPayment(data, gateway = null) {
+    if (!gateway) {
+      renderGatewaySelection(data);
+      return;
+    }
+
+    const btn = document.querySelector(`[data-gateway="${gateway}"]`);
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${esc(currentLang()==='en'?'Creating payment…':'Membuat pembayaran…')}`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${esc(t('opening'))}`;
     }
 
     try {
@@ -352,19 +506,27 @@
       const orderId = order?.order_id || order?.id;
       if (!orderId) throw new Error('Order tidak berhasil dibuat.');
 
+      if (gateway === 'BAYAR_GG') {
+        const result = await createBayarGGPayment(orderId, sb, token, !!user);
+        if (result.already_paid) {
+          await unlockAfterPayment(sb, token);
+          return;
+        }
+        renderBayarGGPayment(data, result, sb, orderId, token, !!user);
+        return;
+      }
+
       const result = await createCashiPayment(orderId, sb, token, !!user);
       if (result.already_paid) {
         await unlockAfterPayment(sb, token);
         return;
       }
-
       if (!result.qr_url && !result.qrUrl && !result.checkout_url) {
         throw new Error('Cashi tidak mengembalikan QR atau halaman pembayaran.');
       }
-
       renderCashiPayment(data, result, sb, orderId, token, !!user);
     } catch (error) {
-      dbg.error('INLINE CASHI PAYMENT FAILED', error);
+      dbg.error(`${gateway} PAYMENT FAILED`, error);
       renderPaymentError(error?.message || 'Pembayaran gagal dibuat.');
     }
   }
