@@ -58,8 +58,7 @@
   async function saveAccount(e){e.preventDefault();const t=tr(),payload={method_type:$('#method-type').value.trim(),account_name:$('#account-name').value.trim(),account_number:$('#account-number').value.trim(),is_default:true,is_active:true};if(!payload.method_type||!payload.account_name||!payload.account_number)return showMessage(t.noAccount);try{if(account){const {data,error}=await sb.from('withdrawal_methods').update(payload).eq('id',account.id).eq('user_id',session.user.id).select('id,method_type,account_name,account_number,is_default,is_active').single();if(error)throw error;account=data}else{const {data,error}=await sb.from('withdrawal_methods').insert({...payload,user_id:session.user.id}).select('id,method_type,account_name,account_number,is_default,is_active').single();if(error)throw error;account=data}renderAccount();$('#account-form').hidden=true;$('#account-display').hidden=false;$('#edit-account').hidden=false;showMessage(t.accountSaved,true)}catch(e){showMessage(e.message||t.failed)}}
   function renderAmountInfo(){
     const a=Number($('#amount').value||0);const fee=currentMode==='instant'?instantFee(a):manualFee(a);const total=Math.max(0,a-fee);
-    $('#fee-value').textContent=a>0?money(fee):money(0);$('#total-value').textContent=a>0?money(total):money(0);$('#recipient-value').textContent=a>0?money(a):money(0);
-    const remaining=Math.max(0,LIMIT-(window.__wdUsed||0));$('#amount-limit-hint').textContent=`${tr().remaining(remaining)}`;
+    const remaining=Math.max(0,LIMIT-(window.__wdUsed||0));
     if(currentMode==='instant'){$('#amount').readOnly=true;}else{$('#amount').readOnly=false;}
     updateInstantButtons();
   }
