@@ -142,6 +142,29 @@
     }catch(e){}
   }
 
+  async function refreshNotificationBadge(){
+    const host=document.querySelector("[data-showlink-navbar]");
+    const badge=host?.querySelector("[data-notification-badge]");
+    if(!badge) return;
+    badge.hidden=true;
+    badge.textContent="";
+    if(!logged()) return;
+    try{
+      const sb=await window.ShowLinkSupabase?.load?.();
+      if(!sb) return;
+      const {data:session}=await sb.auth.getSession();
+      const uid=session?.session?.user?.id;
+      if(!uid) return;
+      const {count,error}=await sb.from("notifications")
+        .select("id",{count:"exact",head:true})
+        .eq("user_id",uid)
+        .is("read_at",null);
+      if(error || !count) return;
+      badge.textContent=count>99?"99+":String(count);
+      badge.hidden=false;
+    }catch(e){}
+  }
+
   function render(){
     const host=document.querySelector("[data-showlink-navbar]");
     if(!host)return;
@@ -164,6 +187,11 @@
           <nav class="sl-nav-links" aria-hidden="true"></nav>
 
           <div class="sl-nav-actions" data-top-navbar-tools>
+            <a class="sl-nav-notification" href="${is ? C.notifications : C.login}" aria-label="${t("notifications")}" title="${t("notifications")}" data-nav-notification>
+              ${icon("","fa-bell")}
+              <span class="sl-nav-notification-badge" data-notification-badge hidden aria-hidden="true"></span>
+              <span class="sl-nav-notification-pulse" aria-hidden="true"></span>
+            </a>
             <div data-showlink-tools class="showlink-tools" aria-label="${t("displayOptions")}" data-sl-tools-ready="false">
               <div class="showlink-tool" data-theme-tool>
                 <button class="showlink-tool-btn" type="button" aria-label="${t("theme")}" aria-expanded="false" data-theme-toggle>
@@ -233,6 +261,7 @@
     window.dispatchEvent(new CustomEvent("showlink:navbar-rendered"));
     applyPlanFeatureLocks();
     applyPlatformControl();
+    refreshNotificationBadge();
 
     const menu=host.querySelector("[data-showlink-menu]");
     menu?.addEventListener("click",()=>{
@@ -282,6 +311,7 @@
   window.ShowLinkNavbar={
     render,
     refresh:()=>{authUser=stored();render()},
+    refreshNotifications:refreshNotificationBadge,
     setAuth:u=>{authUser=u||null;render()}
   };
 

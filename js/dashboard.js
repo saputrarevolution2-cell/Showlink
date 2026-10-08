@@ -19,7 +19,7 @@ const day0=d=>{const x=new Date(d);x.setHours(0,0,0,0);return x};
 const sum=(a,k)=>a.reduce((n,x)=>n+Number(x?.[k]||0),0);
 
 async function loadProfile(sb,u){
- try{const {data:p}=await sb.from("profiles").select("username,display_name,email,plan,avatar_url").eq("id",u.id).maybeSingle();const q=p||{};const name=q.username||q.display_name||u.user_metadata?.username||u.email?.split("@")[0]||"User";$$("[data-user-name]").forEach(e=>e.textContent=name);$$("[data-user-email]").forEach(e=>e.textContent=q.email||u.email||"—");$$("[data-account-status]").forEach(e=>e.textContent=(q.plan||"free").toUpperCase());const a=$("[data-avatar]");if(a&&q.avatar_url)a.innerHTML=`<img src="${String(q.avatar_url).replace(/"/g,"&quot;")}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`}catch(e){console.warn(e)}
+ try{const {data:p}=await sb.from("profiles").select("username,display_name,auth_email,plan,avatar_url").eq("id",u.id).maybeSingle();const q=p||{};const name=q.username||q.display_name||u.user_metadata?.username||u.email?.split("@")[0]||"User";$$("[data-user-name]").forEach(e=>e.textContent=name);$$("[data-user-email]").forEach(e=>e.textContent=q.auth_email||u.email||"—");$$("[data-account-status]").forEach(e=>e.textContent=(q.plan||"free").toUpperCase());const a=$("[data-avatar]");if(a&&q.avatar_url)a.innerHTML=`<img src="${String(q.avatar_url).replace(/"/g,"&quot;")}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`}catch(e){console.warn(e)}
 }
 
 function periodChange(cur,prev){return prev?((cur-prev)/prev)*100:(cur>0?100:0)}
@@ -40,7 +40,7 @@ async function loadDashboardData(sb,u){
   const [w,sl,sc,pl,orders,tx,subl,subc]=await Promise.all([
    sb.from("wallets").select("available_balance,pending_balance,lifetime_earned").eq("user_id",u.id).maybeSingle(),
    sb.from("showlink_shortlinks").select("id,status,views,unique_views,created_at").eq("owner_id",u.id),
-   sb.from("showlink_shortlink_clicks").select("shortlink_id,is_valid,task_completed,earning_amount,created_at,completed_at,visitor_hash").eq("owner_id",u.id).eq("is_valid",true).eq("task_completed",true),
+   sb.from("showlink_shortlink_final_dashboard").select("shortlink_id,owner_id,views,estimated_revenue,updated_at").eq("owner_id",u.id),
    sb.from("payment_links").select("id,status,views,unique_views,sales_count,created_at").eq("owner_id",u.id),
    sb.from("orders").select("id,payment_link_id,amount,status,created_at,paid_at,completed_at").eq("seller_id",u.id),
    sb.from("wallet_transactions").select("amount,order_id,type,direction,description,created_at").eq("user_id",u.id).eq("type","earning").eq("direction","credit"),
@@ -49,10 +49,10 @@ async function loadDashboardData(sb,u){
   ]);
   const a=rows(sl),short=rows(sc),links=rows(pl),or=rows(orders),earn=rows(tx).filter(x=>x.order_id),subs=rows(subc),sublinks=rows(subl);
   d.available_balance=Number(w.data?.available_balance||0);
-  d.short_total=a.length;d.short_views=sum(a,"views");d.short_earnings=sum(short,"earning_amount");
-  d.short_today=short.filter(x=>new Date(x.completed_at||x.created_at)>=today).reduce((n,x)=>n+Number(x.earning_amount||0),0);
-  d.short_month=short.filter(x=>new Date(x.completed_at||x.created_at)>=month).reduce((n,x)=>n+Number(x.earning_amount||0),0);
-  d.short_pending=d.short_earnings;
+  d.short_total=a.length;d.short_views=sum(a,"views");d.short_earnings=sum(short,"estimated_revenue");
+  d.short_today=short.filter(x=>new Date(x.updated_at||0)>=today).reduce((n,x)=>n+Number(x.estimated_revenue||0),0);
+  d.short_month=short.filter(x=>new Date(x.updated_at||0)>=month).reduce((n,x)=>n+Number(x.estimated_revenue||0),0);
+  d.short_pending=0;
   d.pay_total=links.length;
   d.pay_clicks=or.length;
   d.pay_sales=or.filter(x=>["paid","processing","completed"].includes(String(x.status||"").toLowerCase())).length;
@@ -65,12 +65,12 @@ async function loadDashboardData(sb,u){
   d.sub_today=done.filter(x=>new Date(x.completed_at||x.created_at)>=today).reduce((n,x)=>n+Number(x.earning_amount||0),0);
   d.sub_month=done.filter(x=>new Date(x.completed_at||x.created_at)>=month).reduce((n,x)=>n+Number(x.earning_amount||0),0);
   d.sub_unlocked=done.length;d.sub_locked=Math.max(0,subs.length-done.length);d.sub_users=new Set(done.map(x=>x.visitor_hash||x.id)).size;
-  const ps=short.filter(x=>{const z=new Date(x.completed_at||x.created_at);return z>=yesterday&&z<today}).reduce((n,x)=>n+Number(x.earning_amount||0),0);
-  const pms=short.filter(x=>{const z=new Date(x.completed_at||x.created_at);return z>=prevMonth&&z<month}).reduce((n,x)=>n+Number(x.earning_amount||0),0);
+  const ps=short.filter(x=>{const z=new Date(x.updated_at||0);return z>=yesterday&&z<today}).reduce((n,x)=>n+Number(x.estimated_revenue||0),0);
+  const pms=short.filter(x=>{const z=new Date(x.updated_at||0);return z>=prevMonth&&z<month}).reduce((n,x)=>n+Number(x.estimated_revenue||0),0);
   const pp=earn.filter(x=>{const z=new Date(x.created_at);return z>=yesterday&&z<today}).reduce((n,x)=>n+Number(x.amount||0),0);
   const ppm=earn.filter(x=>{const z=new Date(x.created_at);return z>=prevMonth&&z<month}).reduce((n,x)=>n+Number(x.amount||0),0);
   d._tr={short_today:periodChange(d.short_today,ps),short_month:periodChange(d.short_month,pms),pay_today:periodChange(d.pay_today,pp),pay_month:periodChange(d.pay_month,ppm),short_total:0,pay_total:0,sub_today:0,sub_month:0,sub_total:0};
-  const series=[];for(let i=29;i>=0;i--){const st=new Date(today);st.setDate(st.getDate()-i);const en=new Date(st);en.setDate(en.getDate()+1);series.push({short:short.filter(x=>{const z=new Date(x.completed_at||x.created_at);return z>=st&&z<en}).reduce((n,x)=>n+Number(x.earning_amount||0),0),pay:earn.filter(x=>{const z=new Date(x.created_at);return z>=st&&z<en}).reduce((n,x)=>n+Number(x.amount||0),0),sub:done.filter(x=>{const z=new Date(x.completed_at||x.created_at);return z>=st&&z<en}).reduce((n,x)=>n+Number(x.earning_amount||0),0)});}
+  const series=[];for(let i=29;i>=0;i--){const st=new Date(today);st.setDate(st.getDate()-i);const en=new Date(st);en.setDate(en.getDate()+1);series.push({short:short.filter(x=>{const z=new Date(x.updated_at||0);return z>=st&&z<en}).reduce((n,x)=>n+Number(x.estimated_revenue||0),0),pay:earn.filter(x=>{const z=new Date(x.created_at);return z>=st&&z<en}).reduce((n,x)=>n+Number(x.amount||0),0),sub:done.filter(x=>{const z=new Date(x.completed_at||x.created_at);return z>=st&&z<en}).reduce((n,x)=>n+Number(x.earning_amount||0),0)});}
   d._series=series;
  }catch(e){console.warn("[ShowLink] dashboard DB:",e);d._tr={};d._series=[]}
  d.income_total=d.short_earnings+d.pay_earnings;

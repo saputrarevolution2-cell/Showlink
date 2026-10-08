@@ -141,9 +141,9 @@
         ${data.description ? `<p class="pl-desc">${esc(data.description)}</p>` : ''}
         <div class="pl-meta">
           <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('titleLabel'))}</span><span class="pl-meta-value">${esc(data.title || 'Payment Link')}</span></div>
-          <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('priceLabel'))}</span><span class="pl-meta-value">${money(data.price, data.currency || 'IDR')}</span></div>
+          <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('priceLabel'))}</span><span class="pl-meta-value">${money(Number(data.buyer_amount ?? data.price ?? 0), data.currency || 'IDR')}</span></div>
         </div>
-        <div class="pl-price">${money(data.price, data.currency || 'IDR')}</div>
+        <div class="pl-price">${money(Number(data.buyer_amount ?? data.price ?? 0), data.currency || 'IDR')}</div>
         <button class="pl-buy" id="buy"><i class="fa-solid fa-lock-open"></i> ${t('buy')}</button>
         ${renderPaymentGuidance()}
       </div>`;
@@ -223,7 +223,7 @@
   function renderCashiPayment(data, result, sb, orderId, token, isUser) {
     currentView = 'payment';
     currentData = { data, result, sb, orderId, token, isUser };
-    const amount = Number(result.amount ?? data.price ?? 0);
+    const amount = Number(result.amount ?? data.buyer_amount ?? data.price ?? 0);
     const qr = result.qr_url || result.qrUrl || '';
     const checkout = result.checkout_url || '';
     app.innerHTML = `
