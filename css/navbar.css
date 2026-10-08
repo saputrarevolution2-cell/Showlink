@@ -123,3 +123,6 @@ html[data-theme="dark"]{
 }
 
 .sl-drawer-brand-accent{color:var(--sl-primary)}
+
+/* Notification badge visibility */
+.sl-nav-notification-badge[hidden], .sl-nav-notification-pulse[hidden] { display: none !important; }
