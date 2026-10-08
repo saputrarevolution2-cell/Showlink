@@ -537,7 +537,7 @@ html[data-theme="dark"] body{
 
 /* V23 — Edit modal scrolling: only the modal card content scrolls */
 body.sl-modal-open{overflow:hidden!important;touch-action:none!important}
-#sl-edit-modal{position:fixed!important;inset:0!important;z-index:10050!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;padding:24px!important;box-sizing:border-box!important}
+#sl-edit-modal{position:fixed!important;inset:0!important;z-index:10050!important;display:none!important;align-items:center!important;justify-content:center!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;padding:24px!important;box-sizing:border-box!important}
 #sl-edit-modal .sl-modal-card{position:relative!important;width:min(760px,100%)!important;max-height:calc(100dvh - 48px)!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;box-sizing:border-box!important}
 #sl-edit-modal .sl-modal-head{flex:0 0 auto!important}
 #sl-edit-modal #sl-edit-form{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important;scrollbar-gutter:stable!important;box-sizing:border-box!important}
