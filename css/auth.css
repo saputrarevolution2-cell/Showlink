@@ -165,3 +165,271 @@ html[data-theme="dark"] body{
   background:linear-gradient(135deg,#a855f7,#ec4899)!important;
   box-shadow:0 10px 28px rgba(109,93,252,.24);
 }
+
+
+/* ============================================================
+   SHOWLINK AUTH — UNIFIED LOGIN / REGISTER SYSTEM
+   Final visual layer: same shell, spacing, controls and CTA.
+   ============================================================ */
+.auth-page{
+  min-height:100svh;
+  background:
+    radial-gradient(900px 500px at 5% 0%,rgba(109,93,252,.10),transparent 62%),
+    radial-gradient(800px 460px at 100% 20%,rgba(236,72,153,.08),transparent 60%),
+    var(--bg);
+}
+.auth-main{
+  min-height:calc(100svh - 64px);
+  padding:44px 20px 64px;
+}
+.auth-wrap{
+  width:min(100%,1080px);
+  grid-template-columns:minmax(0,.92fr) minmax(420px,1.08fr);
+  gap:22px;
+  align-items:stretch;
+}
+.auth-intro,
+.auth-card{
+  min-height:650px;
+}
+.auth-intro{
+  border-radius:28px;
+  padding:38px;
+  background:
+    radial-gradient(500px 280px at 15% 5%,rgba(255,255,255,.14),transparent 65%),
+    linear-gradient(145deg,#4f46e5 0%,#6d5dfc 48%,#c026d3 100%);
+  box-shadow:0 28px 80px rgba(79,61,180,.20);
+}
+.auth-brand{
+  color:#fff;
+  text-decoration:none;
+}
+.auth-brand .brand-mark{
+  width:40px;height:40px;border-radius:13px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.18);
+}
+.auth-kicker{
+  margin-top:48px;
+  padding:8px 11px;
+  border-radius:999px;
+  width:max-content;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.13);
+}
+.auth-intro h1{
+  max-width:470px;
+  margin:17px 0 12px;
+}
+.auth-points{gap:10px;margin-top:27px}
+.auth-point{
+  min-height:43px;
+  align-items:center;
+  padding:8px 10px;
+  border-radius:13px;
+  background:rgba(255,255,255,.075);
+  border:1px solid rgba(255,255,255,.10);
+}
+.auth-point i{
+  width:28px;height:28px;border-radius:9px;
+  background:rgba(255,255,255,.14);
+}
+.auth-art{height:165px;margin-top:25px}
+.auth-art-card{box-shadow:0 18px 40px rgba(28,20,90,.12)}
+
+.auth-card{
+  box-sizing:border-box;
+  border-radius:28px;
+  padding:38px 40px 32px;
+  background:color-mix(in srgb,var(--surface) 96%,transparent);
+  border:1px solid color-mix(in srgb,var(--line) 88%,transparent);
+  box-shadow:0 28px 80px rgba(30,25,70,.11);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.auth-head{
+  margin-bottom:25px;
+}
+.auth-head .auth-icon{
+  width:58px;height:58px;
+  border-radius:18px;
+  margin-bottom:14px;
+  background:linear-gradient(135deg,#6d5dfc,#a855f7 55%,#ec4899);
+  box-shadow:0 14px 30px rgba(109,93,252,.22);
+}
+.auth-head h2{
+  font-size:30px;
+  letter-spacing:-1.2px;
+}
+.auth-head p{
+  font-size:12px;
+  line-height:1.55;
+}
+.auth-form{gap:15px}
+.auth-field{gap:7px}
+.auth-field label{
+  font-size:11px;
+  letter-spacing:.01em;
+}
+.auth-input-wrap{height:50px}
+.auth-input{
+  box-sizing:border-box;
+  height:50px;
+  border-radius:14px;
+  background:var(--surface-2);
+  border-color:color-mix(in srgb,var(--line) 88%,transparent);
+  padding-left:44px;
+  font-size:12px;
+}
+.auth-input:focus{
+  background:var(--surface);
+  border-color:#7c6cff;
+  box-shadow:0 0 0 4px rgba(109,93,252,.09),0 8px 22px rgba(109,93,252,.07);
+}
+.auth-input-wrap>i:first-child{left:15px}
+.auth-password-toggle{
+  width:34px;height:34px;right:8px;
+}
+.auth-row{
+  min-height:28px;
+}
+.auth-check{
+  font-size:10px;
+  line-height:1.45;
+}
+.auth-link{
+  color:#765cff;
+}
+.auth-submit,
+.auth-google{
+  height:50px;
+  border-radius:14px;
+}
+.auth-submit{
+  background:linear-gradient(135deg,#5b4ff0,#7c5cff 48%,#c04be7 100%);
+  box-shadow:0 13px 28px rgba(109,93,252,.22);
+  font-size:12px;
+}
+.auth-google{
+  background:var(--surface-2);
+  border-color:var(--line);
+}
+.auth-divider{
+  margin:0;
+  min-height:17px;
+}
+.auth-bottom{
+  box-sizing:border-box;
+  width:100%;
+  margin-top:20px;
+  padding:13px 14px;
+  border:1px solid var(--line);
+  background:var(--surface-2);
+  border-radius:13px;
+  text-align:center;
+  font-size:12px!important;
+  font-weight:700!important;
+}
+.auth-bottom .auth-link{
+  font-size:12px!important;
+  margin-left:4px;
+}
+.auth-terms{
+  max-width:430px;
+  align-self:center;
+  font-size:9px;
+  line-height:1.65;
+  margin-top:11px;
+}
+.auth-back{
+  align-self:center;
+  margin-top:16px;
+  font-size:10px;
+  text-decoration:none;
+}
+.auth-hint{font-size:9px;line-height:1.45}
+.auth-strength{height:4px;margin-top:-1px}
+
+html[data-theme="dark"] .auth-card{
+  background:rgba(20,19,32,.90);
+  box-shadow:0 30px 90px rgba(0,0,0,.34);
+}
+html[data-theme="dark"] .auth-input{
+  background:rgba(255,255,255,.035);
+}
+html[data-theme="dark"] .auth-input:focus{
+  background:rgba(255,255,255,.055);
+}
+html[data-theme="dark"] .auth-google,
+html[data-theme="dark"] .auth-bottom{
+  background:rgba(255,255,255,.035);
+}
+
+@media(max-width:900px){
+  .auth-wrap{
+    max-width:620px;
+    grid-template-columns:1fr;
+  }
+  .auth-intro{
+    display:block;
+    min-height:0;
+    padding:28px;
+  }
+  .auth-intro .auth-art{display:none}
+  .auth-kicker{margin-top:25px}
+  .auth-intro h1{font-size:34px}
+  .auth-points{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    margin-top:20px;
+  }
+  .auth-point{
+    min-height:72px;
+    flex-direction:column;
+    justify-content:center;
+    text-align:center;
+    padding:9px 6px;
+    font-size:10px;
+  }
+  .auth-card{
+    min-height:0;
+  }
+}
+@media(max-width:620px){
+  .auth-main{
+    padding:24px 14px 42px;
+  }
+  .auth-wrap{
+    gap:14px;
+  }
+  .auth-intro{
+    padding:23px 20px;
+    border-radius:22px;
+  }
+  .auth-intro h1{
+    font-size:29px;
+    letter-spacing:-1.3px;
+  }
+  .auth-intro p{
+    font-size:12px;
+  }
+  .auth-points{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:7px;
+  }
+  .auth-point{
+    min-height:0;
+    flex-direction:row;
+    text-align:left;
+    justify-content:flex-start;
+    padding:8px 9px;
+  }
+  .auth-card{
+    padding:27px 18px 24px;
+    border-radius:22px;
+  }
+  .auth-head h2{font-size:27px}
+  .auth-form{gap:14px}
+}
