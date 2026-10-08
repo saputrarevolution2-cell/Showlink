@@ -42,11 +42,51 @@
     if (el) el.hidden = !show;
   }
 
-  function setResult(message, type = "info", link = "") {
+  function setResult(message, type = "info", link = "", price = null) {
     const box = $("#create-result");
     if (!box) return;
     box.hidden = false;
     box.className = `payment-result ${type}`;
+
+    if (type === "success" && link) {
+      const safeLink = escapeHtml(link);
+      const priceHtml = price != null ? `<div class="payment-result-price"><span>Harga Payment Link</span><strong>${escapeHtml(rupiah(price))}</strong></div>` : "";
+      box.innerHTML = `
+        <div class="payment-result-head">
+          <div class="payment-result-icon"><i class="fa-solid fa-circle-check"></i></div>
+          <div><strong>${escapeHtml(message)}</strong><span>Link siap dibagikan dan dibuka oleh buyer.</span></div>
+        </div>
+        ${priceHtml}
+        <div class="payment-result-url-wrap">
+          <span class="payment-result-label"><i class="fa-solid fa-link"></i> URL Payment Link</span>
+          <div class="payment-result-url" title="${safeLink}">${safeLink}</div>
+        </div>
+        <div class="payment-result-actions">
+          <button type="button" class="payment-result-btn primary" data-copy-payment-link="${safeLink}"><i class="fa-solid fa-copy"></i><span>Salin Link</span></button>
+          <a class="payment-result-btn" href="${safeLink}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i><span>Buka Link</span></a>
+        </div>`;
+
+      box.querySelector('[data-copy-payment-link]')?.addEventListener('click', async (event) => {
+        const button = event.currentTarget;
+        try {
+          await navigator.clipboard.writeText(link);
+          button.innerHTML = '<i class="fa-solid fa-check"></i><span>Tersalin</span>';
+          button.classList.add('copied');
+          setTimeout(() => {
+            button.innerHTML = '<i class="fa-solid fa-copy"></i><span>Salin Link</span>';
+            button.classList.remove('copied');
+          }, 1800);
+        } catch (_) {
+          const ta = document.createElement('textarea');
+          ta.value = link; document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); } catch (_) {}
+          ta.remove();
+          button.innerHTML = '<i class="fa-solid fa-check"></i><span>Tersalin</span>';
+        }
+      });
+      return;
+    }
+
     box.innerHTML = message + (link ? ` <a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(link)}</a>` : "");
   }
 
@@ -163,7 +203,7 @@
       try {
         const result = await createPaymentLink(form);
         const priceText = rupiah(Number(form.elements.price.value));
-        setResult(`${t("payment.success")} · ${priceText}:`, "success", result.url);
+        setResult(t("payment.success"), "success", result.url, Number(form.elements.price.value));
         form.reset();
       } catch (error) {
         console.error(error);

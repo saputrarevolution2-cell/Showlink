@@ -37,6 +37,7 @@
     if (!currentData) return;
     if (currentView === 'locked') renderLocked(currentData);
     else if (currentView === 'unlocked') renderUnlocked(currentData);
+    else if (currentView === 'owner-preview') renderOwnerPreview(currentData);
     else if (currentView === 'gateway') renderGatewaySelection(currentData);
     else if (currentView === 'payment') {
       if (currentData.provider === 'BAYAR_GG') renderBayarGGPayment(
@@ -73,6 +74,7 @@
       gatewaySecure:'Pembayaran diproses melalui server pembayaran yang kamu pilih.' ,
       titleLabel:'Judul', priceLabel:'Harga', empty:'Konten kosong.',
       notAvailable:'Payment Link tidak tersedia',
+      ownerNoticeTitle:'Ini Payment Link milik kamu', ownerNotice:'Kamu tidak dapat membeli Payment Link milik sendiri. Kamu tetap bisa membuka pratinjau konten dengan tombol Cek Konten.', ownerBuy:'Buy Now', checkContent:'Cek Konten', previewKicker:'PRATINJAU PEMILIK', previewReady:'Ini adalah pratinjau konten milikmu. Pratinjau tidak membuat order atau transaksi.',
       notFound:'Payment Link tidak ditemukan atau sudah tidak aktif.',
       loadError:'Kode Payment Link tidak ditemukan di URL.',
       loading:'Memuat Payment Link…',
@@ -100,6 +102,7 @@
       gatewaySecure:'Payment is processed through your selected payment server.',
       titleLabel:'Title', priceLabel:'Price', empty:'Content is empty.',
       notAvailable:'Payment Link unavailable',
+      ownerNoticeTitle:'This is your Payment Link', ownerNotice:'You cannot buy your own Payment Link. You can still preview the content with Check Content.', ownerBuy:'Buy Now', checkContent:'Check Content', previewKicker:'OWNER PREVIEW', previewReady:'This is your own content preview. Previewing does not create an order or transaction.',
       notFound:'Payment Link was not found or is no longer active.',
       loadError:'Payment Link code was not found in the URL.',
       loading:'Loading Payment Link…',
@@ -142,6 +145,73 @@
       <div class="pl-marquee">${banks.map(x=>`<span>${esc(x)}</span>`).join('')}</div>
       <div class="pl-marquee reverse">${wallets.map(x=>`<span>${esc(x)}</span>`).join('')}</div>
     </div>`;
+  }
+
+  function renderOwnerLocked(data) {
+    currentView = 'locked';
+    currentData = data;
+    const image = data.thumbnail_url;
+    app.innerHTML = `
+      ${image ? `<div class="pl-cover"><img src="${esc(image)}" alt=""></div>` : `<div class="pl-cover"><i class="fa-solid fa-user-lock"></i></div>`}
+      <div class="pl-body">
+        <span class="pl-kicker"><i class="fa-solid fa-user-check"></i> PAYMENT LINK</span>
+        <h1 class="pl-title">${esc(data.title || 'Payment Link')}</h1>
+        ${data.description ? `<p class="pl-desc">${esc(data.description)}</p>` : ''}
+        <div class="pl-owner-notice">
+          <div class="pl-owner-notice-icon"><i class="fa-solid fa-circle-info"></i></div>
+          <div><strong>${esc(t('ownerNoticeTitle'))}</strong><p>${esc(t('ownerNotice'))}</p></div>
+        </div>
+        <div class="pl-meta">
+          <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('titleLabel'))}</span><span class="pl-meta-value">${esc(data.title || 'Payment Link')}</span></div>
+          <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('priceLabel'))}</span><span class="pl-meta-value">${money(Number(data.buyer_amount ?? data.price ?? 0), data.currency || 'IDR')}</span></div>
+        </div>
+        <div class="pl-owner-actions">
+          <button class="pl-buy" id="owner-buy" type="button"><i class="fa-solid fa-cart-shopping"></i> ${esc(t('ownerBuy'))}</button>
+          <button class="pl-buy pl-secondary-buy" id="owner-content" type="button"><i class="fa-solid fa-eye"></i> ${esc(t('checkContent'))}</button>
+        </div>
+        <div class="pl-owner-inline-status" id="owner-status" hidden></div>
+      </div>`;
+
+    document.getElementById('owner-buy')?.addEventListener('click', () => {
+      const status = document.getElementById('owner-status');
+      if (!status) return;
+      status.hidden = false;
+      status.innerHTML = `<i class="fa-solid fa-circle-info"></i><span>${esc(t('ownerNotice'))}</span>`;
+    });
+
+    document.getElementById('owner-content')?.addEventListener('click', async () => {
+      const button = document.getElementById('owner-content');
+      const status = document.getElementById('owner-status');
+      button.disabled = true;
+      button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${esc(currentLang()==='en'?'Loading…':'Memuat…')}`;
+      try {
+        const sb = await window.ShowLinkSupabase.load();
+        const { data: preview, error } = await sb.rpc('get_payment_link_owner_preview', { p_payment_link_id: data.id });
+        if (error) throw error;
+        renderOwnerPreview({ ...data, ...preview });
+      } catch (error) {
+        if (status) { status.hidden = false; status.className = 'pl-owner-inline-status error'; status.textContent = error?.message || (currentLang()==='en'?'Preview failed.':'Gagal membuka pratinjau.'); }
+        button.disabled = false;
+        button.innerHTML = `<i class="fa-solid fa-eye"></i> ${esc(t('checkContent'))}`;
+      }
+    });
+  }
+
+  function renderOwnerPreview(data) {
+    currentView = 'owner-preview';
+    currentData = data;
+    const content = data.content_html || (data.content_text ? `<pre class="pl-content-text">${esc(data.content_text)}</pre>` : `<div class="pl-status">${esc(t('empty'))}</div>`);
+    app.innerHTML = `
+      ${data.thumbnail_url ? `<div class="pl-cover"><img src="${esc(data.thumbnail_url)}" alt=""></div>` : `<div class="pl-cover"><i class="fa-solid fa-eye"></i></div>`}
+      <div class="pl-body">
+        <span class="pl-kicker"><i class="fa-solid fa-eye"></i> ${esc(t('previewKicker'))}</span>
+        <h1 class="pl-title">${esc(data.title || 'Payment Link')}</h1>
+        ${data.description ? `<p class="pl-desc">${esc(data.description)}</p>` : ''}
+        <div class="pl-owner-preview-status"><i class="fa-solid fa-circle-check"></i> ${esc(t('previewReady'))}</div>
+        <div class="pl-content">${content}</div>
+        <button class="pl-buy pl-back-gateway" id="owner-preview-back" type="button"><i class="fa-solid fa-arrow-left"></i> ${esc(t('back'))}</button>
+      </div>`;
+    document.getElementById('owner-preview-back')?.addEventListener('click', () => renderOwnerLocked(data));
   }
 
   function renderLocked(data) {
@@ -596,6 +666,11 @@
 
       if (error) throw error;
       if (!data) throw new Error(t('notFound'));
+
+      if (data.is_owner === true) {
+        renderOwnerLocked(data);
+        return;
+      }
 
       // The public page is the Payment Link landing page. Only after payment
       // access is granted do we expose content_html/content_text.
