@@ -1,0 +1,12 @@
+/* Google Profile page logic extracted from google-profile.html */
+
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function showGoogleReceipt(username,email){
+ document.body.insertAdjacentHTML("beforeend",`<div id="auth-receipt"><div class="auth-receipt-backdrop"><div class="auth-receipt-card" id="auth-receipt-card"><div class="auth-receipt-icon"><i class="fa-solid fa-circle-check"></i></div><h3>Pendaftaran berhasil!</h3><p class="auth-receipt-note">Akun Google berhasil terhubung.</p><div class="auth-receipt-row"><span>Username</span><strong>${esc(username)}</strong></div><div class="auth-receipt-row"><span>Email</span><strong>${esc(email)}</strong></div><div class="auth-receipt-row"><span>Metode password</span><strong>Google Account</strong></div><p class="auth-receipt-safe">Password Google tidak disimpan oleh ShowLink dan tidak ditampilkan.</p><div class="auth-receipt-actions"><button type="button" class="auth-submit" id="save-google-shot"><i class="fa-solid fa-camera"></i> Simpan screenshot</button><button type="button" class="auth-secondary" id="go-dashboard">Lanjut ke Dashboard</button></div></div></div></div>`);
+ document.getElementById("go-dashboard").onclick=()=>location.replace("/dashboard.html");
+ document.getElementById("save-google-shot").onclick=async()=>{const c=await html2canvas(document.getElementById("auth-receipt-card"),{backgroundColor:null,scale:2,useCORS:true});const a=document.createElement("a");a.download="showlink-google-success.png";a.href=c.toDataURL("image/png");a.click()}
+}
+
+(async()=>{const sb=await window.ShowLinkSupabase.load();const {data}=await sb.auth.getSession();if(!data.session)location.replace("/login.html");const f=document.getElementById("profile-form"),a=document.querySelector("[data-alert]");f.addEventListener("submit",async e=>{e.preventDefault();const username=f.username.value.trim();if(!/^[A-Za-z0-9_]{3,30}$/.test(username)){a.textContent="Username tidak valid.";a.classList.add("is-visible");return}const u=data.session.user;const {error}=await sb.from("profiles").update({username,display_name:username,email:u.email}).eq("id",u.id);if(error){a.textContent=error.message.includes("unique")?"Username sudah digunakan.":error.message;a.classList.add("is-visible");return}await sb.auth.updateUser({data:{username,display_name:username}});
+showGoogleReceipt(username,u.email||"");
+})})();
