@@ -543,3 +543,24 @@ body.sl-modal-open{overflow:hidden!important;touch-action:none!important}
 #sl-edit-modal #sl-edit-form{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important;scrollbar-gutter:stable!important;box-sizing:border-box!important}
 #sl-edit-modal #sl-edit-form .sl-edit-actions{position:sticky!important;bottom:0!important;z-index:3!important;background:var(--sl-surface-strong)!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;box-shadow:0 -8px 20px color-mix(in srgb,var(--sl-text) 7%,transparent)!important}
 @media(max-width:720px){#sl-edit-modal{align-items:flex-end!important;padding:8px!important}#sl-edit-modal .sl-modal-card{max-height:calc(100dvh - 16px)!important;border-radius:24px 24px 16px 16px!important}#sl-edit-modal #sl-edit-form{padding-bottom:90px!important}}
+
+
+/* V24 — reliable Edit actions + clean button treatment */
+#sl-edit-modal .sl-edit-actions .btn {
+  appearance:none !important; -webkit-appearance:none !important;
+  border:1px solid var(--sl-border) !important;
+  min-height:48px !important; padding:0 20px !important;
+  border-radius:14px !important; font-weight:800 !important;
+  font-size:13px !important; line-height:1 !important;
+  cursor:pointer !important; transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background .18s ease !important;
+}
+#sl-edit-modal .sl-edit-actions .btn.secondary {
+  background:var(--sl-surface) !important; color:var(--sl-text) !important;
+}
+#sl-edit-modal .sl-edit-actions .btn.btn-primary {
+  background:var(--sl-purple) !important; color:#fff !important; border-color:transparent !important;
+}
+#sl-edit-modal .sl-edit-actions .btn:hover:not(:disabled) { transform:translateY(-1px) !important; box-shadow:0 10px 24px rgba(0,0,0,.12) !important; }
+#sl-edit-modal .sl-edit-actions .btn:disabled { opacity:.65 !important; cursor:wait !important; transform:none !important; }
+#sl-edit-modal.is-open { display:flex !important; }
+@media(max-width:720px){#sl-edit-modal .sl-edit-actions .btn{min-height:50px !important;border-radius:13px !important}}
