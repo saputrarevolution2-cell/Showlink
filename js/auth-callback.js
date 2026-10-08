@@ -1,1 +1,4 @@
 (() => { 'use strict'; document.documentElement.dataset.pageReady = 'true'; })();
+
+
+(async()=>{const el=document.querySelector("[data-status]");try{const sb=await window.ShowLinkSupabase.load();const {data,error}=await sb.auth.getSession();if(error)throw error;if(!data.session?.user){el.textContent="Login belum selesai. Silakan kembali.";return}const u=data.session.user;const meta=u.user_metadata||{};let username=meta.username||meta.preferred_username||"";const {data:profile}=await sb.from("profiles").select("username").eq("id",u.id).maybeSingle();username=profile?.username||username;if(!username){location.replace("/google-profile.html");return}localStorage.setItem("showlink_user",JSON.stringify({id:u.id,email:u.email||"",user_metadata:meta}));location.replace("/dashboard.html")}catch(e){el.textContent=e.message||"Login Google gagal."}})();

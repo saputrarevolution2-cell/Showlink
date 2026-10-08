@@ -1,9 +1,7 @@
-/* ShowLink shared footer. */
+/* ShowLink — shared imported footer */
 (() => {
   "use strict";
-  const C={home:"/",about:"/about.html",platform:"/#platform",how:"/#how"};
-  const icon=(cls,name)=>`<i class="fa-solid ${name}${cls?` ${cls}`:""}" aria-hidden="true"></i>`;
-  const t=k=>window.ShowLinkLanguage?.t?.(k)||k;
-  function render(){const host=document.querySelector("[data-showlink-footer]");if(!host)return;const y=new Date().getFullYear();host.innerHTML=`<footer class="sl-footer"><div class="sl-footer-shell"><div class="sl-footer-main"><a class="sl-footer-brand" href="${C.home}" aria-label="ShowLink"><span class="sl-brand-mark"><img src="/assets/showlink-logo.svg" alt="ShowLink"></span><span class="sl-footer-brand-text"><strong>ShowLink</strong><small data-i18n="footerTagline">${t("footerTagline")}</small></span></a><nav class="sl-footer-links" aria-label="${t("footerNavigation")}"><a href="${C.platform}" data-i18n="platformInfo">${t("platformInfo")}</a><a href="${C.how}" data-i18n="howItWorks">${t("howItWorks")}</a><a href="${C.about}" data-i18n="about">${t("about")}</a></nav></div><div class="sl-footer-bottom"><span data-i18n="copyright">${t("copyright").replace("{year}",y)}</span><span>ShowLink</span></div></div></footer>`}
+  async function render(){const host=document.querySelector("[data-showlink-footer]");if(!host)return;try{const r=await fetch("/components/footer.html",{cache:"no-store"});if(!r.ok)throw new Error(`footer.html ${r.status}`);host.innerHTML=await r.text();const y=new Date().getFullYear();const c=host.querySelector("[data-footer-copyright]");if(c)c.textContent=(window.ShowLinkLanguage?.t?.("copyright")||`© ${y} ShowLink. All rights reserved.`).replace("{year}",y);document.body.classList.add("showlink-footer-page");window.dispatchEvent(new CustomEvent("showlink:footer-rendered"));}catch(e){console.error("ShowLink footer import failed:",e);}}
   window.ShowLinkFooter={render,refresh:render};
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",render,{once:true});else render();
 })();
