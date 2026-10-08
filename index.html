@@ -2,9 +2,9 @@
 <html lang="id">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#7c3aed">
-  <meta name="description" content="ShowLink Payment Link — buat link pembayaran dan jual akses digital.">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1026">
+  <meta name="description" content="ShowLink — Payment Link untuk menerima pembayaran dan menjual akses digital dengan pengalaman checkout modern.">
   <title>ShowLink — Payment Link</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +15,14 @@
   <link rel="stylesheet" href="/css/navbar.css">
   <link rel="stylesheet" href="/css/footer.css">
   <script>
-    (()=>{try{const s=localStorage.getItem('showlink-theme');const dark=s==='dark'||(s!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=dark?'dark':'light';}catch(e){}})();
+    (() => {
+      try {
+        const saved = localStorage.getItem('showlink-theme');
+        const dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+      } catch (_) {}
+    })();
   </script>
   <script src="/js/showlink-components.js" defer></script>
   <script src="/js/navbar.js" defer></script>
@@ -24,77 +31,173 @@
 </head>
 <body class="index-page">
   <div data-showlink-navbar></div>
+
   <main class="sl-main">
-    <section class="sl-container index-hero">
-      <div class="hero-copy">
-        <span class="hero-kicker"><i class="fa-solid fa-bolt"></i><span data-index-i18n="badge">SHOWLINK · PAYMENT LINK</span></span>
-        <h1><span data-index-i18n="title">Jual akses digital dengan</span> <em data-index-i18n="titleAccent">satu link.</em></h1>
-        <p class="hero-intro" data-index-i18n="intro">Buat Payment Link, tentukan harga, bagikan URL, dan buka konten otomatis setelah pembayaran berhasil diverifikasi.</p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="/register.html"><i class="fa-solid fa-rocket"></i><span data-index-i18n="start">Mulai Sekarang</span></a>
-          <a class="btn btn-secondary" href="/login.html"><i class="fa-solid fa-right-to-bracket"></i><span data-index-i18n="login">Login</span></a>
+    <!-- =========================================================
+         HERO / ABOUT PLATFORM
+         Gambar 3 iPhone berisi QR + web platform + withdraw
+         ditempatkan di bagian paling atas agar langsung menjelaskan produk.
+    ========================================================== -->
+    <section class="hero-section">
+      <div class="hero-glow hero-glow-one"></div>
+      <div class="hero-glow hero-glow-two"></div>
+      <div class="sl-container hero-layout">
+        <div class="hero-copy">
+          <span class="eyebrow"><i class="fa-solid fa-sparkles"></i><span data-index-i18n="heroBadge">SHOWLINK · PAYMENT PLATFORM</span></span>
+          <h1><span data-index-i18n="heroTitle">Satu link untuk</span> <span class="gradient-text" data-index-i18n="heroAccent">menerima pembayaran.</span></h1>
+          <p data-index-i18n="heroText">Buat Payment Link, bagikan ke mana saja, terima pembayaran melalui gateway yang aktif, lalu kelola saldo dan penarikan dari satu platform.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="/register.html"><i class="fa-solid fa-rocket"></i><span data-index-i18n="start">Mulai Sekarang</span></a>
+            <a class="btn btn-glass" href="#about-platform"><i class="fa-solid fa-circle-play"></i><span data-index-i18n="seePlatform">Lihat Platform</span></a>
+          </div>
+          <div class="hero-points">
+            <span><i class="fa-solid fa-circle-check"></i><span data-index-i18n="point1">Payment Link siap dibagikan</span></span>
+            <span><i class="fa-solid fa-shield-halved"></i><span data-index-i18n="point2">Checkout terverifikasi</span></span>
+            <span><i class="fa-solid fa-mobile-screen-button"></i><span data-index-i18n="point3">Mobile friendly</span></span>
+          </div>
         </div>
-        <div class="hero-trust"><span><i class="fa-solid fa-shield-halved"></i><span data-index-i18n="secure">Pembayaran aman &amp; terverifikasi</span></span><span><i class="fa-solid fa-mobile-screen-button"></i>Mobile first</span><span><i class="fa-solid fa-globe"></i>Global ready</span></div>
-      </div>
-      <div class="hero-visual">
-        <div class="orb orb-a"></div><div class="orb orb-b"></div>
-        <div class="hero-device">
-          <div class="device-head"><span class="brand-dot"><i class="fa-solid fa-link"></i></span><div><b>ShowLink</b><small>Secure Payment Link</small></div><i class="fa-solid fa-shield-halved shield"></i></div>
-          <div class="device-product"><img src="/assets/showcase/payment-link.svg" alt="ShowLink Payment Link showcase"><div class="device-product-overlay"><span>DIGITAL CONTENT</span><b data-index-i18n="demoTitle">Premium Content</b><small data-index-i18n="demoSub">Akses setelah pembayaran</small></div></div>
-          <div class="device-price"><span>Total</span><strong>Rp 25.000</strong></div>
-          <div class="device-secure"><i class="fa-solid fa-circle-check"></i><span data-index-i18n="verified">Payment terverifikasi sebelum konten dibuka</span></div>
+
+        <div class="hero-art" id="about-platform">
+          <div class="hero-art-frame">
+            <div class="hero-art-badge"><i class="fa-solid fa-qrcode"></i><span data-index-i18n="qrBadge">PAYMENT · PLATFORM · WITHDRAW</span></div>
+            <img src="/assets/showcase/showlink-three-iphone.png" alt="ShowLink Payment Link, platform web, QR payment dan withdraw" fetchpriority="high">
+          </div>
+          <div class="hero-floating hero-floating-a"><i class="fa-solid fa-link"></i><div><b>Payment Link</b><small>Ready to share</small></div></div>
+          <div class="hero-floating hero-floating-b"><i class="fa-solid fa-wallet"></i><div><b>Withdraw</b><small>Manage your balance</small></div></div>
         </div>
-        <div class="float-card float-one"><i class="fa-solid fa-check"></i><div><b>Payment</b><small>Verified</small></div></div>
-        <div class="float-card float-two"><i class="fa-solid fa-wallet"></i><div><b>Balance</b><small>Available</small></div></div>
       </div>
     </section>
 
-    <section class="sl-container feature-section">
-      <div class="feature-grid">
-        <article class="feature-card"><span class="feature-icon"><i class="fa-solid fa-pen-to-square"></i></span><div><h2 data-index-i18n="feature1">Buat Payment Link</h2><p data-index-i18n="feature1p">Isi judul, deskripsi, konten, dan harga. Sistem membuat URL yang siap dibagikan.</p></div></article>
-        <article class="feature-card"><span class="feature-icon"><i class="fa-solid fa-credit-card"></i></span><div><h2 data-index-i18n="feature2">Buyer membayar</h2><p data-index-i18n="feature2p">Buyer memilih metode pembayaran yang tersedia dari gateway aktif.</p></div></article>
-        <article class="feature-card"><span class="feature-icon"><i class="fa-solid fa-unlock-keyhole"></i></span><div><h2 data-index-i18n="feature3">Konten terbuka</h2><p data-index-i18n="feature3p">Konten diberikan setelah status pembayaran berhasil diverifikasi.</p></div></article>
-      </div>
-    </section>
-
-    <section class="showcase-section">
+    <!-- =========================================================
+         PLATFORM DETAIL
+         Gambar anime dipakai khusus sebagai detail / storytelling.
+    ========================================================== -->
+    <section class="about-section" aria-labelledby="about-title">
       <div class="sl-container">
-        <div class="section-heading"><span class="section-kicker" data-index-i18n="showcaseKicker">Dibuat untuk jualan digital</span><h2 data-index-i18n="showcaseTitle">Satu alur dari link sampai saldo.</h2><p data-index-i18n="showcaseText">Tampilan yang cepat, modern, dan nyaman untuk creator maupun buyer.</p></div>
-        <div class="showcase-grid">
-          <figure class="showcase-card large"><img src="/assets/showcase/payment-link.svg" alt="Payment Link interface"><figcaption><b>Payment Link</b><span>Fast checkout experience</span></figcaption></figure>
-          <figure class="showcase-card"><img src="/assets/showcase/checkout.svg" alt="Checkout interface"><figcaption><b>Checkout</b><span>Simple payment flow</span></figcaption></figure>
-          <figure class="showcase-card"><img src="/assets/showcase/payout.svg" alt="Payout dashboard"><figcaption><b>Balance</b><span>Settlement &amp; withdrawal</span></figcaption></figure>
-          <figure class="showcase-card wide"><img src="/assets/showcase/global-payout.svg" alt="Global payout interface"><figcaption><b>Global payout</b><span>Local &amp; international destinations</span></figcaption></figure>
+        <div class="section-head centered">
+          <span class="section-kicker"><i class="fa-solid fa-layer-group"></i><span data-index-i18n="aboutKicker">TENTANG SHOWLINK</span></span>
+          <h2 id="about-title" data-index-i18n="aboutTitle">Platform pembayaran yang dibuat untuk jualan digital.</h2>
+          <p data-index-i18n="aboutText">Dari membuat link, buyer membayar, sampai saldo siap dikelola — semuanya dibuat dalam satu pengalaman yang sederhana dan premium.</p>
+        </div>
+        <div class="anime-detail-card">
+          <div class="anime-copy">
+            <span class="mini-label"><i class="fa-solid fa-wand-magic-sparkles"></i><span data-index-i18n="detailLabel">SHOWLINK EXPERIENCE</span></span>
+            <h3 data-index-i18n="detailTitle">Satu platform. Satu alur. Lebih mudah menjual.</h3>
+            <p data-index-i18n="detailText">Gunakan Payment Link sebagai pintu masuk pembayaran, berikan pengalaman checkout yang rapi, dan kelola hasil penjualan dari dashboard ShowLink.</p>
+            <div class="detail-list">
+              <div><i class="fa-solid fa-link"></i><span data-index-i18n="detail1">Buat Payment Link dalam beberapa langkah.</span></div>
+              <div><i class="fa-solid fa-credit-card"></i><span data-index-i18n="detail2">Buyer memilih metode pembayaran yang tersedia.</span></div>
+              <div><i class="fa-solid fa-chart-line"></i><span data-index-i18n="detail3">Pantau order, saldo, settlement, dan withdraw.</span></div>
+            </div>
+            <a class="text-link" href="/about.html"><span data-index-i18n="learnMore">Pelajari tentang ShowLink</span><i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+          <div class="anime-media">
+            <div class="anime-shine"></div>
+            <img src="/assets/showcase/showlink-anime-showcase.png" alt="ShowLink platform showcase" loading="lazy">
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="payment-section payment-logo-section">
+    <!-- =========================================================
+         WORKFLOW / 4 SHOWCASE INTERFACE IMAGES
+    ========================================================== -->
+    <section class="workflow-section" aria-labelledby="workflow-title">
       <div class="sl-container">
-        <div class="section-heading compact payment-heading">
-          <span class="section-kicker"><i class="fa-solid fa-layer-group"></i> PAYMENT ECOSYSTEM</span>
-          <h2 data-index-i18n="paymentTitle">Satu checkout, banyak pilihan pembayaran.</h2>
-          <p data-index-i18n="paymentText">Tampilkan pengalaman pembayaran premium dengan bank, e-wallet, QR, dan metode global yang tersedia melalui gateway aktif.</p>
+        <div class="section-head">
+          <span class="section-kicker"><i class="fa-solid fa-bolt"></i><span data-index-i18n="workflowKicker">ALUR PEMBAYARAN</span></span>
+          <h2 id="workflow-title" data-index-i18n="workflowTitle">Dari link sampai saldo, semuanya terlihat jelas.</h2>
+          <p data-index-i18n="workflowText">Gunakan visual platform di bawah untuk menunjukkan pengalaman Payment Link, checkout, balance, dan payout.</p>
+        </div>
+        <div class="workflow-grid">
+          <figure class="showcase-card showcase-main">
+            <img src="/assets/showcase/payment-link.svg" alt="ShowLink Payment Link" loading="lazy">
+            <figcaption><b>Payment Link</b><span data-index-i18n="capPayment">Buat dan bagikan link pembayaran.</span></figcaption>
+          </figure>
+          <figure class="showcase-card">
+            <img src="/assets/showcase/checkout.svg" alt="ShowLink Checkout" loading="lazy">
+            <figcaption><b>Checkout</b><span data-index-i18n="capCheckout">Pengalaman pembayaran yang sederhana.</span></figcaption>
+          </figure>
+          <figure class="showcase-card">
+            <img src="/assets/showcase/payout.svg" alt="ShowLink Balance and Payout" loading="lazy">
+            <figcaption><b>Balance</b><span data-index-i18n="capBalance">Pantau saldo dan settlement.</span></figcaption>
+          </figure>
+          <figure class="showcase-card showcase-wide">
+            <img src="/assets/showcase/global-payout.svg" alt="ShowLink Global Payout" loading="lazy">
+            <figcaption><b>Global Payout</b><span data-index-i18n="capGlobal">Tujuan penarikan lokal dan internasional.</span></figcaption>
+          </figure>
         </div>
       </div>
-      <div class="payment-logo-row bank-marquee" aria-label="Bank payment methods">
-        <div class="logo-marquee-track"><div class="method-logo"><img src="/assets/showcase/bank-bca.svg" alt="BCA"></div><div class="method-logo"><img src="/assets/showcase/bank-bri.svg" alt="BRI"></div><div class="method-logo"><img src="/assets/showcase/bank-bni.svg" alt="BNI"></div><div class="method-logo"><img src="/assets/showcase/bank-mandiri.svg" alt="MANDIRI"></div><div class="method-logo"><img src="/assets/showcase/bank-btn.svg" alt="BTN"></div><div class="method-logo"><img src="/assets/showcase/bank-bsi.svg" alt="BSI"></div><div class="method-logo"><img src="/assets/showcase/bank-cimb.svg" alt="CIMB"></div><div class="method-logo"><img src="/assets/showcase/bank-permata.svg" alt="PERMATA"></div><div class="method-logo"><img src="/assets/showcase/bank-danamon.svg" alt="DANAMON"></div><div class="method-logo"><img src="/assets/showcase/bank-ocbc.svg" alt="OCBC"></div><div class="method-logo"><img src="/assets/showcase/bank-maybank.svg" alt="MAYBANK"></div><div class="method-logo"><img src="/assets/showcase/bank-mega.svg" alt="MEGA"></div><div class="method-logo"><img src="/assets/showcase/bank-jago.svg" alt="JAGO"></div><div class="method-logo"><img src="/assets/showcase/bank-seabank.svg" alt="SEABANK"></div><div class="method-logo"><img src="/assets/showcase/bank-blu.svg" alt="BLU"></div><div class="method-logo"><img src="/assets/showcase/bank-jenius.svg" alt="JENIUS"></div><div class="method-logo"><img src="/assets/showcase/bank-sinarmas.svg" alt="SINARMAS"></div><div class="method-logo"><img src="/assets/showcase/bank-muamalat.svg" alt="MUAMALAT"></div><div class="method-logo"><img src="/assets/showcase/bank-bca.svg" alt="BCA"></div><div class="method-logo"><img src="/assets/showcase/bank-bri.svg" alt="BRI"></div><div class="method-logo"><img src="/assets/showcase/bank-bni.svg" alt="BNI"></div><div class="method-logo"><img src="/assets/showcase/bank-mandiri.svg" alt="MANDIRI"></div><div class="method-logo"><img src="/assets/showcase/bank-btn.svg" alt="BTN"></div><div class="method-logo"><img src="/assets/showcase/bank-bsi.svg" alt="BSI"></div><div class="method-logo"><img src="/assets/showcase/bank-cimb.svg" alt="CIMB"></div><div class="method-logo"><img src="/assets/showcase/bank-permata.svg" alt="PERMATA"></div><div class="method-logo"><img src="/assets/showcase/bank-danamon.svg" alt="DANAMON"></div><div class="method-logo"><img src="/assets/showcase/bank-ocbc.svg" alt="OCBC"></div><div class="method-logo"><img src="/assets/showcase/bank-maybank.svg" alt="MAYBANK"></div><div class="method-logo"><img src="/assets/showcase/bank-mega.svg" alt="MEGA"></div><div class="method-logo"><img src="/assets/showcase/bank-jago.svg" alt="JAGO"></div><div class="method-logo"><img src="/assets/showcase/bank-seabank.svg" alt="SEABANK"></div><div class="method-logo"><img src="/assets/showcase/bank-blu.svg" alt="BLU"></div><div class="method-logo"><img src="/assets/showcase/bank-jenius.svg" alt="JENIUS"></div><div class="method-logo"><img src="/assets/showcase/bank-sinarmas.svg" alt="SINARMAS"></div><div class="method-logo"><img src="/assets/showcase/bank-muamalat.svg" alt="MUAMALAT"></div></div>
-      </div>
-      <div class="payment-logo-row wallet-marquee" aria-label="E-wallet and global payment methods">
-        <div class="logo-marquee-track"><div class="method-logo"><img src="/assets/showcase/wallet-gopay.svg" alt="GOPAY"></div><div class="method-logo"><img src="/assets/showcase/wallet-ovo.svg" alt="OVO"></div><div class="method-logo"><img src="/assets/showcase/wallet-dana.svg" alt="DANA"></div><div class="method-logo"><img src="/assets/showcase/wallet-shopeepay.svg" alt="SHOPEEPAY"></div><div class="method-logo"><img src="/assets/showcase/wallet-linkaja.svg" alt="LINKAJA"></div><div class="method-logo"><img src="/assets/showcase/wallet-sakuku.svg" alt="SAKUKU"></div><div class="method-logo"><img src="/assets/showcase/wallet-isaku.svg" alt="ISAKU"></div><div class="method-logo"><img src="/assets/showcase/wallet-qris.svg" alt="QRIS"></div><div class="method-logo"><img src="/assets/showcase/wallet-paypal.svg" alt="PAYPAL"></div><div class="method-logo"><img src="/assets/showcase/wallet-wise.svg" alt="WISE"></div><div class="method-logo"><img src="/assets/showcase/wallet-alipay.svg" alt="ALIPAY"></div><div class="method-logo"><img src="/assets/showcase/wallet-wechat.svg" alt="WECHAT"></div><div class="method-logo"><img src="/assets/showcase/wallet-applepay.svg" alt="APPLEPAY"></div><div class="method-logo"><img src="/assets/showcase/wallet-googlepay.svg" alt="GOOGLEPAY"></div><div class="method-logo"><img src="/assets/showcase/wallet-visa.svg" alt="VISA"></div><div class="method-logo"><img src="/assets/showcase/wallet-mastercard.svg" alt="MASTERCARD"></div><div class="method-logo"><img src="/assets/showcase/wallet-gopay.svg" alt="GOPAY"></div><div class="method-logo"><img src="/assets/showcase/wallet-ovo.svg" alt="OVO"></div><div class="method-logo"><img src="/assets/showcase/wallet-dana.svg" alt="DANA"></div><div class="method-logo"><img src="/assets/showcase/wallet-shopeepay.svg" alt="SHOPEEPAY"></div><div class="method-logo"><img src="/assets/showcase/wallet-linkaja.svg" alt="LINKAJA"></div><div class="method-logo"><img src="/assets/showcase/wallet-sakuku.svg" alt="SAKUKU"></div><div class="method-logo"><img src="/assets/showcase/wallet-isaku.svg" alt="ISAKU"></div><div class="method-logo"><img src="/assets/showcase/wallet-qris.svg" alt="QRIS"></div><div class="method-logo"><img src="/assets/showcase/wallet-paypal.svg" alt="PAYPAL"></div><div class="method-logo"><img src="/assets/showcase/wallet-wise.svg" alt="WISE"></div><div class="method-logo"><img src="/assets/showcase/wallet-alipay.svg" alt="ALIPAY"></div><div class="method-logo"><img src="/assets/showcase/wallet-wechat.svg" alt="WECHAT"></div><div class="method-logo"><img src="/assets/showcase/wallet-applepay.svg" alt="APPLEPAY"></div><div class="method-logo"><img src="/assets/showcase/wallet-googlepay.svg" alt="GOOGLEPAY"></div><div class="method-logo"><img src="/assets/showcase/wallet-visa.svg" alt="VISA"></div><div class="method-logo"><img src="/assets/showcase/wallet-mastercard.svg" alt="MASTERCARD"></div></div>
-      </div>
-      <div class="sl-container payment-note"><i class="fa-solid fa-circle-info"></i><span>Logo di atas adalah tampilan showcase metode pembayaran. Metode yang benar-benar tersedia saat checkout mengikuti gateway/provider yang aktif.</span></div>
     </section>
 
-    <section class="payout-section">
-      <div class="sl-container payout-wrap">
-        <div class="payout-copy"><span class="section-kicker"><i class="fa-solid fa-money-bill-transfer"></i> WITHDRAW</span><h2 data-index-i18n="payoutTitle">Withdraw lokal &amp; internasional</h2><p data-index-i18n="payoutText">Simpan tujuan penarikan untuk bank atau e-wallet lokal Indonesia maupun tujuan internasional. Provider payout yang aktif menentukan metode yang benar-benar dapat diproses.</p><div class="payout-tags"><span><i class="fa-solid fa-flag"></i><b data-index-i18n="local">Indonesia</b></span><span><i class="fa-solid fa-earth-americas"></i><b data-index-i18n="global">International</b></span></div></div>
-        <div class="payout-grid"><div><i class="fa-solid fa-building-columns"></i><b data-index-i18n="payout1">Bank lokal</b><small>Bank transfer</small></div><div><i class="fa-solid fa-mobile-screen-button"></i><b data-index-i18n="payout2">E-wallet lokal</b><small>DANA · OVO · GoPay</small></div><div><i class="fa-solid fa-globe"></i><b data-index-i18n="payout3">International bank</b><small>Cross-border destination</small></div><div><i class="fa-solid fa-wallet"></i><b data-index-i18n="payout4">International wallet</b><small>Provider dependent</small></div></div>
+    <!-- =========================================================
+         PAYMENT / WITHDRAW LOGOS
+         Semua logo yang ada di assets/showcase dipakai di index.
+    ========================================================== -->
+    <section class="payments-section" aria-labelledby="payment-title">
+      <div class="sl-container">
+        <div class="section-head centered payment-head">
+          <span class="section-kicker"><i class="fa-solid fa-credit-card"></i><span data-index-i18n="paymentKicker">PAYMENT & WITHDRAW</span></span>
+          <h2 id="payment-title" data-index-i18n="paymentTitle">Banyak pilihan metode, satu pengalaman premium.</h2>
+          <p data-index-i18n="paymentText">Logo bank dan e-wallet di bawah adalah showcase metode. Metode yang benar-benar dapat diproses tetap mengikuti gateway/provider yang aktif.</p>
+        </div>
+      </div>
+
+      <div class="logo-block">
+        <div class="sl-container logo-title"><span><i class="fa-solid fa-building-columns"></i></span><div><b data-index-i18n="bankTitle">Bank</b><small data-index-i18n="bankSub">Bank transfer & local banking</small></div></div>
+        <div class="logo-marquee marquee-left" aria-label="Bank showcase">
+          <div class="logo-track">
+            <div class="logo-card"><img src="/assets/showcase/bank-bca.svg" alt="BCA"></div><div class="logo-card"><img src="/assets/showcase/bank-bri.svg" alt="BRI"></div><div class="logo-card"><img src="/assets/showcase/bank-bni.svg" alt="BNI"></div><div class="logo-card"><img src="/assets/showcase/bank-mandiri.svg" alt="Mandiri"></div><div class="logo-card"><img src="/assets/showcase/bank-btn.svg" alt="BTN"></div><div class="logo-card"><img src="/assets/showcase/bank-bsi.svg" alt="BSI"></div><div class="logo-card"><img src="/assets/showcase/bank-cimb.svg" alt="CIMB Niaga"></div><div class="logo-card"><img src="/assets/showcase/bank-permata.svg" alt="Permata"></div><div class="logo-card"><img src="/assets/showcase/bank-danamon.svg" alt="Danamon"></div><div class="logo-card"><img src="/assets/showcase/bank-ocbc.svg" alt="OCBC"></div><div class="logo-card"><img src="/assets/showcase/bank-maybank.svg" alt="Maybank"></div><div class="logo-card"><img src="/assets/showcase/bank-mega.svg" alt="Bank Mega"></div><div class="logo-card"><img src="/assets/showcase/bank-jago.svg" alt="Bank Jago"></div><div class="logo-card"><img src="/assets/showcase/bank-seabank.svg" alt="SeaBank"></div><div class="logo-card"><img src="/assets/showcase/bank-blu.svg" alt="blu"></div><div class="logo-card"><img src="/assets/showcase/bank-jenius.svg" alt="Jenius"></div><div class="logo-card"><img src="/assets/showcase/bank-sinarmas.svg" alt="Sinarmas"></div><div class="logo-card"><img src="/assets/showcase/bank-muamalat.svg" alt="Muamalat"></div>
+            <div class="logo-card"><img src="/assets/showcase/bank-bca.svg" alt="BCA"></div><div class="logo-card"><img src="/assets/showcase/bank-bri.svg" alt="BRI"></div><div class="logo-card"><img src="/assets/showcase/bank-bni.svg" alt="BNI"></div><div class="logo-card"><img src="/assets/showcase/bank-mandiri.svg" alt="Mandiri"></div><div class="logo-card"><img src="/assets/showcase/bank-btn.svg" alt="BTN"></div><div class="logo-card"><img src="/assets/showcase/bank-bsi.svg" alt="BSI"></div><div class="logo-card"><img src="/assets/showcase/bank-cimb.svg" alt="CIMB Niaga"></div><div class="logo-card"><img src="/assets/showcase/bank-permata.svg" alt="Permata"></div><div class="logo-card"><img src="/assets/showcase/bank-danamon.svg" alt="Danamon"></div><div class="logo-card"><img src="/assets/showcase/bank-ocbc.svg" alt="OCBC"></div><div class="logo-card"><img src="/assets/showcase/bank-maybank.svg" alt="Maybank"></div><div class="logo-card"><img src="/assets/showcase/bank-mega.svg" alt="Bank Mega"></div><div class="logo-card"><img src="/assets/showcase/bank-jago.svg" alt="Bank Jago"></div><div class="logo-card"><img src="/assets/showcase/bank-seabank.svg" alt="SeaBank"></div><div class="logo-card"><img src="/assets/showcase/bank-blu.svg" alt="blu"></div><div class="logo-card"><img src="/assets/showcase/bank-jenius.svg" alt="Jenius"></div><div class="logo-card"><img src="/assets/showcase/bank-sinarmas.svg" alt="Sinarmas"></div><div class="logo-card"><img src="/assets/showcase/bank-muamalat.svg" alt="Muamalat"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="logo-block logo-block-wallet">
+        <div class="sl-container logo-title"><span><i class="fa-solid fa-wallet"></i></span><div><b data-index-i18n="walletTitle">E-wallet & Global</b><small data-index-i18n="walletSub">Digital wallet, QR & international methods</small></div></div>
+        <div class="logo-marquee marquee-right" aria-label="E-wallet and global payment showcase">
+          <div class="logo-track">
+            <div class="logo-card"><img src="/assets/showcase/wallet-gopay.svg" alt="GoPay"></div><div class="logo-card"><img src="/assets/showcase/wallet-ovo.svg" alt="OVO"></div><div class="logo-card"><img src="/assets/showcase/wallet-dana.svg" alt="DANA"></div><div class="logo-card"><img src="/assets/showcase/wallet-shopeepay.svg" alt="ShopeePay"></div><div class="logo-card"><img src="/assets/showcase/wallet-linkaja.svg" alt="LinkAja"></div><div class="logo-card"><img src="/assets/showcase/wallet-sakuku.svg" alt="Sakuku"></div><div class="logo-card"><img src="/assets/showcase/wallet-isaku.svg" alt="i.saku"></div><div class="logo-card"><img src="/assets/showcase/wallet-qris.svg" alt="QRIS"></div><div class="logo-card"><img src="/assets/showcase/wallet-paypal.svg" alt="PayPal"></div><div class="logo-card"><img src="/assets/showcase/wallet-wise.svg" alt="Wise"></div><div class="logo-card"><img src="/assets/showcase/wallet-alipay.svg" alt="Alipay"></div><div class="logo-card"><img src="/assets/showcase/wallet-wechat.svg" alt="WeChat Pay"></div><div class="logo-card"><img src="/assets/showcase/wallet-applepay.svg" alt="Apple Pay"></div><div class="logo-card"><img src="/assets/showcase/wallet-googlepay.svg" alt="Google Pay"></div><div class="logo-card"><img src="/assets/showcase/wallet-visa.svg" alt="Visa"></div><div class="logo-card"><img src="/assets/showcase/wallet-mastercard.svg" alt="Mastercard"></div>
+            <div class="logo-card"><img src="/assets/showcase/wallet-gopay.svg" alt="GoPay"></div><div class="logo-card"><img src="/assets/showcase/wallet-ovo.svg" alt="OVO"></div><div class="logo-card"><img src="/assets/showcase/wallet-dana.svg" alt="DANA"></div><div class="logo-card"><img src="/assets/showcase/wallet-shopeepay.svg" alt="ShopeePay"></div><div class="logo-card"><img src="/assets/showcase/wallet-linkaja.svg" alt="LinkAja"></div><div class="logo-card"><img src="/assets/showcase/wallet-sakuku.svg" alt="Sakuku"></div><div class="logo-card"><img src="/assets/showcase/wallet-isaku.svg" alt="i.saku"></div><div class="logo-card"><img src="/assets/showcase/wallet-qris.svg" alt="QRIS"></div><div class="logo-card"><img src="/assets/showcase/wallet-paypal.svg" alt="PayPal"></div><div class="logo-card"><img src="/assets/showcase/wallet-wise.svg" alt="Wise"></div><div class="logo-card"><img src="/assets/showcase/wallet-alipay.svg" alt="Alipay"></div><div class="logo-card"><img src="/assets/showcase/wallet-wechat.svg" alt="WeChat Pay"></div><div class="logo-card"><img src="/assets/showcase/wallet-applepay.svg" alt="Apple Pay"></div><div class="logo-card"><img src="/assets/showcase/wallet-googlepay.svg" alt="Google Pay"></div><div class="logo-card"><img src="/assets/showcase/wallet-visa.svg" alt="Visa"></div><div class="logo-card"><img src="/assets/showcase/wallet-mastercard.svg" alt="Mastercard"></div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="cta-section"><div class="sl-container"><div class="cta-card"><div><span class="section-kicker">SHOWLINK</span><h2 data-index-i18n="ctaTitle">Mulai dengan Payment Link hari ini</h2><p data-index-i18n="ctaText">Buat akun gratis dan mulai menerima pembayaran melalui link yang bisa kamu bagikan di mana saja.</p></div><a class="btn btn-primary" href="/register.html"><i class="fa-solid fa-rocket"></i><span data-index-i18n="cta">Buat Payment Link Gratis</span></a></div><p class="disclaimer" data-index-i18n="note">Metode pembayaran &amp; payout mengikuti gateway/provider yang dikonfigurasi di akun ShowLink.</p></div></section>
+    <!-- =========================================================
+         WITHDRAW DETAIL
+    ========================================================== -->
+    <section class="withdraw-section" aria-labelledby="withdraw-title">
+      <div class="sl-container withdraw-layout">
+        <div class="withdraw-visual">
+          <img src="/assets/showcase/payout.svg" alt="ShowLink withdrawal dashboard" loading="lazy">
+          <img class="withdraw-global" src="/assets/showcase/global-payout.svg" alt="ShowLink global payout" loading="lazy">
+        </div>
+        <div class="withdraw-copy">
+          <span class="section-kicker"><i class="fa-solid fa-money-bill-transfer"></i><span data-index-i18n="withdrawKicker">WITHDRAW</span></span>
+          <h2 id="withdraw-title" data-index-i18n="withdrawTitle">Saldo masuk, penarikan tetap sederhana.</h2>
+          <p data-index-i18n="withdrawText">Tampilkan tujuan penarikan bank atau e-wallet lokal maupun internasional. Provider payout yang aktif menentukan metode yang benar-benar dapat diproses.</p>
+          <div class="withdraw-chips">
+            <span><i class="fa-solid fa-building-columns"></i><span data-index-i18n="localBank">Bank Lokal</span></span>
+            <span><i class="fa-solid fa-mobile-screen-button"></i><span data-index-i18n="localWallet">E-wallet Lokal</span></span>
+            <span><i class="fa-solid fa-earth-americas"></i><span data-index-i18n="globalBank">International</span></span>
+          </div>
+          <div class="withdraw-note"><i class="fa-solid fa-circle-info"></i><span data-index-i18n="withdrawNote">Dukungan payout bergantung pada provider/gateway yang dikonfigurasi di platform.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="sl-container">
+        <div class="cta-card">
+          <div><span class="section-kicker">SHOWLINK</span><h2 data-index-i18n="ctaTitle">Mulai menerima pembayaran dengan Payment Link.</h2><p data-index-i18n="ctaText">Buat akun dan bangun pengalaman checkout yang terlihat profesional dari link pertama kamu.</p></div>
+          <a class="btn btn-primary" href="/register.html"><i class="fa-solid fa-rocket"></i><span data-index-i18n="cta">Buat Payment Link</span></a>
+        </div>
+        <p class="disclaimer" data-index-i18n="disclaimer">Metode pembayaran dan payout pada website adalah showcase; ketersediaan transaksi mengikuti gateway/provider yang aktif.</p>
+      </div>
+    </section>
   </main>
+
   <div data-showlink-footer></div>
 </body>
 </html>
