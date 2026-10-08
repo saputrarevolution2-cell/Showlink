@@ -621,10 +621,11 @@ BEGIN
     v_seller_amount
   FROM public.get_payment_link_buyer_price(v_link.price, v_buyer) p;
 
-  -- Cashi minimum is Rp2,000.
-  IF v_buyer_amount < 2000 THEN
+  -- Minimum actual checkout amount after the 25% buyer discount is Rp1,500.
+  -- Payment links themselves still require a seller-set price of at least Rp2,000.
+  IF v_buyer_amount < 1500 THEN
     RAISE EXCEPTION
-      'PAYMENT_AMOUNT_BELOW_CASHI_MINIMUM:%',
+      'PAYMENT_AMOUNT_BELOW_MINIMUM:%',
       v_buyer_amount;
   END IF;
 
@@ -853,14 +854,17 @@ GRANT EXECUTE ON FUNCTION public.get_paid_content(text,text) TO anon,authenticat
 
 
 -- 2. Payment Link pricing configuration.
+-- Buyer-facing price is 75% of the seller-set Payment Link price.
+-- Example: Rp2,000 -> Rp1,500; Rp10,000 -> Rp7,500.
+-- The original Payment Link price remains stored in payment_links.price.
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.payment_link_pricing_config (
   id boolean PRIMARY KEY DEFAULT true CHECK (id = true),
 
-  free_percent numeric(5,2) NOT NULL DEFAULT 100.00,
-  vip_percent numeric(5,2) NOT NULL DEFAULT 70.00,
-  premium_percent numeric(5,2) NOT NULL DEFAULT 50.00,
-  guest_percent numeric(5,2) NOT NULL DEFAULT 100.00,
+  free_percent numeric(5,2) NOT NULL DEFAULT 75.00,
+  vip_percent numeric(5,2) NOT NULL DEFAULT 75.00,
+  premium_percent numeric(5,2) NOT NULL DEFAULT 75.00,
+  guest_percent numeric(5,2) NOT NULL DEFAULT 75.00,
 
   platform_fee_percent numeric(5,2) NOT NULL DEFAULT 20.00,
 
@@ -884,7 +888,7 @@ INSERT INTO public.payment_link_pricing_config (
   guest_percent,
   platform_fee_percent
 )
-VALUES (true, 100.00, 70.00, 50.00, 100.00, 20.00)
+VALUES (true, 75.00, 75.00, 75.00, 75.00, 20.00)
 ON CONFLICT (id) DO UPDATE
 SET free_percent = EXCLUDED.free_percent,
     vip_percent = EXCLUDED.vip_percent,
