@@ -1,1 +1,68 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dashboard — ShowLink</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><link rel="stylesheet" href="/css/dashboard.css"><link rel="stylesheet" href="/css/showlink-components.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css"><script src="/js/supabase-config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/supabase-client.js"></script><script src="/js/showlink-components.js" defer></script><script src="/js/navbar.js" defer></script><script src="/js/footer.js" defer></script></head><body class="dashboard-page"><div data-showlink-navbar></div><main class="sl-main"><div class="sl-container"><section class="sl-main-hero"><div><span class="sl-main-kicker"><i class="fa-solid fa-gauge-high"></i> SHOWLINK · PAYMENT LINK</span><h1><span data-user-name>User</span>, selamat datang 👋</h1><p class="sl-main-intro" data-i18n="dashboardIntro">Pantau Payment Link, penjualan, dan penghasilanmu dari satu tempat.</p></div><div class="dashboard-actions"><a class="btn btn-primary" href="/payment-link.html"><i class="fa-solid fa-plus"></i> <span data-i18n="createPaymentLink">Buat Payment Link</span></a><a class="btn btn-secondary" href="/kelola-tautan.html"><i class="fa-solid fa-list"></i> <span data-i18n="managePaymentLinks">Kelola Payment Link</span></a></div></section><section class="dashboard-stat-grid"><article class="stat-card"><span>Saldo tersedia</span><strong data-metric="available_balance">Rp0</strong></article><article class="stat-card"><span>Pendapatan Payment Link</span><strong data-metric="paymentIncome">Rp0</strong></article><article class="stat-card"><span>Penjualan berhasil</span><strong data-metric="paymentSales">0</strong></article><article class="stat-card"><span>Total views</span><strong data-metric="paymentViews">0</strong></article><article class="stat-card"><span>Total Payment Link</span><strong data-metric="totalPaymentLinks">0</strong></article><article class="stat-card"><span>Saldo pending</span><strong data-metric="pendingSettlement">Rp0</strong></article></section><div class="sl-main-grid"><article class="sl-main-card"><div class="card-head"><div><span class="sl-main-kicker">PAYMENT LINK</span><h2>Aktivitas penjualan</h2></div></div><div class="table-wrap"><table><thead><tr><th>Waktu</th><th>Amount</th><th>Status</th></tr></thead><tbody id="payment-recent-body"><tr><td colspan="3">Memuat...</td></tr></tbody></table></div></article><article class="sl-main-card"><i class="fa-solid fa-chart-line"></i><h2>Fokus platform</h2><p>ShowLink saat ini difokuskan sepenuhnya pada Payment Link: pembuatan link, checkout, verifikasi pembayaran, akses konten, penjualan, saldo, dan withdrawal.</p><div class="quick-actions"><a class="btn btn-primary" href="/payment-link.html">Buat Link</a><a class="btn btn-secondary" href="/withdraw.html">Withdraw</a></div></article></div></div></main><div data-showlink-footer></div><script src="/js/dashboard.js" defer></script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard — ShowLink</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="/css/dashboard.css"><link rel="stylesheet" href="/css/showlink-components.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css">
+<script src="/js/supabase-config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/supabase-client.js"></script>
+<script src="/js/showlink-components.js" defer></script><script src="/js/navbar.js" defer></script><script src="/js/footer.js" defer></script>
+</head>
+<body class="dashboard-page">
+<div data-showlink-navbar></div>
+<main class="dashboard-shell">
+<div class="dashboard-container">
+  <section class="dashboard-hero">
+    <div>
+      <span class="dash-kicker"><i class="fa-solid fa-gauge-high"></i> SHOWLINK · PAYMENT LINK</span>
+      <h1><span data-user-name>User</span>, <span data-i18n="welcomeBack">selamat datang</span> <span aria-hidden="true">👋</span></h1>
+      <p data-i18n="dashboardIntro">Pantau Payment Link, penjualan, views, dan pendapatanmu dari satu tempat.</p>
+    </div>
+    <div class="hero-actions">
+      <a class="dash-btn primary" href="/payment-link.html"><i class="fa-solid fa-plus"></i><span data-i18n="createPaymentLink">Buat Payment Link</span></a>
+      <a class="dash-btn ghost" href="/kelola-tautan.html"><i class="fa-solid fa-link"></i><span data-i18n="managePaymentLinks">Kelola Link</span></a>
+    </div>
+  </section>
+
+  <section class="stat-grid" aria-label="Dashboard statistics">
+    <article class="stat-card"><div class="stat-icon blue"><i class="fa-solid fa-link"></i></div><div><span data-i18n="totalLinks">Total Payment Link</span><strong data-metric="totalPaymentLinks">0</strong><small data-stat-sub="activeLinks">0 aktif</small></div></article>
+    <article class="stat-card"><div class="stat-icon purple"><i class="fa-solid fa-chart-column"></i></div><div><span data-i18n="totalViews">Total Views</span><strong data-metric="paymentViews">0</strong><small data-stat-sub="uniqueViews">0 unique views</small></div></article>
+    <article class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-cart-shopping"></i></div><div><span data-i18n="totalSales">Total Terjual</span><strong data-metric="paymentSales">0</strong><small data-stat-sub="successfulSales">transaksi berhasil</small></div></article>
+    <article class="stat-card"><div class="stat-icon orange"><i class="fa-solid fa-wallet"></i></div><div><span data-i18n="netIncome">Pendapatan Bersih</span><strong data-metric="paymentIncome">Rp0</strong><small data-i18n="afterPlatform">Sudah setelah potongan platform</small></div></article>
+    <article class="stat-card"><div class="stat-icon cyan"><i class="fa-solid fa-circle-check"></i></div><div><span data-i18n="availableBalance">Saldo Tersedia</span><strong data-metric="availableBalance">Rp0</strong><small data-i18n="readyToWithdraw">Siap dicairkan</small></div></article>
+    <article class="stat-card"><div class="stat-icon yellow"><i class="fa-solid fa-clock"></i></div><div><span data-i18n="pendingBalance">Saldo Pending</span><strong data-metric="pendingBalance">Rp0</strong><small data-i18n="pendingSettlement">Menunggu settlement</small></div></article>
+  </section>
+
+  <section class="analytics-card">
+    <div class="section-head">
+      <div><span class="dash-kicker"><i class="fa-solid fa-chart-line"></i> <span data-i18n="statistics">STATISTIK</span></span><h2 data-i18n="sevenDayStats">Aktivitas 7 hari terakhir</h2><p data-i18n="sevenDayStatsSub">Ringkasan penjualan dan pendapatan bersih berdasarkan transaksi berhasil.</p></div>
+      <div class="analytics-totals"><div><small data-i18n="sales7d">Terjual</small><b data-metric="sales7d">0</b></div><div><small data-i18n="income7d">Pendapatan</small><b data-metric="income7d">Rp0</b></div></div>
+    </div>
+    <div class="bar-chart" id="seven-day-chart" aria-label="7 day sales chart"></div>
+  </section>
+
+  <section class="links-card">
+    <div class="section-head links-head">
+      <div><span class="dash-kicker"><i class="fa-solid fa-link"></i> PAYMENT LINK</span><h2 data-i18n="yourLinks">Payment Link kamu</h2><p data-i18n="yourLinksSub">Kelola performa link dan lihat pendapatan bersih dari setiap link.</p></div>
+      <a class="text-link" href="/kelola-tautan.html"><span data-i18n="manageAll">Kelola semua</span><i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    <div class="links-table-wrap">
+      <table class="links-table">
+        <thead><tr><th data-i18n="link">Link</th><th data-i18n="price">Harga</th><th data-i18n="created">Dibuat</th><th data-i18n="views">Views</th><th data-i18n="sold">Terjual</th><th data-i18n="income">Pendapatan</th><th data-i18n="status">Status</th><th></th></tr></thead>
+        <tbody id="dashboard-links-body"><tr><td colspan="8" class="table-loading"><i class="fa-solid fa-spinner fa-spin"></i><span data-i18n="loading">Memuat data...</span></td></tr></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="links-pagination" hidden></div>
+  </section>
+
+  <section class="dashboard-bottom">
+    <a class="quick-card" href="/payment-link.html"><span class="quick-icon purple"><i class="fa-solid fa-plus"></i></span><span><b data-i18n="createNewLink">Buat Payment Link baru</b><small data-i18n="createNewLinkSub">Tambahkan produk dan mulai menerima pembayaran.</small></span><i class="fa-solid fa-chevron-right"></i></a>
+    <a class="quick-card" href="/withdraw.html"><span class="quick-icon green"><i class="fa-solid fa-money-bill-transfer"></i></span><span><b data-i18n="withdraw">Withdraw</b><small data-i18n="withdrawSub">Cairkan saldo yang tersedia.</small></span><i class="fa-solid fa-chevron-right"></i></a>
+  </section>
+</div>
+</main>
+<div data-showlink-footer></div>
+<script src="/js/dashboard.js" defer></script>
+</body></html>
