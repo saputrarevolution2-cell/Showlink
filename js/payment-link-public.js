@@ -68,6 +68,13 @@
     id: {
       kicker:'PAYMENT LINK', locked:'Konten terkunci. Lakukan pembayaran untuk membuka konten.',
       buy:'Beli & Bayar', verified:'Pembayaran terverifikasi. Konten sudah terbuka.',
+      purchaseConfirmTitle:'Konfirmasi Pembelian',
+      purchaseConfirmText:'Sebelum melanjutkan, pastikan judul, harga, dan Payment Link sudah benar.',
+      purchaseRuleTitle:'Peraturan Pembayaran',
+      purchaseRule:'Dengan melanjutkan, kamu menyetujui bahwa setelah pembayaran/order dibuat, transaksi wajib diselesaikan. Pastikan kamu benar-benar siap membayar sebelum menekan tombol lanjut.',
+      purchaseAgree:'Saya sudah membaca dan menyetujui peraturan. Saya siap membayar.',
+      purchaseCancel:'Batal',
+      purchaseContinue:'Setujui & Lanjut Bayar',
       chooseGateway:'Pilih Server Pembayaran', gatewayDesc:'Pilih server pembayaran terlebih dahulu sebelum melanjutkan.',
       server1:'Server 1', server2:'Server 2', cashi:'Cashi', bayarGG:'BayarGG',
       continuePayment:'Lanjut Pembayaran', back:'Kembali', opening:'Menyiapkan pembayaran…',
@@ -96,6 +103,13 @@
     en: {
       kicker:'PAYMENT LINK', locked:'Content is locked. Complete payment to unlock it.',
       buy:'Buy & Pay', verified:'Payment verified. Content is now unlocked.',
+      purchaseConfirmTitle:'Purchase Confirmation',
+      purchaseConfirmText:'Before continuing, make sure the title, price, and Payment Link are correct.',
+      purchaseRuleTitle:'Payment Rules',
+      purchaseRule:'By continuing, you agree that once the payment/order is created, the transaction must be completed. Make sure you are ready to pay before continuing.',
+      purchaseAgree:'I have read and agree to the rules. I am ready to pay.',
+      purchaseCancel:'Cancel',
+      purchaseContinue:'Agree & Continue to Pay',
       chooseGateway:'Choose Payment Server', gatewayDesc:'Choose a payment server before continuing.',
       server1:'Server 1', server2:'Server 2', cashi:'Cashi', bayarGG:'BayarGG',
       continuePayment:'Continue Payment', back:'Back', opening:'Preparing payment…',
@@ -234,10 +248,7 @@
       </div>`;
 
     document.getElementById('buy').addEventListener('click', () => {
-      startPayment(data).catch(error => {
-        dbg.error('PAYMENT LINK INLINE PAYMENT FAILED', error);
-        renderPaymentError(error?.message || 'Pembayaran gagal dibuat.');
-      });
+      openPurchaseConfirmation(data);
     });
   }
 
@@ -288,6 +299,98 @@
     return result;
   }
 
+
+  function openPurchaseConfirmation(data) {
+    document.getElementById('pl-purchase-confirm')?.remove();
+
+    const amount = money(
+      Number(data?.buyer_amount ?? data?.price ?? 0),
+      data?.currency || 'IDR'
+    );
+
+    const modal = document.createElement('div');
+    modal.id = 'pl-purchase-confirm';
+    modal.className = 'pl-confirm-backdrop';
+    modal.innerHTML = `
+      <div class="pl-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="pl-confirm-title">
+        <div class="pl-confirm-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="pl-confirm-kicker">SHOWLINK</div>
+        <h2 id="pl-confirm-title">${esc(t('purchaseConfirmTitle'))}</h2>
+        <p class="pl-confirm-text">${esc(t('purchaseConfirmText'))}</p>
+
+        <div class="pl-confirm-summary">
+          <div>
+            <span>${esc(t('titleLabel'))}</span>
+            <strong>${esc(data?.title || 'Payment Link')}</strong>
+          </div>
+          <div>
+            <span>${esc(t('priceLabel'))}</span>
+            <strong>${esc(amount)}</strong>
+          </div>
+        </div>
+
+        <div class="pl-confirm-rule">
+          <div class="pl-confirm-rule-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div>
+            <strong>${esc(t('purchaseRuleTitle'))}</strong>
+            <p>${esc(t('purchaseRule'))}</p>
+          </div>
+        </div>
+
+        <label class="pl-confirm-check">
+          <input id="pl-purchase-agree" type="checkbox">
+          <span class="pl-confirm-box"><i class="fa-solid fa-check"></i></span>
+          <span>${esc(t('purchaseAgree'))}</span>
+        </label>
+
+        <div class="pl-confirm-actions">
+          <button class="pl-confirm-cancel" id="pl-purchase-cancel" type="button">
+            ${esc(t('purchaseCancel'))}
+          </button>
+          <button class="pl-confirm-submit" id="pl-purchase-submit" type="button" disabled>
+            <i class="fa-solid fa-lock"></i>
+            <span>${esc(t('purchaseContinue'))}</span>
+          </button>
+        </div>
+      </div>`;
+
+    document.body.appendChild(modal);
+    document.body.classList.add('pl-confirm-open');
+
+    const checkbox = document.getElementById('pl-purchase-agree');
+    const submit = document.getElementById('pl-purchase-submit');
+    const close = () => {
+      modal.remove();
+      document.body.classList.remove('pl-confirm-open');
+    };
+
+    checkbox?.addEventListener('change', () => {
+      if (submit) submit.disabled = !checkbox.checked;
+    });
+
+    document.getElementById('pl-purchase-cancel')?.addEventListener('click', close);
+    modal.addEventListener('click', event => {
+      if (event.target === modal) close();
+    });
+
+    submit?.addEventListener('click', () => {
+      if (!checkbox?.checked) return;
+      close();
+      startPayment(data).catch(error => {
+        dbg.error('PAYMENT LINK INLINE PAYMENT FAILED', error);
+        renderPaymentError(error?.message || 'Pembayaran gagal dibuat.');
+      });
+    });
+
+    document.addEventListener('keydown', function escConfirm(event) {
+      if (event.key !== 'Escape') return;
+      if (!document.getElementById('pl-purchase-confirm')) return;
+      document.removeEventListener('keydown', escConfirm);
+      close();
+    }, { once: true });
+
+    requestAnimationFrame(() => checkbox?.focus());
+  }
 
   async function renderGatewaySelection(data) {
     currentView = 'gateway';
