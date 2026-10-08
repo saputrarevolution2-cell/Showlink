@@ -64,7 +64,19 @@
 
   <section class="dashboard-bottom">
     <a class="quick-card" href="/payment-link.html"><span class="quick-icon purple"><i class="fa-solid fa-plus"></i></span><span><b data-i18n="createNewLink">Buat Payment Link baru</b><small data-i18n="createNewLinkSub">Tambahkan produk dan mulai menerima pembayaran.</small></span><i class="fa-solid fa-chevron-right"></i></a>
+    <a class="quick-card" href="/kelola-tautan.html"><span class="quick-icon blue"><i class="fa-solid fa-link"></i></span><span><b data-i18n="manageLinksAction">Kelola Payment Link</b><small data-i18n="manageLinksActionSub">Lihat, edit, dan pantau semua link kamu.</small></span><i class="fa-solid fa-chevron-right"></i></a>
+    <a class="quick-card" href="/order.html"><span class="quick-icon orange"><i class="fa-solid fa-receipt"></i></span><span><b data-i18n="viewOrders">Lihat Order</b><small data-i18n="viewOrdersSub">Cek transaksi dan status pembayaran terbaru.</small></span><i class="fa-solid fa-chevron-right"></i></a>
     <a class="quick-card" href="/withdraw.html"><span class="quick-icon green"><i class="fa-solid fa-money-bill-transfer"></i></span><span><b data-i18n="withdraw">Withdraw</b><small data-i18n="withdrawSub">Cairkan saldo yang tersedia.</small></span><i class="fa-solid fa-chevron-right"></i></a>
+  </section>
+
+  <section class="links-card recent-transactions-card">
+    <div class="section-head links-head">
+      <div><span class="dash-kicker"><i class="fa-solid fa-clock-rotate-left"></i> <span data-i18n="recentTransactions">TRANSAKSI TERBARU</span></span><h2 data-i18n="recentTransactionsTitle">Transaksi terbaru</h2><p data-i18n="recentTransactionsSub">Pantau pembayaran terbaru dan statusnya dalam satu tempat.</p></div>
+      <a class="text-link" href="/order.html"><span data-i18n="viewAllOrders">Lihat semua</span><i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+    <div id="recent-transactions" class="recent-transactions" aria-live="polite">
+      <div class="transaction-loading"><i class="fa-solid fa-spinner fa-spin"></i><span data-i18n="loading">Memuat data...</span></div>
+    </div>
   </section>
 </div>
 </main>
