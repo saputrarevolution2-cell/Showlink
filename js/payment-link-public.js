@@ -163,8 +163,18 @@
     </div>
     <div class="pl-support">
       <div>${t('support')}</div>
-      <div class="pl-marquee">${banks.map(x=>`<span>${esc(x)}</span>`).join('')}</div>
-      <div class="pl-marquee reverse">${wallets.map(x=>`<span>${esc(x)}</span>`).join('')}</div>
+      <div class="pl-marquee" aria-label="Bank payment methods">
+        <div class="pl-marquee-track">
+          ${banks.map(x=>`<span>${esc(x)}</span>`).join('')}
+          ${banks.map(x=>`<span aria-hidden="true">${esc(x)}</span>`).join('')}
+        </div>
+      </div>
+      <div class="pl-marquee reverse" aria-label="E-wallet payment methods">
+        <div class="pl-marquee-track">
+          ${wallets.map(x=>`<span>${esc(x)}</span>`).join('')}
+          ${wallets.map(x=>`<span aria-hidden="true">${esc(x)}</span>`).join('')}
+        </div>
+      </div>
     </div>`;
   }
 
