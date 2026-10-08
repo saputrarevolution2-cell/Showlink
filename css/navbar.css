@@ -95,7 +95,7 @@ html[data-theme="dark"]{
   position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;
   background:#f43f5e;opacity:0;transform:scale(.6);pointer-events:none;
 }
-.sl-nav-notification:has(.sl-nav-notification-badge:not([hidden])) .sl-nav-notification-pulse{
+.sl-nav-notification.has-notifications .sl-nav-notification-pulse{
   opacity:.8;animation:sl-notification-pulse 1.9s ease-out infinite;
 }
 @keyframes sl-notification-pulse{
@@ -108,7 +108,7 @@ html[data-theme="dark"]{
 }
 @media(prefers-reduced-motion:reduce){
   .sl-nav-notification,.sl-nav-notification > i{transition:none}
-  .sl-nav-notification:has(.sl-nav-notification-badge:not([hidden])) .sl-nav-notification-pulse{animation:none}
+  .sl-nav-notification.has-notifications .sl-nav-notification-pulse{animation:none}
 }
 
 @media(max-width:620px){.sl-nav-shell{width:calc(100% - 18px)}.sl-brand-text{display:none}.sl-brand-mark{width:42px;height:42px}.sl-desktop-action{display:none!important}}
