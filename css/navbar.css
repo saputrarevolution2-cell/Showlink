@@ -123,3 +123,11 @@ html[data-theme="dark"]{
 }
 
 .sl-drawer-brand-accent{color:var(--sl-primary)}
+
+
+/* V35 navigation structure, disabled upcoming pages and in-menu notification count */
+.sl-nav-link-disabled{cursor:default;opacity:.72;user-select:none;transform:none!important}
+.sl-nav-link-disabled:hover{background:transparent;color:var(--sl-nav-muted)}
+.sl-nav-link-disabled .sl-new-badge{margin-left:auto;flex:none;white-space:nowrap;font-size:9px;padding:4px 7px}
+.sl-menu-notification-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:linear-gradient(135deg,#ff2f92,#ef4444);color:#fff;font-size:10px;font-weight:900;line-height:1;box-shadow:0 3px 10px rgba(239,68,68,.22)}
+.sl-menu-notification-badge[hidden]{display:none!important}
