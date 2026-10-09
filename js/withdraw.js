@@ -5,7 +5,7 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const LIMIT = 500000;
   const lang = () => localStorage.getItem('showlink-language') === 'en' ? 'en' : 'id';
-  let sb, session, account=null, currentMode='manual', pendingConfirm=null;
+  let sb, session, account=null, currentMode='manual', pendingConfirm=null, withdrawalsGloballyOpen=true, scheduleOpen=true;
 
   const T = {
     id:{
@@ -34,13 +34,16 @@
     renderAmountInfo(); renderConfirm();
   }
   function localDate(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jakarta'}).format(new Date());}
-  function jakartaNow(){return new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Jakarta'}));}
-  function isManualOpen(){const d=jakartaNow(),mins=d.getHours()*60+d.getMinutes();return mins>=480&&mins<1260;}
+  function jakartaParts(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());return {hour:Number(p.find(x=>x.type==='hour')?.value||0),minute:Number(p.find(x=>x.type==='minute')?.value||0)};}
+  function isManualOpen(){const d=jakartaParts(),mins=d.hour*60+d.minute;return mins>=480&&mins<1260; }
+  async function refreshWithdrawalAvailability(){try{const {data,error}=await sb.rpc('showlink_withdrawal_availability');if(error)throw error;withdrawalsGloballyOpen=data?.withdrawals_open!==false;scheduleOpen=data?.manual_open_by_schedule!==false;}catch(e){console.warn('Could not read withdrawal availability; using WIB schedule until backend responds.',e);scheduleOpen=isManualOpen();}updateManualAvailability();}
   function updateManualAvailability(){
     const t=tr(), closed=$('#manual-closed'), form=$('#withdraw-form'), manual=currentMode==='manual';
-    if(!manual){closed.hidden=true;form.classList.remove('is-disabled');return;}
-    const open=isManualOpen(); closed.hidden=open; form.classList.toggle('is-disabled',!open);
-    if(!open){$('#closed-reason').textContent=t.open;}
+    const inHours=isManualOpen();
+    const open=withdrawalsGloballyOpen && (!manual || inHours);
+    closed.hidden=open; form.classList.toggle('is-disabled',!open);
+    if(!withdrawalsGloballyOpen){$('#closed-reason').textContent=lang()==='en'?'Withdrawals are temporarily disabled by admin.':'Pengajuan withdraw sedang ditutup oleh admin.';}
+    else if(manual&&!inHours){$('#closed-reason').textContent=t.open;}
     $('#submit-btn').disabled=!open || (window.__wdUsed||0)>=LIMIT;
   }
   function showMessage(msg,ok=false){const b=$('#withdraw-message');b.textContent=msg;b.className=`app-message show ${ok?'success':'error'}`;}
@@ -68,9 +71,9 @@
     $('#confirm-title').textContent=t.previewTitle;$('#confirm-text').textContent=t.previewText;$('#confirm-amount').textContent=money(a);$('#confirm-account').textContent=`${account?.account_name||'—'} • ${account?.method_type||'—'} • ${account?.account_number||'—'}`;$('#confirm-fee').textContent=money(fee);$('#confirm-total').textContent=money(total);$('#confirm-recipient').textContent=money(a);$('#confirm-submit').textContent=t.requestNow;$('#confirm-back').textContent=t.back;
   }
   function openConfirm(){
-    const t=tr(),amount=Number($('#amount').value||0);if(!account)return showMessage(t.noAccount);if(currentMode==='instant'&&!([50000,100000,150000,200000].includes(amount)))return showMessage(t.instantInvalid);if(currentMode==='manual'&&(!Number.isFinite(amount)||amount<10000))return showMessage(t.min);const fee=currentMode==='instant'?instantFee(amount):manualFee(amount),total=amount-fee,remaining=Math.max(0,LIMIT-(window.__wdUsed||0));if(amount>remaining)return showMessage(t.limitExceeded(remaining));if(amount>(window.__available||0))return showMessage(t.insufficient(amount));if(currentMode==='manual'&&!isManualOpen())return showMessage(t.manualClosed);pendingConfirm={amount,fee,total,netAmount:total};renderConfirm();$('#withdraw-confirm').hidden=false;}
+    const t=tr(),amount=Number($('#amount').value||0);if(!account)return showMessage(t.noAccount);if(currentMode==='instant'&&!([50000,100000,150000,200000].includes(amount)))return showMessage(t.instantInvalid);if(currentMode==='manual'&&(!Number.isFinite(amount)||amount<10000))return showMessage(t.min);const fee=currentMode==='instant'?instantFee(amount):manualFee(amount),total=amount-fee,remaining=Math.max(0,LIMIT-(window.__wdUsed||0));if(amount>remaining)return showMessage(t.limitExceeded(remaining));if(amount>(window.__available||0))return showMessage(t.insufficient(amount));if(!withdrawalsGloballyOpen)return showMessage(lang()==='en'?'Withdrawals are temporarily disabled by admin.':'Pengajuan withdraw sedang ditutup oleh admin.');if(currentMode==='manual'&&!isManualOpen())return showMessage(t.manualClosed);pendingConfirm={amount,fee,total,netAmount:total};renderConfirm();$('#withdraw-confirm').hidden=false;}
   async function confirmSubmit(){
-    if(!pendingConfirm)return;const t=tr(),btn=$('#confirm-submit');btn.disabled=true;try{const {data,error}=await sb.rpc('request_withdrawal',{p_amount:pendingConfirm.amount,p_method_id:account.id,p_mode:currentMode});if(error)throw error;$('#withdraw-confirm').hidden=true;pendingConfirm=null;$('#amount').value='';showMessage(t.savedRequest,true);await Promise.all([loadWallet(),loadDaily(),loadHistory()]);window.ShowLinkNavbar?.refreshNotifications()}catch(err){const msg=String(err.message||'');let mapped=t.failed;if(msg.includes('DAILY_WITHDRAW_LIMIT'))mapped=t.limitReached;else if(msg.includes('MANUAL_WITHDRAWAL_CLOSED'))mapped=t.manualClosed;else if(msg.includes('INVALID_INSTANT_AMOUNT'))mapped=t.instantInvalid;else if(msg.includes('INSUFFICIENT_AVAILABLE_BALANCE'))mapped=t.insufficient(pendingConfirm?.amount||0);showMessage(mapped)}finally{btn.disabled=false;}}
+    if(!pendingConfirm)return;const t=tr(),btn=$('#confirm-submit');btn.disabled=true;try{const {data,error}=await sb.rpc('request_withdrawal',{p_amount:pendingConfirm.amount,p_method_id:account.id,p_mode:currentMode});if(error)throw error;$('#withdraw-confirm').hidden=true;pendingConfirm=null;$('#amount').value='';showMessage(t.savedRequest,true);await Promise.all([loadWallet(),loadDaily(),loadHistory()]);window.ShowLinkNavbar?.refreshNotifications()}catch(err){const msg=String(err.message||'');let mapped=t.failed;if(msg.includes('DAILY_WITHDRAW_LIMIT'))mapped=t.limitReached;else if(msg.includes('WITHDRAWALS_CLOSED'))mapped=lang()==='en'?'Withdrawals are temporarily disabled by admin.':'Pengajuan withdraw sedang ditutup oleh admin.';else if(msg.includes('MANUAL_WITHDRAWAL_CLOSED'))mapped=t.manualClosed;else if(msg.includes('INVALID_INSTANT_AMOUNT'))mapped=t.instantInvalid;else if(msg.includes('INSUFFICIENT_AVAILABLE_BALANCE'))mapped=t.insufficient(pendingConfirm?.amount||0);showMessage(mapped)}finally{btn.disabled=false;}}
   function selectMode(mode){currentMode=mode;$('#withdraw-mode').value=mode;document.querySelectorAll('.withdraw-mode').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));$('#instant-options').hidden=mode!=='instant';$('#manual-notice').hidden=mode!=='manual';$('#instant-notice').hidden=mode!=='instant';$('#withdraw-form button span').textContent=mode==='instant'?tr().instantSubmit:tr().submit;$('#amount').placeholder=mode==='instant'?'Rp50.000':'Rp10.000';if(mode==='instant'){const active=document.querySelector('[data-instant-amount].active');$('#amount').value=active?.dataset.instantAmount||50000;}renderAmountInfo();updateManualAvailability();}
   function bind(){
     document.querySelectorAll('.withdraw-mode').forEach(b=>b.addEventListener('click',()=>selectMode(b.dataset.mode)));
@@ -79,6 +82,6 @@
     $('#account-form').addEventListener('submit',saveAccount);$('#edit-account').addEventListener('click',()=>{$('#account-form').hidden=false;$('#account-display').hidden=true;$('#edit-account').hidden=true;renderAccount()});$('#cancel-account').addEventListener('click',()=>{$('#account-form').hidden=true;$('#account-display').hidden=false;$('#edit-account').hidden=false;renderAccount()});
     window.addEventListener('showlink:language-change',()=>{applyText();updateManualAvailability();loadHistory();});setInterval(updateManualAvailability,30000);
   }
-  async function init(){sb=await window.ShowLinkSupabase.load();const {data:{session:s}}=await sb.auth.getSession();session=s;if(!session)return location.replace('/login.html?redirect='+encodeURIComponent(location.pathname));await sb.rpc('release_due_settlements');bind();applyText();selectMode('manual');await Promise.all([loadWallet(),loadAccount(),loadDaily(),loadHistory()]);updateManualAvailability();}
+  async function init(){sb=await window.ShowLinkSupabase.load();const {data:{session:s}}=await sb.auth.getSession();session=s;if(!session)return location.replace('/login.html?redirect='+encodeURIComponent(location.pathname));await sb.rpc('release_due_settlements');bind();applyText();selectMode('manual');await Promise.all([loadWallet(),loadAccount(),loadDaily(),loadHistory()]);await refreshWithdrawalAvailability();setInterval(refreshWithdrawalAvailability,30000);}
   document.addEventListener('DOMContentLoaded',()=>init().catch(e=>{console.error(e);showMessage(e.message||tr().failed)}));
 })();
