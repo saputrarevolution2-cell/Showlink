@@ -1,6 +1,14 @@
--- ShowLink Withdrawal V18 — manual withdrawal open daily 08:00–21:00 WIB
+-- ShowLink Withdrawal V20 — unified admin switch + WIB schedule
 -- Manual + Instant withdrawal, fee rules, daily limit, admin approval/rejection,
 -- user/admin notifications and safe balance reservation.
+
+CREATE TABLE IF NOT EXISTS public.platform_controls (
+  id boolean PRIMARY KEY DEFAULT true CHECK (id=true),
+  withdrawals_open boolean NOT NULL DEFAULT true,
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  updated_by uuid REFERENCES public.profiles(id) ON DELETE SET NULL
+);
+INSERT INTO public.platform_controls(id) VALUES(true) ON CONFLICT(id) DO NOTHING;
 
 ALTER TABLE public.withdrawals
   ADD COLUMN IF NOT EXISTS metadata jsonb NOT NULL DEFAULT '{}'::jsonb;
@@ -57,6 +65,10 @@ DECLARE
 BEGIN
   IF uid IS NULL THEN RAISE EXCEPTION 'AUTH_REQUIRED'; END IF;
   IF p_mode NOT IN ('manual','instant') THEN RAISE EXCEPTION 'INVALID_WITHDRAW_MODE'; END IF;
+  -- The admin master switch blocks every withdrawal mode.
+  IF NOT COALESCE((SELECT withdrawals_open FROM public.platform_controls WHERE id=true), true) THEN
+    RAISE EXCEPTION 'WITHDRAWALS_CLOSED';
+  END IF;
   PERFORM public.release_due_settlements();
 
   IF p_amount IS NULL OR p_amount < 10000 THEN RAISE EXCEPTION 'MIN_WITHDRAWAL_10000'; END IF;
@@ -159,6 +171,21 @@ END;
 $$;
 REVOKE ALL ON FUNCTION public.request_withdrawal(numeric,uuid,text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.request_withdrawal(numeric,uuid,text) TO authenticated;
+-- Remove the obsolete two-argument overload so PostgREST cannot call the wrong logic.
+DROP FUNCTION IF EXISTS public.request_withdrawal(numeric,uuid);
+
+CREATE OR REPLACE FUNCTION public.showlink_withdrawal_availability()
+RETURNS jsonb LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public,extensions AS $$
+  SELECT jsonb_build_object(
+    'withdrawals_open', COALESCE((SELECT withdrawals_open FROM public.platform_controls WHERE id=true), true),
+    'manual_open_by_schedule', ((extract(hour from (now() AT TIME ZONE 'Asia/Jakarta'))::int * 60 + extract(minute from (now() AT TIME ZONE 'Asia/Jakarta'))::int) >= 480
+      AND (extract(hour from (now() AT TIME ZONE 'Asia/Jakarta'))::int * 60 + extract(minute from (now() AT TIME ZONE 'Asia/Jakarta'))::int) < 1260),
+    'timezone', 'Asia/Jakarta',
+    'server_time', now() AT TIME ZONE 'Asia/Jakarta'
+  );
+$$;
+REVOKE ALL ON FUNCTION public.showlink_withdrawal_availability() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.showlink_withdrawal_availability() TO authenticated;
 
 CREATE OR REPLACE FUNCTION public.admin_update_withdrawal(
   p_withdrawal_id uuid,
