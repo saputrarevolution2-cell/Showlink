@@ -1,4 +1,4 @@
--- ShowLink Withdrawal V15
+-- ShowLink Withdrawal V18 — manual withdrawal open daily 08:00–21:00 WIB
 -- Manual + Instant withdrawal, fee rules, daily limit, admin approval/rejection,
 -- user/admin notifications and safe balance reservation.
 
@@ -51,7 +51,6 @@ DECLARE
   used_today numeric := 0;
   daily_limit numeric := 500000;
   now_jakarta timestamp;
-  day_of_week integer;
   minute_of_day integer;
   admin_id uuid;
   account_label text;
@@ -63,11 +62,10 @@ BEGIN
   IF p_amount IS NULL OR p_amount < 10000 THEN RAISE EXCEPTION 'MIN_WITHDRAWAL_10000'; END IF;
 
   now_jakarta := now() AT TIME ZONE 'Asia/Jakarta';
-  day_of_week := extract(dow from now_jakarta)::integer;
   minute_of_day := extract(hour from now_jakarta)::integer * 60 + extract(minute from now_jakarta)::integer;
 
   IF p_mode='manual' THEN
-    IF day_of_week IN (0,6) OR minute_of_day < 480 OR minute_of_day >= 1260 THEN
+    IF minute_of_day < 480 OR minute_of_day >= 1260 THEN
       RAISE EXCEPTION 'MANUAL_WITHDRAWAL_CLOSED';
     END IF;
     fee := public.showlink_manual_withdraw_fee(p_amount);
