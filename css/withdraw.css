@@ -497,3 +497,16 @@ html[data-theme="dark"] .app-message.success{color:#6ee7b7}html[data-theme="dark
 /* V21: the closed notice must obey the HTML hidden attribute even with display:flex. */
 .withdraw-closed[hidden]{display:none!important}
 .withdraw-closed:not([hidden]){display:flex}
+
+/* V22: per-mode lock states; show a clear notice without blurring the form. */
+.withdraw-form.is-disabled{filter:none!important;opacity:1!important;pointer-events:auto!important;user-select:auto!important}
+.withdraw-mode:disabled,.instant-amounts button:disabled{opacity:.45;filter:grayscale(.7);cursor:not-allowed;pointer-events:none;transform:none!important;box-shadow:none!important}
+.withdraw-mode:disabled.active{border-color:var(--border);box-shadow:none;background:var(--surface2)}
+.withdraw-form-controls-disabled{opacity:.58}
+.withdraw-closed.instant-closed{border-color:rgba(245,158,11,.28);background:rgba(245,158,11,.08)}
+.withdraw-closed.instant-closed>i{color:#d97706}
+.instant-limit-panel{padding:12px 13px;border:1px solid var(--border);border-radius:14px;background:var(--surface2);margin:0 0 4px}
+.instant-limit-head{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;font-weight:800}
+.instant-limit-head strong{white-space:nowrap}
+.withdraw-page [hidden]{display:none!important}
+#withdraw-message{position:static;filter:none;backdrop-filter:none;box-shadow:none;margin:10px 0}
