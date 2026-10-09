@@ -34,17 +34,20 @@
     renderAmountInfo(); renderConfirm();
   }
   function localDate(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jakarta'}).format(new Date());}
-  function jakartaParts(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());return {hour:Number(p.find(x=>x.type==='hour')?.value||0),minute:Number(p.find(x=>x.type==='minute')?.value||0)};}
+  function jakartaParts(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());const get=k=>Number(p.find(x=>x.type===k)?.value);let hour=get('hour'),minute=get('minute');if(!Number.isFinite(hour)||!Number.isFinite(minute)){const fallback=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Jakarta'}));hour=fallback.getHours();minute=fallback.getMinutes();}return {hour:hour===24?0:hour,minute};}
+  function jakartaClock(){const p=new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).format(new Date());return `${p} WIB`;}
   function isManualOpen(){const d=jakartaParts(),mins=d.hour*60+d.minute;return mins>=480&&mins<1260; }
   async function refreshWithdrawalAvailability(){try{const {data,error}=await sb.rpc('showlink_withdrawal_availability');if(error)throw error;withdrawalsGloballyOpen=data?.withdrawals_open!==false;scheduleOpen=data?.manual_open_by_schedule!==false;}catch(e){console.warn('Could not read withdrawal availability; using WIB schedule until backend responds.',e);scheduleOpen=isManualOpen();}updateManualAvailability();}
   function updateManualAvailability(){
     const t=tr(), closed=$('#manual-closed'), form=$('#withdraw-form'), manual=currentMode==='manual';
     const inHours=isManualOpen();
     const open=withdrawalsGloballyOpen && (!manual || inHours);
-    closed.hidden=open; form.classList.toggle('is-disabled',!open);
-    if(!withdrawalsGloballyOpen){$('#closed-reason').textContent=lang()==='en'?'Withdrawals are temporarily disabled by admin.':'Pengajuan withdraw sedang ditutup oleh admin.';}
-    else if(manual&&!inHours){$('#closed-reason').textContent=t.open;}
+    closed.hidden=Boolean(open); form.classList.toggle('is-disabled',!open);
+    if(!withdrawalsGloballyOpen){$('#closed-reason').textContent=lang()==='en'?'Withdrawals are temporarily disabled by admin.':'Pengajuan withdraw sedang ditutup oleh admin. Periksa sakelar withdrawal di panel admin.';}
+    else if(manual&&!inHours){$('#closed-reason').textContent=`${t.open} Sekarang ${jakartaClock()}.`; }
+    else if(manual&&inHours){$('#closed-reason').textContent='';}
     $('#submit-btn').disabled=!open || (window.__wdUsed||0)>=LIMIT;
+    console.debug('[ShowLink withdrawal status]',{build:'v21',time:jakartaClock(),scheduleOpen:inHours,withdrawalsGloballyOpen,mode:currentMode,open});
   }
   function showMessage(msg,ok=false){const b=$('#withdraw-message');b.textContent=msg;b.className=`app-message show ${ok?'success':'error'}`;}
   async function loadAccount(){const {data,error}=await sb.from('withdrawal_methods').select('id,method_type,account_name,account_number,is_default,is_active').eq('user_id',session.user.id).eq('is_active',true).order('is_default',{ascending:false}).limit(1);if(error)throw error;account=data?.[0]||null;renderAccount();}
