@@ -102,10 +102,29 @@ END; $$;
 REVOKE ALL ON FUNCTION public.admin_delete_payment_link(uuid) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.admin_delete_payment_link(uuid) TO authenticated;
 
--- Do not redefine request_withdrawal here: the canonical 3-argument (p_mode)
--- implementation lives in withdraw-migration.sql and enforces both the admin switch
--- and the WIB schedule. Remove only the obsolete overload if it still exists.
-DROP FUNCTION IF EXISTS public.request_withdrawal(numeric,uuid);
+-- Enforce the withdrawal switch in the actual request path, not only the UI.
+CREATE OR REPLACE FUNCTION public.request_withdrawal(p_amount numeric,p_method_id uuid)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,extensions AS $$
+DECLARE uid uuid:=auth.uid(); w public.wallets%ROWTYPE; m public.withdrawal_methods%ROWTYPE; wid uuid; fee numeric:=0; net numeric;
+BEGIN
+  IF uid IS NULL THEN RAISE EXCEPTION 'AUTH_REQUIRED'; END IF;
+  IF NOT COALESCE((SELECT withdrawals_open FROM public.platform_controls WHERE id=true),true) THEN RAISE EXCEPTION 'WITHDRAWALS_CLOSED'; END IF;
+  PERFORM public.release_due_settlements();
+  IF p_amount IS NULL OR p_amount < 10000 THEN RAISE EXCEPTION 'MIN_WITHDRAWAL_10000'; END IF;
+  SELECT * INTO m FROM public.withdrawal_methods WHERE id=p_method_id AND user_id=uid AND is_active=true FOR UPDATE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'WITHDRAWAL_METHOD_NOT_FOUND'; END IF;
+  SELECT * INTO w FROM public.wallets WHERE user_id=uid FOR UPDATE;
+  IF NOT FOUND OR w.available_balance < p_amount THEN RAISE EXCEPTION 'INSUFFICIENT_AVAILABLE_BALANCE'; END IF;
+  net:=greatest(0,p_amount-fee);
+  INSERT INTO public.withdrawals(user_id,method_id,amount,fee,net_amount,status) VALUES(uid,m.id,p_amount,fee,net,'pending') RETURNING id INTO wid;
+  UPDATE public.wallets SET available_balance=available_balance-p_amount,lifetime_withdrawn=lifetime_withdrawn+p_amount,updated_at=now() WHERE user_id=uid;
+  UPDATE public.profiles SET balance=greatest(0,balance-p_amount),total_withdrawn=total_withdrawn+p_amount,updated_at=now() WHERE id=uid;
+  INSERT INTO public.wallet_transactions(user_id,type,direction,amount,balance_before,balance_after,withdrawal_id,description) VALUES(uid,'withdrawal','debit',p_amount,w.available_balance,w.available_balance-p_amount,wid,'Withdrawal request');
+  INSERT INTO public.notifications(user_id,type,title,message,link_url) VALUES(uid,'withdrawal','Withdrawal diajukan',format('Permintaan withdrawal Rp%s berhasil dibuat.',to_char(p_amount,'FM999G999G999G990D00')),'/withdraw.html');
+  RETURN jsonb_build_object('ok',true,'withdrawal_id',wid,'amount',p_amount,'net_amount',net,'status','pending');
+END; $$;
+REVOKE ALL ON FUNCTION public.request_withdrawal(numeric,uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.request_withdrawal(numeric,uuid) TO authenticated;
 
 CREATE OR REPLACE FUNCTION public.admin_users(p_limit integer DEFAULT 100)
 RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,extensions AS $$
