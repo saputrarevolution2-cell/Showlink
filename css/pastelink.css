@@ -108,7 +108,7 @@ html[data-theme="dark"] .app-card,html[data-theme="dark"] .app-stat,html[data-th
   box-shadow:var(--sl-shadow);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);z-index:10050;
   opacity:0;visibility:hidden;transform:translateY(-5px);transition:opacity .16s ease,transform .16s ease,visibility .16s ease;
 }
-.showlink-tool.is-open .showlink-tool-menu{opacity:1;visibility:visible;transform:translateY(0)}
+.showlink-tool.is-open 
 .showlink-tool-option{
   width:100%;min-height:40px;display:flex;align-items:center;gap:9px;padding:9px 10px;border:0;border-radius:9px;
   background:transparent;color:var(--sl-text);cursor:pointer;font:inherit;font-size:13px;text-align:left;
