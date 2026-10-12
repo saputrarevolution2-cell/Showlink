@@ -31,7 +31,7 @@
 .cs-footer-note{text-align:center;color:var(--cs-muted);font-size:13px;margin:22px 0 0;}.cs-footer-note i{color:#ec78ad;margin-right:6px;}
 @keyframes cs-spin{to{transform:rotate(360deg)}}@keyframes cs-bob{0%,100%{translate:0 0}50%{translate:0 -10px}}@keyframes cs-pulse{50%{box-shadow:0 0 0 8px rgba(245,158,11,0)}}@keyframes cs-progress{from{width:62%}to{width:72%}}
 html[data-theme="dark"] .cs-card,body.dark .cs-card{background:#171927;border-color:#2c3045;}html[data-theme="dark"] .cs-art img,body.dark .cs-art img{mix-blend-mode:normal;}
-@media(max-width:800px){.cs-shell{width:min(620px,calc(100% - 22px));margin:18px auto 32px}.cs-card{grid-template-columns:1fr;border-radius:23px}.cs-copy{padding:30px 24px 26px;order:1}.cs-art{min-height:300px;order:0}.cs-anime{max-height:330px}.cs-copy h1{font-size:38px}.cs-art-caption{bottom:13px}}
+@media(max-width:800px){.cs-shell{width:min(620px,calc(100% - 22px));margin:calc(var(--sl-nav-height,72px) + 18px) auto 32px}.cs-card{grid-template-columns:1fr;border-radius:23px}.cs-copy{padding:30px 24px 26px;order:1}.cs-art{min-height:300px;order:0}.cs-anime{max-height:330px}.cs-copy h1{font-size:38px}.cs-art-caption{bottom:13px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition:none!important}}
 
 /* SHOWLINK UNIFIED UI — embedded in this page's existing stylesheet.
