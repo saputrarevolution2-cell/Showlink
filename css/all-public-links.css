@@ -86,3 +86,42 @@ main label{color:var(--sl-text);font-size:13px;font-weight:750}
 html[data-theme="dark"] .app-card,html[data-theme="dark"] .app-stat,html[data-theme="dark"] .card,html[data-theme="dark"] .panel,html[data-theme="dark"] .section-card,html[data-theme="dark"] .metric-card,html[data-theme="dark"] .stat-card,html[data-theme="dark"] .feature-card,html[data-theme="dark"] .content-card,html[data-theme="dark"] .form-card,html[data-theme="dark"] .form-panel,html[data-theme="dark"] .settings-card,html[data-theme="dark"] .profile-card,html[data-theme="dark"] .payment-card,html[data-theme="dark"] .link-card,html[data-theme="dark"] .auth-card,html[data-theme="dark"] .dashboard-card,html[data-theme="dark"] .dash-card,html[data-theme="dark"] .withdraw-card{background:var(--sl-surface)!important;color:var(--sl-text)}
 @media(max-width:850px){.app-wrap{width:min(100% - 24px,1120px);padding:100px 0 36px}.app-grid,.app-row{grid-template-columns:1fr}.app-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.app-hero{align-items:flex-start;flex-direction:column}.app-card{padding:18px}.app-table{min-width:650px}.page-scroll-table{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}}
 @media(max-width:420px){.app-wrap{width:calc(100% - 20px)}.app-stats{gap:10px}.app-stat{padding:13px}.app-stat strong{font-size:19px}.app-card{border-radius:15px}}
+
+
+/* Shared ShowLink navbar theme/language controls — aligned with Admin */
+.showlink-tools { display:flex; align-items:center; justify-content:flex-end; gap:8px; }
+.showlink-tool { position:relative; display:inline-flex; align-items:center; }
+.showlink-tool-btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  min-height:40px; min-width:88px; padding:0 12px;
+  border:1px solid var(--sl-border); border-radius:10px;
+  background:var(--sl-surface); color:var(--sl-text);
+  cursor:pointer; font-size:12px; font-weight:700;
+  box-shadow:var(--sl-shadow-sm); transition:background .18s ease,border-color .18s ease;
+}
+.showlink-tool-btn:hover { background:var(--sl-hover); border-color:var(--sl-border-strong); }
+.showlink-tool-btn .sl-tool-icon, .sl-option-icon { display:inline-flex; align-items:center; justify-content:center; width:19px; min-width:19px; }
+.showlink-tool-text, .showlink-lang-label { white-space:nowrap; }
+.showlink-lang-label { min-width:22px; text-align:center; }
+.showlink-tool-menu {
+  position:absolute; top:calc(100% + 7px); right:0; z-index:10050;
+  min-width:158px; padding:6px; border:1px solid var(--sl-border); border-radius:12px;
+  background:var(--sl-surface-strong); color:var(--sl-text); box-shadow:var(--sl-shadow);
+  opacity:0; visibility:hidden; transform:translateY(-4px);
+  transition:opacity .16s ease,transform .16s ease,visibility .16s ease;
+}
+.showlink-tool.is-open .showlink-tool-menu { opacity:1; visibility:visible; transform:translateY(0); }
+.showlink-tool-option {
+  display:flex; align-items:center; gap:9px; width:100%; min-height:40px;
+  padding:9px 10px; border:0; border-radius:8px; background:transparent;
+  color:var(--sl-text); text-align:left; cursor:pointer; font-size:13px;
+}
+.showlink-tool-option:hover, .showlink-tool-option.is-active { background:var(--sl-hover); }
+.showlink-tool-option .sl-check { margin-left:auto; color:var(--sl-purple); }
+.sl-option-sun { color:#d97706; }
+.sl-option-moon { color:#818cf8; }
+@media (max-width:820px) {
+  .showlink-tools { gap:6px; }
+  .showlink-tool-btn { min-width:40px; width:40px; padding:0; }
+  .showlink-tool-text, .showlink-lang-label { display:none; }
+}
