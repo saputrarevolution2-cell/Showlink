@@ -57,6 +57,9 @@ DECLARE
 BEGIN
   IF uid IS NULL THEN RAISE EXCEPTION 'AUTH_REQUIRED'; END IF;
   IF p_mode NOT IN ('manual','instant') THEN RAISE EXCEPTION 'INVALID_WITHDRAW_MODE'; END IF;
+  IF NOT COALESCE((SELECT withdrawals_open FROM public.platform_controls WHERE id=true), true) THEN RAISE EXCEPTION 'WITHDRAWALS_CLOSED'; END IF;
+  IF p_mode='manual' AND NOT COALESCE((SELECT manual_withdrawals_open FROM public.platform_controls WHERE id=true), true) THEN RAISE EXCEPTION 'MANUAL_WITHDRAWAL_DISABLED'; END IF;
+  IF p_mode='instant' AND NOT COALESCE((SELECT instant_withdrawals_open FROM public.platform_controls WHERE id=true), true) THEN RAISE EXCEPTION 'INSTANT_WITHDRAWAL_DISABLED'; END IF;
   PERFORM public.release_due_settlements();
 
   IF p_amount IS NULL OR p_amount < 10000 THEN RAISE EXCEPTION 'MIN_WITHDRAWAL_10000'; END IF;

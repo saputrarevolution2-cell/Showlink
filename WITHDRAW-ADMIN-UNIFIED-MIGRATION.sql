@@ -5,9 +5,13 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_banned boolean NOT NULL 
 CREATE TABLE IF NOT EXISTS public.platform_controls (
   id boolean PRIMARY KEY DEFAULT true CHECK (id=true),
   withdrawals_open boolean NOT NULL DEFAULT true,
+  manual_withdrawals_open boolean NOT NULL DEFAULT true,
+  instant_withdrawals_open boolean NOT NULL DEFAULT true,
   updated_at timestamptz NOT NULL DEFAULT now(),
   updated_by uuid REFERENCES public.profiles(id) ON DELETE SET NULL
 );
+ALTER TABLE public.platform_controls ADD COLUMN IF NOT EXISTS manual_withdrawals_open boolean NOT NULL DEFAULT true;
+ALTER TABLE public.platform_controls ADD COLUMN IF NOT EXISTS instant_withdrawals_open boolean NOT NULL DEFAULT true;
 INSERT INTO public.platform_controls(id) VALUES(true) ON CONFLICT(id) DO NOTHING;
 ALTER TABLE public.platform_controls ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.platform_controls FROM anon, authenticated;
@@ -50,6 +54,23 @@ BEGIN
 END; $$;
 REVOKE ALL ON FUNCTION public.admin_set_withdrawals_open(boolean) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.admin_set_withdrawals_open(boolean) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.admin_set_withdrawal_mode_open(p_mode text,p_open boolean)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,extensions AS $$
+BEGIN
+  IF NOT public.is_current_user_admin() THEN RAISE EXCEPTION 'ADMIN_REQUIRED'; END IF;
+  IF p_mode NOT IN ('manual','instant') THEN RAISE EXCEPTION 'INVALID_WITHDRAW_MODE'; END IF;
+  IF p_mode='manual' THEN
+    UPDATE public.platform_controls SET manual_withdrawals_open=p_open,updated_at=now(),updated_by=auth.uid() WHERE id=true;
+  ELSE
+    UPDATE public.platform_controls SET instant_withdrawals_open=p_open,updated_at=now(),updated_by=auth.uid() WHERE id=true;
+  END IF;
+  INSERT INTO public.admin_audit_logs(admin_id,action,target_type,details)
+  VALUES(auth.uid(),CASE WHEN p_open THEN 'open_withdrawal_mode' ELSE 'close_withdrawal_mode' END,'platform',jsonb_build_object('mode',p_mode,'open',p_open));
+  RETURN jsonb_build_object('ok',true,'mode',p_mode,'open',p_open);
+END; $$;
+REVOKE ALL ON FUNCTION public.admin_set_withdrawal_mode_open(text,boolean) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.admin_set_withdrawal_mode_open(text,boolean) TO authenticated;
 
 CREATE OR REPLACE FUNCTION public.admin_announce_all(p_title text,p_message text,p_link_url text DEFAULT '/dashboard.html')
 RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=public,extensions AS $$
@@ -186,9 +207,13 @@ GRANT EXECUTE ON FUNCTION public.admin_update_withdrawal(uuid,text,text) TO auth
 CREATE TABLE IF NOT EXISTS public.platform_controls (
   id boolean PRIMARY KEY DEFAULT true CHECK (id=true),
   withdrawals_open boolean NOT NULL DEFAULT true,
+  manual_withdrawals_open boolean NOT NULL DEFAULT true,
+  instant_withdrawals_open boolean NOT NULL DEFAULT true,
   updated_at timestamptz NOT NULL DEFAULT now(),
   updated_by uuid REFERENCES public.profiles(id) ON DELETE SET NULL
 );
+ALTER TABLE public.platform_controls ADD COLUMN IF NOT EXISTS manual_withdrawals_open boolean NOT NULL DEFAULT true;
+ALTER TABLE public.platform_controls ADD COLUMN IF NOT EXISTS instant_withdrawals_open boolean NOT NULL DEFAULT true;
 INSERT INTO public.platform_controls(id) VALUES(true) ON CONFLICT(id) DO NOTHING;
 
 ALTER TABLE public.withdrawals
@@ -249,6 +274,12 @@ BEGIN
   -- The admin master switch blocks every withdrawal mode.
   IF NOT COALESCE((SELECT withdrawals_open FROM public.platform_controls WHERE id=true), true) THEN
     RAISE EXCEPTION 'WITHDRAWALS_CLOSED';
+  END IF;
+  IF p_mode='manual' AND NOT COALESCE((SELECT manual_withdrawals_open FROM public.platform_controls WHERE id=true), true) THEN
+    RAISE EXCEPTION 'MANUAL_WITHDRAWAL_DISABLED';
+  END IF;
+  IF p_mode='instant' AND NOT COALESCE((SELECT instant_withdrawals_open FROM public.platform_controls WHERE id=true), true) THEN
+    RAISE EXCEPTION 'INSTANT_WITHDRAWAL_DISABLED';
   END IF;
   PERFORM public.release_due_settlements();
 
@@ -359,6 +390,8 @@ CREATE OR REPLACE FUNCTION public.showlink_withdrawal_availability()
 RETURNS jsonb LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public,extensions AS $$
   SELECT jsonb_build_object(
     'withdrawals_open', COALESCE((SELECT withdrawals_open FROM public.platform_controls WHERE id=true), true),
+    'manual_withdrawals_open', COALESCE((SELECT manual_withdrawals_open FROM public.platform_controls WHERE id=true), true),
+    'instant_withdrawals_open', COALESCE((SELECT instant_withdrawals_open FROM public.platform_controls WHERE id=true), true),
     'manual_open_by_schedule', ((extract(hour from (now() AT TIME ZONE 'Asia/Jakarta'))::int * 60 + extract(minute from (now() AT TIME ZONE 'Asia/Jakarta'))::int) >= 480
       AND (extract(hour from (now() AT TIME ZONE 'Asia/Jakarta'))::int * 60 + extract(minute from (now() AT TIME ZONE 'Asia/Jakarta'))::int) < 1260),
     'timezone', 'Asia/Jakarta',
