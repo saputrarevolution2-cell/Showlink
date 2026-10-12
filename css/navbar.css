@@ -131,3 +131,9 @@ html[data-theme="dark"]{
 .sl-nav-link-disabled .sl-new-badge{margin-left:auto;flex:none;white-space:nowrap;font-size:9px;padding:4px 7px}
 .sl-menu-notification-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:linear-gradient(135deg,#ff2f92,#ef4444);color:#fff;font-size:10px;font-weight:900;line-height:1;box-shadow:0 3px 10px rgba(239,68,68,.22)}
 .sl-menu-notification-badge[hidden]{display:none!important}
+
+/* Navbar order NEW badge */
+.sl-new-badge.sl-new-green{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;padding:3px 7px;border-radius:999px;background:#16a34a;color:#fff;font-size:10px;font-weight:900;line-height:1;letter-spacing:.04em;vertical-align:middle;box-shadow:0 2px 7px #16a34a33}
+[data-order-new]{pointer-events:none}
+
+[data-order-link]{display:inline-flex}
