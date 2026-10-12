@@ -1,6 +1,27 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const API = "https://www.bayar.gg/api/create-payment.php";
+const QRIS_CONVERT_API = "https://www.bayar.gg/api/qris-convert.php";
+
+async function convertQrisToImage(qris: string, amount: number, apiKey: string): Promise<{ qris: string | null; qr_image_url: string | null }> {
+  if (!qris) return { qris: null, qr_image_url: null };
+  try {
+    const response = await fetch(QRIS_CONVERT_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-API-Key": apiKey },
+      body: JSON.stringify({ qris, nominal: amount }),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || result?.success !== true) {
+      console.error("BayarGG QRIS conversion failed", response.status, result?.message || result?.error || "unknown error");
+      return { qris, qr_image_url: null };
+    }
+    return { qris: String(result.qris || qris), qr_image_url: String(result.qr_image_url || "") || null };
+  } catch (error) {
+    console.error("BayarGG QRIS conversion request failed", error);
+    return { qris, qr_image_url: null };
+  }
+}
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -51,7 +72,11 @@ Deno.serve(async (req) => {
       .eq("order_id", order.id).eq("provider","BAYAR_GG").eq("status","pending")
       .order("created_at",{ascending:false}).limit(1).maybeSingle();
     if (existing?.checkout_url) {
-      return json({ success:true, order_id:order.id, provider:"BAYAR_GG", payment_url:existing.checkout_url, checkout_url:existing.checkout_url, invoice_id:existing.invoice_id || existing.provider_payment_id, amount:Number(existing.amount ?? order.amount), reused:true });
+      const oldPayload = existing.provider_payload as any;
+      const oldData = oldPayload?.data || oldPayload?.payment || oldPayload || {};
+      const oldQris = String(existing.qr_string || oldData?.qris_string || oldData?.qris || "").trim();
+      const qr = await convertQrisToImage(oldQris, Number(existing.amount ?? order.amount), env("BAYARGG_API_KEY"));
+      return json({ success:true, order_id:order.id, provider:"BAYAR_GG", payment_url:existing.checkout_url, checkout_url:existing.checkout_url, invoice_id:existing.invoice_id || existing.provider_payment_id, amount:Number(existing.amount ?? order.amount), qris_string:qr.qris, qr_image_url:qr.qr_image_url, reused:true });
     }
 
     const callbackUrl = `${supabaseUrl}/functions/v1/bayar-gg-webhook`;
@@ -84,12 +109,14 @@ Deno.serve(async (req) => {
     const amount=Number(data?.final_amount ?? data?.amount ?? order.amount);
     if(!invoice || !paymentUrl) return json({error:"BayarGG response missing invoice_id/payment_url"},502);
 
-    const payload={order_id:order.id,provider:"BAYAR_GG",payment_method:String(data?.payment_method || Deno.env.get("BAYARGG_PAYMENT_METHOD") || "qris"),provider_payment_id:invoice,invoice_id:invoice,amount,fee:Math.max(0,amount-Number(order.amount)),net_amount:Math.max(0,Number(order.amount)),status:"pending",checkout_url:paymentUrl,qr_string:data?.qris_string || null,provider_payload:result,updated_at:new Date().toISOString()};
+    const qrisString = String(data?.qris_string || data?.qris || "").trim();
+    const qr = await convertQrisToImage(qrisString, amount, env("BAYARGG_API_KEY"));
+    const payload={order_id:order.id,provider:"BAYAR_GG",payment_method:String(data?.payment_method || Deno.env.get("BAYARGG_PAYMENT_METHOD") || "qris"),provider_payment_id:invoice,invoice_id:invoice,amount,fee:Math.max(0,amount-Number(order.amount)),net_amount:Math.max(0,Number(order.amount)),status:"pending",checkout_url:paymentUrl,qr_string:qr.qris,provider_payload:result,updated_at:new Date().toISOString()};
     const {error:payErr}=await service.from("payments").insert(payload);
     if(payErr && !/duplicate key|unique constraint/i.test(payErr.message||"")) return json({error:"Payment record could not be saved",db_error:payErr.message},500);
     const {error:orderErr}=await service.from("orders").update({provider:"BAYAR_GG",provider_order_id:invoice,payment_reference:invoice,status:"waiting_payment",gateway_payload:result}).eq("id",order.id);
     if(orderErr) return json({error:"Order could not be updated"},500);
 
-    return json({success:true,order_id:order.id,provider:"BAYAR_GG",invoice_id:invoice,payment_url:paymentUrl,checkout_url:paymentUrl,amount});
+    return json({success:true,order_id:order.id,provider:"BAYAR_GG",invoice_id:invoice,payment_url:paymentUrl,checkout_url:paymentUrl,amount,qris_string:qr.qris,qr_image_url:qr.qr_image_url});
   } catch(e) { console.error(e); return json({error:e instanceof Error?e.message:"Internal server error"},500); }
 });
