@@ -2,75 +2,63 @@
 
 /* ShowLink — shared theme, display controls and global glass/holographic system. */
 :root{
-  --sl-pink:#ff2fb3;
-  --sl-magenta:#d946ef;
-  --sl-purple:#7c3aed;
+  --sl-pink:#6366f1;
+  --sl-magenta:#7c3aed;
+  --sl-purple:#4f46e5;
   --sl-blue:#2563eb;
-  --sl-cyan:#06d6ff;
+  --sl-cyan:#0891b2;
   --sl-green:#10b981;
   --sl-orange:#f97316;
   --sl-yellow:#f59e0b;
   --sl-red:#ef4444;
 
-  --sl-gradient:linear-gradient(135deg,#ff2fb3 0%,#c026d3 28%,#7c3aed 48%,#2563eb 72%,#06d6ff 100%);
-  --sl-gradient-reverse:linear-gradient(135deg,#06d6ff 0%,#2563eb 28%,#7c3aed 52%,#c026d3 74%,#ff2fb3 100%);
-  --sl-gradient-soft:linear-gradient(135deg,rgba(255,47,179,.12),rgba(124,58,237,.10),rgba(37,99,235,.10),rgba(6,214,255,.12));
-  --sl-gradient-border:linear-gradient(90deg,#ff2fb3,#c026d3,#7c3aed,#2563eb,#06d6ff);
+  --sl-gradient:linear-gradient(135deg,#4f46e5 0%,#4338ca 52%,#2563eb 100%);
+  --sl-gradient-reverse:linear-gradient(135deg,#2563eb 0%,#4338ca 52%,#4f46e5 100%);
+  --sl-gradient-soft:linear-gradient(135deg,rgba(79,70,229,.08),rgba(37,99,235,.06));
+  --sl-gradient-border:linear-gradient(90deg,#4f46e5,#2563eb);
 
-  --sl-bg:#f5f8ff;
-  --sl-bg-2:#eef6ff;
-  --sl-surface:rgba(255,255,255,.70);
-  --sl-surface-strong:rgba(255,255,255,.88);
-  --sl-surface-soft:rgba(247,250,255,.72);
-  --sl-text:#10162c;
-  --sl-muted:#65718a;
-  --sl-border:rgba(88,74,190,.16);
-  --sl-border-strong:rgba(37,99,235,.24);
-  --sl-hover:rgba(124,58,237,.08);
-  --sl-shadow:0 18px 60px rgba(50,54,120,.12);
-  --sl-shadow-sm:0 8px 28px rgba(50,54,120,.09);
-  --sl-glass-blur:18px;
+  --sl-bg:#f8fafc;
+  --sl-bg-2:#f1f5f9;
+  --sl-surface:rgba(255,255,255,.96);
+  --sl-surface-strong:#ffffff;
+  --sl-surface-soft:#f8fafc;
+  --sl-text:#172033;
+  --sl-muted:#64748b;
+  --sl-border:rgba(148,163,184,.28);
+  --sl-border-strong:rgba(79,70,229,.34);
+  --sl-hover:rgba(79,70,229,.06);
+  --sl-shadow:0 16px 40px rgba(15,23,42,.08);
+  --sl-shadow-sm:0 4px 16px rgba(15,23,42,.05);
+  --sl-glass-blur:12px;
 }
 
 html[data-theme="dark"]{
-  --sl-bg:#040817;
-  --sl-bg-2:#07112b;
-  --sl-surface:rgba(9,17,43,.66);
-  --sl-surface-strong:rgba(10,20,48,.86);
-  --sl-surface-soft:rgba(13,24,55,.72);
-  --sl-text:#f7fbff;
-  --sl-muted:#aab9d5;
-  --sl-border:rgba(108,161,255,.22);
-  --sl-border-strong:rgba(80,210,255,.32);
-  --sl-hover:rgba(125,91,255,.16);
-  --sl-shadow:0 22px 80px rgba(0,0,0,.40);
-  --sl-shadow-sm:0 10px 34px rgba(0,0,0,.28);
+  --sl-bg:#0b1220;
+  --sl-bg-2:#111c2e;
+  --sl-surface:rgba(17,28,46,.94);
+  --sl-surface-strong:#111c2e;
+  --sl-surface-soft:#172338;
+  --sl-text:#f8fafc;
+  --sl-muted:#a8b4c7;
+  --sl-border:rgba(148,163,184,.20);
+  --sl-border-strong:rgba(129,140,248,.45);
+  --sl-hover:rgba(129,140,248,.12);
+  --sl-shadow:0 18px 48px rgba(0,0,0,.24);
+  --sl-shadow-sm:0 6px 20px rgba(0,0,0,.18);
 }
 
 html{
-  background:
-    radial-gradient(circle at 8% 4%,rgba(255,47,179,.14),transparent 24%),
-    radial-gradient(circle at 92% 8%,rgba(37,99,235,.14),transparent 27%),
-    radial-gradient(circle at 50% 100%,rgba(6,214,255,.11),transparent 34%),
-    var(--sl-bg);
+  background:var(--sl-bg);
   color-scheme:light;
 }
 html[data-theme="dark"]{
   color-scheme:dark;
-  background:
-    radial-gradient(circle at 8% 4%,rgba(255,47,179,.10),transparent 24%),
-    radial-gradient(circle at 92% 8%,rgba(37,99,235,.13),transparent 28%),
-    radial-gradient(circle at 50% 100%,rgba(6,214,255,.09),transparent 35%),
-    var(--sl-bg);
+  background:var(--sl-bg);
 }
 
 body{
   color:var(--sl-text);
-  background:
-    radial-gradient(circle at 12% 0%,rgba(255,47,179,.06),transparent 25%),
-    radial-gradient(circle at 88% 10%,rgba(124,58,237,.06),transparent 28%),
-    radial-gradient(circle at 50% 100%,rgba(6,214,255,.05),transparent 32%),
-    var(--sl-bg);
+  background:var(--sl-bg);
 }
 
 /* Existing page surfaces inherit one visual language without introducing another stylesheet. */
@@ -228,14 +216,12 @@ html[data-theme="dark"]{
 .modal-card,
 .dropdown-panel{
   background:
-    linear-gradient(135deg,rgba(255,255,255,.72),rgba(255,255,255,.42)) !important;
-  border:1px solid rgba(255,255,255,.72) !important;
+    #ffffff !important;
+  border:1px solid var(--sl-border) !important;
   box-shadow:
-    0 18px 55px rgba(78,55,155,.12),
-    inset 0 1px 0 rgba(255,255,255,.90),
-    0 0 0 1px rgba(255,47,179,.035) !important;
-  backdrop-filter:blur(20px) saturate(135%);
-  -webkit-backdrop-filter:blur(20px) saturate(135%);
+    0 8px 24px rgba(15,23,42,.06) !important;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
   color:var(--sl-text);
 }
 
@@ -335,11 +321,11 @@ textarea.form-control,
 input.form-control,
 select.form-control{
   color:var(--sl-text) !important;
-  background:linear-gradient(135deg,rgba(255,255,255,.68),rgba(247,249,255,.48)) !important;
-  border:1px solid rgba(112,91,210,.20) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.82),0 6px 20px rgba(69,54,145,.055) !important;
-  backdrop-filter:blur(14px) saturate(125%);
-  -webkit-backdrop-filter:blur(14px) saturate(125%);
+  background:#ffffff !important;
+  border:1px solid var(--sl-border) !important;
+  box-shadow:0 1px 2px rgba(15,23,42,.025) !important;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
 }
 html[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
 html[data-theme="dark"] select,
@@ -355,14 +341,14 @@ html[data-theme="dark"] input.form-control,
 html[data-theme="dark"] select.form-control{
   color:var(--sl-text) !important;
   background:linear-gradient(135deg,rgba(7,14,39,.78),rgba(22,13,53,.60),rgba(4,35,57,.62)) !important;
-  border-color:rgba(105,164,255,.30) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 25px rgba(0,0,0,.20) !important;
+  border-color:rgba(148,163,184,.30) !important;
+  box-shadow:0 1px 2px rgba(0,0,0,.12) !important;
 }
 input::placeholder,textarea::placeholder{color:var(--sl-muted) !important;opacity:.82}
 input:focus,select:focus,textarea:focus,.auth-input:focus,.form-input:focus,.input:focus,.field-input:focus,.text-input:focus,.search-input:focus{
   outline:none !important;
   border-color:rgba(124,58,237,.58) !important;
-  box-shadow:0 0 0 3px rgba(124,58,237,.11),0 0 24px rgba(6,214,255,.08),inset 0 1px 0 rgba(255,255,255,.75) !important;
+  box-shadow:0 0 0 3px rgba(79,70,229,.12) !important;
 }
 
 /* Form labels and field helpers follow the crystal palette. */
@@ -399,17 +385,17 @@ html[data-theme="dark"] .btn-ghost,html[data-theme="dark"] .btn-outline,html[dat
 .sl-card,.sl-main-card,.task-card,.checkout-card,.final-card,.auth-art-card,.auth-receipt-card,
 .payment-create-card,.pf-choice-card,.sl-info-panel,.sl-mobile-panel,.faq-section,.why-section,
 .settings-row,.create-field,.payment-field,.auth-row,.auth-receipt-row,.price-row{
-  background:linear-gradient(135deg,rgba(255,255,255,.70),rgba(255,255,255,.40)) !important;
+  background:#ffffff !important;
   border-color:var(--sl-border) !important;
-  box-shadow:0 16px 48px rgba(73,55,145,.10),inset 0 1px 0 rgba(255,255,255,.86) !important;
+  box-shadow:0 8px 24px rgba(15,23,42,.05) !important;
   color:var(--sl-text);
   backdrop-filter:blur(18px) saturate(130%);
   -webkit-backdrop-filter:blur(18px) saturate(130%);
 }
 html[data-theme="dark"] .sl-card,html[data-theme="dark"] .sl-main-card,html[data-theme="dark"] .task-card,html[data-theme="dark"] .checkout-card,html[data-theme="dark"] .final-card,html[data-theme="dark"] .auth-art-card,html[data-theme="dark"] .auth-receipt-card,html[data-theme="dark"] .payment-create-card,html[data-theme="dark"] .pf-choice-card,html[data-theme="dark"] .sl-info-panel,html[data-theme="dark"] .sl-mobile-panel,html[data-theme="dark"] .faq-section,html[data-theme="dark"] .why-section,html[data-theme="dark"] .settings-row,html[data-theme="dark"] .create-field,html[data-theme="dark"] .payment-field,html[data-theme="dark"] .auth-row,html[data-theme="dark"] .auth-receipt-row,html[data-theme="dark"] .price-row{
-  background:linear-gradient(135deg,rgba(11,18,48,.78),rgba(20,13,52,.58),rgba(5,34,59,.62)) !important;
-  border-color:rgba(112,160,255,.27) !important;
-  box-shadow:0 20px 70px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.08) !important;
+  background:#111c2e !important;
+  border-color:rgba(148,163,184,.22) !important;
+  box-shadow:0 12px 32px rgba(0,0,0,.20) !important;
 }
 
 /* Forms themselves are part of the crystal surface, not just their inputs. */
@@ -463,7 +449,7 @@ body{
 }
 html[data-theme="dark"] body{
   background:
-    radial-gradient(circle at 8% 4%,rgba(109,93,252,.12),transparent 27%),
+    radial-gradient(circle at 8% 4%,rgba(79,70,229,.08),transparent 27%),
     radial-gradient(circle at 92% 12%,rgba(236,72,153,.08),transparent 25%),
     radial-gradient(circle at 50% 100%,rgba(59,130,246,.07),transparent 30%),
     var(--bg);
@@ -489,7 +475,7 @@ html[data-theme="dark"] body{
 .sl-placeholder>i{
   background:linear-gradient(135deg,rgba(59,130,246,.13),rgba(139,92,246,.14),rgba(236,72,153,.11));
   border:1px solid rgba(109,93,252,.13);
-  box-shadow:0 12px 30px rgba(109,93,252,.10);
+  box-shadow:0 12px 30px rgba(79,70,229,.07);
   color:#a855f7;
 }
 .sl-main-kicker i,.sl-kicker i,.dash-kicker i{color:#7c3aed}
