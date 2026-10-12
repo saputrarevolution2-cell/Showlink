@@ -75,7 +75,10 @@ Deno.serve(async (req) => {
       const oldPayload = existing.provider_payload as any;
       const oldData = oldPayload?.data || oldPayload?.payment || oldPayload || {};
       const oldQris = String(existing.qr_string || oldData?.qris_string || oldData?.qris || "").trim();
-      const qr = await convertQrisToImage(oldQris, Number(existing.amount ?? order.amount), env("BAYARGG_API_KEY"));
+      const method = String(oldData?.payment_method || Deno.env.get("BAYARGG_PAYMENT_METHOD") || "qris").toLowerCase();
+      // BayarGG's standard "qris" already returns a QRIS payload. Do not send it
+      // through qris-convert.php; the browser renders qris_string into a QR image.
+      const qr = method === "qris" ? { qris: oldQris, qr_image_url: null } : await convertQrisToImage(oldQris, Number(existing.amount ?? order.amount), env("BAYARGG_API_KEY"));
       return json({ success:true, order_id:order.id, provider:"BAYAR_GG", payment_url:existing.checkout_url, checkout_url:existing.checkout_url, invoice_id:existing.invoice_id || existing.provider_payment_id, amount:Number(existing.amount ?? order.amount), qris_string:qr.qris, qr_image_url:qr.qr_image_url, reused:true });
     }
 
@@ -110,13 +113,15 @@ Deno.serve(async (req) => {
     if(!invoice || !paymentUrl) return json({error:"BayarGG response missing invoice_id/payment_url"},502);
 
     const qrisString = String(data?.qris_string || data?.qris || "").trim();
-    const qr = await convertQrisToImage(qrisString, amount, env("BAYARGG_API_KEY"));
-    const payload={order_id:order.id,provider:"BAYAR_GG",payment_method:String(data?.payment_method || Deno.env.get("BAYARGG_PAYMENT_METHOD") || "qris"),provider_payment_id:invoice,invoice_id:invoice,amount,fee:Math.max(0,amount-Number(order.amount)),net_amount:Math.max(0,Number(order.amount)),status:"pending",checkout_url:paymentUrl,qr_string:qr.qris,provider_payload:result,updated_at:new Date().toISOString()};
+    const method = String(data?.payment_method || Deno.env.get("BAYARGG_PAYMENT_METHOD") || "qris").toLowerCase();
+    // Standard BayarGG QRIS returns qris_string directly; conversion is not needed.
+    const qr = method === "qris" ? { qris: qrisString, qr_image_url: null } : await convertQrisToImage(qrisString, amount, env("BAYARGG_API_KEY"));
+    const payload={order_id:order.id,provider:"BAYAR_GG",payment_method:method,provider_payment_id:invoice,invoice_id:invoice,amount,fee:Math.max(0,amount-Number(order.amount)),net_amount:Math.max(0,Number(order.amount)),status:"pending",checkout_url:paymentUrl,qr_string:qr.qris,provider_payload:result,updated_at:new Date().toISOString()};
     const {error:payErr}=await service.from("payments").insert(payload);
     if(payErr && !/duplicate key|unique constraint/i.test(payErr.message||"")) return json({error:"Payment record could not be saved",db_error:payErr.message},500);
     const {error:orderErr}=await service.from("orders").update({provider:"BAYAR_GG",provider_order_id:invoice,payment_reference:invoice,status:"waiting_payment",gateway_payload:result}).eq("id",order.id);
     if(orderErr) return json({error:"Order could not be updated"},500);
 
-    return json({success:true,order_id:order.id,provider:"BAYAR_GG",invoice_id:invoice,payment_url:paymentUrl,checkout_url:paymentUrl,amount,qris_string:qr.qris,qr_image_url:qr.qr_image_url});
+    return json({success:true,order_id:order.id,provider:"BAYAR_GG",invoice_id:invoice,payment_url:paymentUrl,checkout_url:paymentUrl,amount,qris_string:qr.qris,qr_image_url:qr.qr_image_url,payment_method:method});
   } catch(e) { console.error(e); return json({error:e instanceof Error?e.message:"Internal server error"},500); }
 });
