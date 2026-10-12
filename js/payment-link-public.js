@@ -415,9 +415,6 @@
         ${qr ? `<div style="text-align:center;margin:22px 0">
           <img src="${esc(qr)}" alt="QR pembayaran Cashi" style="display:block;max-width:320px;width:100%;margin:auto;border-radius:18px;background:#fff;padding:10px;box-sizing:border-box">
         </div>` : ''}
-        ${checkout ? `<a class="pl-buy" href="${esc(checkout)}" target="_blank" rel="noopener noreferrer" style="display:flex;text-decoration:none;justify-content:center;align-items:center;gap:8px">
-          ${esc(currentLang()==='en'?'Open Cashi':'Buka Cashi')} <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </a>` : ''}
         <button class="pl-buy" id="check-payment" type="button" style="margin-top:10px">
           <i class="fa-solid fa-circle-check"></i> ${esc(currentLang()==='en'?'Check Payment':'Cek Pembayaran')}
         </button>
@@ -469,16 +466,13 @@
         <span class="pl-kicker"><i class="fa-solid fa-qrcode"></i> BAYAR GG</span>
         <h1 class="pl-title">${esc(currentLang()==='en'?'Complete payment':'Lanjutkan pembayaran')}</h1>
         <p class="pl-desc">${esc(currentLang()==='en'
-          ? 'Open the BayarGG checkout and complete your payment. Return here to verify the payment.'
-          : 'Buka halaman pembayaran BayarGG dan selesaikan pembayaran. Setelah selesai, kembali ke sini untuk verifikasi.')}</p>
+          ? 'Scan the QR and complete your payment. Stay on this page to verify the payment.'
+          : 'Scan QRIS dan selesaikan pembayaran. Tetap di halaman ini untuk mengecek status pembayaran.')}</p>
         <div class="pl-meta">
           <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('titleLabel'))}</span><span class="pl-meta-value">${esc(data.title || 'Payment Link')}</span></div>
           <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('priceLabel'))}</span><span class="pl-meta-value">${money(amount, data.currency || 'IDR')}</span></div>
         </div>
         ${qrImage ? `<div class="pl-qris-image" style="margin:16px auto;text-align:center"><img src="${esc(qrImage)}" alt="QRIS BayarGG" style="display:block;max-width:280px;width:100%;height:auto;margin:0 auto;border-radius:12px;background:#fff;padding:8px" referrerpolicy="no-referrer"><p class="pl-desc">Scan QRIS untuk membayar ${esc(money(amount, data.currency || 'IDR'))}</p></div>` : (qrPayload ? `<div class="pl-qris-image" style="margin:16px auto;text-align:center"><div id="bayargg-qr-code" aria-label="QRIS BayarGG" style="display:flex;justify-content:center;background:#fff;padding:12px;border-radius:12px;width:max-content;max-width:100%;margin:0 auto"></div><p class="pl-desc">Scan QRIS untuk membayar ${esc(money(amount, data.currency || 'IDR'))}</p></div>` : '')}
-        ${checkout ? `<a class="pl-buy" href="${esc(checkout)}" target="_blank" rel="noopener noreferrer" style="display:flex;text-decoration:none;justify-content:center;align-items:center;gap:8px">
-          ${esc(currentLang()==='en'?'Open BayarGG':'Buka BayarGG')} <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </a>` : ''}
         <button class="pl-buy" id="check-payment" type="button" style="margin-top:10px"><i class="fa-solid fa-circle-check"></i> ${esc(currentLang()==='en'?'Check Payment':'Cek Pembayaran')}</button>
         <div class="pl-status" id="payment-status">${esc(currentLang()==='en'?'Waiting for payment confirmation…':'Menunggu konfirmasi pembayaran…')}</div>
         <button class="pl-buy pl-back-gateway" id="back-to-gateway" type="button"><i class="fa-solid fa-arrow-left"></i> ${esc(t('back'))}</button>
@@ -489,7 +483,7 @@
         try { new window.QRCode(qrNode, { text: qrPayload, width: 256, height: 256, correctLevel: window.QRCode.CorrectLevel.M }); }
         catch (err) { console.error('Could not render BayarGG QRIS payload', err); }
       } else if (qrNode) {
-        qrNode.innerHTML = `<p style="max-width:260px;color:#333;font-size:13px;text-align:center">QR belum bisa ditampilkan. Silakan tekan Buka BayarGG untuk melanjutkan pembayaran.</p>`;
+        qrNode.innerHTML = `<p style="max-width:260px;color:#333;font-size:13px;text-align:center">QR belum bisa ditampilkan. Silakan muat ulang halaman atau hubungi pengelola link pembayaran.</p>`;
       }
     }
     document.getElementById('check-payment')?.addEventListener('click', () => checkBayarGGPayment(orderId, sb, token, isUser));
