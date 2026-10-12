@@ -15,6 +15,33 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
     '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
   }[c]));
+
+  // Render plain-text URLs as safe, clickable links in Content previews and unlocked pages.
+  function linkifyContent(value) {
+    const text = String(value ?? '');
+    const urlPattern = /(?:https?:\/\/|www\.)[^\s<]+/gi;
+    let html = '';
+    let last = 0;
+    for (const match of text.matchAll(urlPattern)) {
+      const start = match.index;
+      let raw = match[0];
+      // Keep common sentence punctuation outside the link.
+      let trailing = '';
+      while (/[.,!?;:，。！？、）)\]】}]+$/.test(raw)) {
+        trailing = raw.slice(-1) + trailing;
+        raw = raw.slice(0, -1);
+      }
+      html += esc(text.slice(last, start));
+      if (raw) {
+        const href = /^www\./i.test(raw) ? 'https://' + raw : raw;
+        html += `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(raw)}</a>`;
+      }
+      html += esc(trailing);
+      last = start + match[0].length;
+    }
+    html += esc(text.slice(last));
+    return `<pre class="pl-content-text">${html}</pre>`;
+  }
   const money = (n, currency='IDR') => new Intl.NumberFormat('id-ID', {
     style:'currency', currency, maximumFractionDigits:0
   }).format(Number(n || 0));
@@ -231,7 +258,7 @@
   function renderOwnerPreview(data) {
     currentView = 'owner-preview';
     currentData = data;
-    const content = data.content_html || (data.content_text ? `<pre class="pl-content-text">${esc(data.content_text)}</pre>` : `<div class="pl-status">${esc(t('empty'))}</div>`);
+    const content = data.content_html || (data.content_text ? linkifyContent(data.content_text) : `<div class="pl-status">${esc(t('empty'))}</div>`);
     app.innerHTML = `
       ${data.thumbnail_url ? `<div class="pl-cover"><img src="${esc(data.thumbnail_url)}" alt=""></div>` : `<div class="pl-cover"><i class="fa-solid fa-eye"></i></div>`}
       <div class="pl-body">
@@ -643,7 +670,7 @@
     currentView = 'unlocked';
     currentData = data;
     const content = data.content_html ||
-      (data.content_text ? `<pre class="pl-content-text">${esc(data.content_text)}</pre>` : `<div class="pl-status">${esc(t('empty'))}</div>`);
+      (data.content_text ? linkifyContent(data.content_text) : `<div class="pl-status">${esc(t('empty'))}</div>`);
     app.innerHTML = `
       ${data.thumbnail_url ? `<div class="pl-cover"><img src="${esc(data.thumbnail_url)}" alt=""></div>` : `<div class="pl-cover"><i class="fa-solid fa-unlock"></i></div>`}
       <div class="pl-body">
