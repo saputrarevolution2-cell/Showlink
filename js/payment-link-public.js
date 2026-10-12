@@ -434,6 +434,7 @@
     currentData = { provider:'BAYAR_GG', data, result, sb, orderId, token, isUser };
     const amount = Number(result.amount ?? result.final_amount ?? data.buyer_amount ?? data.price ?? 0);
     const checkout = result.payment_url || result.checkout_url || '';
+    const qrImage = result.qr_image_url || '';
     app.innerHTML = `
       ${data.thumbnail_url ? `<div class="pl-cover"><img src="${esc(data.thumbnail_url)}" alt=""></div>` : `<div class="pl-cover"><i class="fa-solid fa-qrcode"></i></div>`}
       <div class="pl-body">
@@ -446,6 +447,7 @@
           <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('titleLabel'))}</span><span class="pl-meta-value">${esc(data.title || 'Payment Link')}</span></div>
           <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('priceLabel'))}</span><span class="pl-meta-value">${money(amount, data.currency || 'IDR')}</span></div>
         </div>
+        ${qrImage ? `<div class="pl-qris-image" style="margin:16px auto;text-align:center"><img src="${esc(qrImage)}" alt="QRIS BayarGG" style="display:block;max-width:280px;width:100%;height:auto;margin:0 auto;border-radius:12px;background:#fff;padding:8px" referrerpolicy="no-referrer"><p class="pl-desc">Scan QRIS untuk membayar ${esc(money(amount, data.currency || 'IDR'))}</p></div>` : ''}
         ${checkout ? `<a class="pl-buy" href="${esc(checkout)}" target="_blank" rel="noopener noreferrer" style="display:flex;text-decoration:none;justify-content:center;align-items:center;gap:8px">
           ${esc(currentLang()==='en'?'Open BayarGG':'Buka BayarGG')} <i class="fa-solid fa-arrow-up-right-from-square"></i>
         </a>` : ''}
