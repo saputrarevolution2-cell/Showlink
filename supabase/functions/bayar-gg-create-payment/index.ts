@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
       body:JSON.stringify({
         amount:Number(order.amount),
         description:`Order ${order.order_number}`,
-        payment_method:Deno.env.get("BAYARGG_PAYMENT_METHOD") || "qris_bayar_gg",
+        payment_method:Deno.env.get("BAYARGG_PAYMENT_METHOD") || "qris",
         payment_url:Deno.env.get("BAYARGG_PAYMENT_URL") || "https://www.bayar.gg/pay",
         callback_url:callbackUrl,
         redirect_url:redirectUrl
@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
     const amount=Number(data?.final_amount ?? data?.amount ?? order.amount);
     if(!invoice || !paymentUrl) return json({error:"BayarGG response missing invoice_id/payment_url"},502);
 
-    const payload={order_id:order.id,provider:"BAYAR_GG",payment_method:String(data?.payment_method || Deno.env.get("BAYARGG_PAYMENT_METHOD") || "qris_bayar_gg"),provider_payment_id:invoice,invoice_id:invoice,amount,fee:Math.max(0,amount-Number(order.amount)),net_amount:Math.max(0,Number(order.amount)),status:"pending",checkout_url:paymentUrl,qr_string:data?.qris_string || null,provider_payload:result,updated_at:new Date().toISOString()};
+    const payload={order_id:order.id,provider:"BAYAR_GG",payment_method:String(data?.payment_method || Deno.env.get("BAYARGG_PAYMENT_METHOD") || "qris"),provider_payment_id:invoice,invoice_id:invoice,amount,fee:Math.max(0,amount-Number(order.amount)),net_amount:Math.max(0,Number(order.amount)),status:"pending",checkout_url:paymentUrl,qr_string:data?.qris_string || null,provider_payload:result,updated_at:new Date().toISOString()};
     const {error:payErr}=await service.from("payments").insert(payload);
     if(payErr && !/duplicate key|unique constraint/i.test(payErr.message||"")) return json({error:"Payment record could not be saved",db_error:payErr.message},500);
     const {error:orderErr}=await service.from("orders").update({provider:"BAYAR_GG",provider_order_id:invoice,payment_reference:invoice,status:"waiting_payment",gateway_payload:result}).eq("id",order.id);
