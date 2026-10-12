@@ -42,6 +42,49 @@
     html += esc(text.slice(last));
     return `<pre class="pl-content-text">${html}</pre>`;
   }
+  // Also linkify URLs inside stored HTML content, without rewriting HTML attributes
+  // or nesting links that are already clickable.
+  function linkifyHtml(value) {
+    const template = document.createElement('template');
+    template.innerHTML = String(value ?? '');
+    const walker = document.createTreeWalker(template.content, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (node.parentElement && node.parentElement.closest('a,script,style,textarea,code,pre')) continue;
+      if (/(?:https?:\/\/|www\.)[^\s<]+/i.test(node.nodeValue || '')) nodes.push(node);
+    }
+    const urlPattern = /(?:https?:\/\/|www\.)[^\s<]+/gi;
+    for (const node of nodes) {
+      const text = node.nodeValue || '';
+      const fragment = document.createDocumentFragment();
+      let last = 0;
+      for (const match of text.matchAll(urlPattern)) {
+        const start = match.index;
+        let raw = match[0];
+        let trailing = '';
+        while (/[.,!?;:，。！？、）)\]】}]+$/.test(raw)) {
+          trailing = raw.slice(-1) + trailing;
+          raw = raw.slice(0, -1);
+        }
+        fragment.append(document.createTextNode(text.slice(last, start)));
+        if (raw) {
+          const a = document.createElement('a');
+          a.href = /^www\./i.test(raw) ? 'https://' + raw : raw;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.textContent = raw;
+          fragment.append(a);
+        }
+        if (trailing) fragment.append(document.createTextNode(trailing));
+        last = start + match[0].length;
+      }
+      fragment.append(document.createTextNode(text.slice(last)));
+      node.replaceWith(fragment);
+    }
+    return template.innerHTML;
+  }
+
   const money = (n, currency='IDR') => new Intl.NumberFormat('id-ID', {
     style:'currency', currency, maximumFractionDigits:0
   }).format(Number(n || 0));
@@ -258,7 +301,7 @@
   function renderOwnerPreview(data) {
     currentView = 'owner-preview';
     currentData = data;
-    const content = data.content_html || (data.content_text ? linkifyContent(data.content_text) : `<div class="pl-status">${esc(t('empty'))}</div>`);
+    const content = data.content_html ? linkifyHtml(data.content_html) : (data.content_text ? linkifyContent(data.content_text) : `<div class="pl-status">${esc(t('empty'))}</div>`);
     app.innerHTML = `
       ${data.thumbnail_url ? `<div class="pl-cover"><img src="${esc(data.thumbnail_url)}" alt=""></div>` : `<div class="pl-cover"><i class="fa-solid fa-eye"></i></div>`}
       <div class="pl-body">
@@ -663,7 +706,7 @@
   function renderUnlocked(data) {
     currentView = 'unlocked';
     currentData = data;
-    const content = data.content_html ||
+    const content = data.content_html ? linkifyHtml(data.content_html) :
       (data.content_text ? linkifyContent(data.content_text) : `<div class="pl-status">${esc(t('empty'))}</div>`);
     app.innerHTML = `
       ${data.thumbnail_url ? `<div class="pl-cover"><img src="${esc(data.thumbnail_url)}" alt=""></div>` : `<div class="pl-cover"><i class="fa-solid fa-unlock"></i></div>`}
