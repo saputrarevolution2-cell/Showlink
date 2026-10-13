@@ -6,3 +6,49 @@
 .paste-editor a{color:#4f46e5;text-decoration:underline}
 
 .paste-toolbar button{min-width:42px}.paste-rendered blockquote.paste-quote{margin:8px 0;padding:10px 14px;border-left:4px solid #6366f1;background:#4f46e50b;border-radius:0 8px 8px 0;white-space:pre-wrap;cursor:pointer}.paste-rendered del{text-decoration:line-through}
+
+
+/* PasteLink: readable text and controls in dark theme */
+html[data-theme="dark"] .paste-card{
+  background:var(--sl-surface, #111827) !important;
+  color:var(--sl-text, #f1f5f9) !important;
+  border-color:var(--sl-border, #334155) !important;
+}
+html[data-theme="dark"] .paste-card h1,
+html[data-theme="dark"] .paste-card h2,
+html[data-theme="dark"] .paste-card label,
+html[data-theme="dark"] .paste-card .paste-heading p,
+html[data-theme="dark"] .paste-card .paste-hint,
+html[data-theme="dark"] .paste-card .paste-rendered,
+html[data-theme="dark"] .paste-card .paste-rendered p{
+  color:var(--sl-text, #f1f5f9) !important;
+}
+html[data-theme="dark"] .paste-card input,
+html[data-theme="dark"] .paste-card textarea,
+html[data-theme="dark"] .paste-card .paste-editor{
+  background:#0b1220 !important;
+  color:#f8fafc !important;
+  caret-color:#f8fafc;
+  border-color:#475569 !important;
+}
+html[data-theme="dark"] .paste-editor:empty:before{color:#94a3b8 !important}
+html[data-theme="dark"] .paste-toolbar button,
+html[data-theme="dark"] .paste-result button{
+  background:#1e293b !important;
+  color:#f8fafc !important;
+  border-color:#475569 !important;
+}
+html[data-theme="dark"] .paste-rendered a,
+html[data-theme="dark"] .paste-card .paste-open,
+html[data-theme="dark"] .paste-card .paste-back,
+html[data-theme="dark"] .paste-result a{color:#93c5fd !important}
+html[data-theme="dark"] .paste-result{
+  background:#172554 !important;
+  color:#f8fafc !important;
+}
+html[data-theme="dark"] .paste-rendered blockquote.paste-quote{
+  background:rgba(129,140,248,.12) !important;
+  color:#f8fafc !important;
+  border-left-color:#a5b4fc !important;
+}
+html[data-theme="dark"] .paste-message{color:#c4b5fd !important}
