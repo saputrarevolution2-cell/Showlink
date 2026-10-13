@@ -52,3 +52,31 @@ html[data-theme="dark"] .paste-rendered blockquote.paste-quote{
   border-left-color:#a5b4fc !important;
 }
 html[data-theme="dark"] .paste-message{color:#c4b5fd !important}
+
+
+/* Ensure typed text stays visible regardless of where the app applies dark-theme state. */
+html[data-theme="dark"] .paste-card .paste-editor,
+body[data-theme="dark"] .paste-card .paste-editor,
+html.dark .paste-card .paste-editor,
+body.dark .paste-card .paste-editor,
+[data-theme="dark"] .paste-card .paste-editor,
+.theme-dark .paste-card .paste-editor {
+  background-color:#0b1220 !important;
+  color:#f8fafc !important;
+  -webkit-text-fill-color:#f8fafc !important;
+  caret-color:#f8fafc !important;
+}
+.paste-card .paste-editor,
+.paste-card .paste-editor * {
+  color:inherit;
+  -webkit-text-fill-color:inherit;
+}
+html[data-theme="dark"] .paste-card .paste-editor *,
+body[data-theme="dark"] .paste-card .paste-editor *,
+html.dark .paste-card .paste-editor *,
+body.dark .paste-card .paste-editor *,
+[data-theme="dark"] .paste-card .paste-editor *,
+.theme-dark .paste-card .paste-editor * {
+  color:#f8fafc !important;
+  -webkit-text-fill-color:#f8fafc !important;
+}
