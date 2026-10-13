@@ -137,3 +137,8 @@ html[data-theme="dark"]{
 [data-order-new]{pointer-events:none}
 
 [data-order-link]{display:inline-flex}
+
+
+/* PasteLink NEW flame badge */
+.sl-new-badge.sl-pastelink-new{display:inline-flex;align-items:center;justify-content:center;gap:4px;margin-left:6px;padding:4px 8px;border-radius:999px;background:linear-gradient(135deg,#fff3a3,#facc15);color:#713f12;border:1px solid #f59e0b;font-size:10px;font-weight:900;line-height:1;letter-spacing:.035em;white-space:nowrap;box-shadow:0 2px 9px #f59e0b45}
+.sl-pastelink-new i{color:#ea580c;font-size:11px;filter:drop-shadow(0 0 3px #fb923c66)}
