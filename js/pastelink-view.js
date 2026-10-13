@@ -1,6 +1,6 @@
 (()=>{
 const $=s=>document.querySelector(s);
-const slug=location.pathname.split('/').filter(Boolean).pop();
+const slug=String(window.__SHOWLINK_PASTELINK_SLUG||new URLSearchParams(location.search).get('slug')||location.pathname.split('/').filter(Boolean).pop()||'').trim();
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function render(text){
  return String(text).split('\n').map(line=>{
