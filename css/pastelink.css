@@ -113,3 +113,13 @@ body.dark .paste-card .paste-editor *,
 .theme-dark .paste-password-box,.dark .paste-password-box,[data-theme="dark"] .paste-password-box{background:var(--surface,#111827)!important;color:var(--text-primary,#f8fafc)!important;border-color:var(--border,#374151)!important}
 .theme-dark .paste-password-box input,.dark .paste-password-box input,[data-theme="dark"] .paste-password-box input{background:var(--input-bg,#1f2937)!important;color:var(--text-primary,#f8fafc)!important;border-color:var(--border,#4b5563)!important;-webkit-text-fill-color:#f8fafc!important}
 .theme-dark .paste-password-box input::placeholder,.dark .paste-password-box input::placeholder,[data-theme="dark"] .paste-password-box input::placeholder{color:#9ca3af!important;-webkit-text-fill-color:#9ca3af!important}
+/* PasteLink viewer: floating, self-dismissing notifications */
+.paste-toast{position:fixed;z-index:99999;top:calc(env(safe-area-inset-top,0px) + 18px);left:50%;width:max-content;max-width:min( calc(100vw - 32px), 520px );box-sizing:border-box;padding:13px 18px;border-radius:14px;background:#172033;color:#fff;box-shadow:0 12px 38px #0003;font-weight:700;line-height:1.45;text-align:center;opacity:0;transform:translate(-50%,-18px);visibility:hidden;pointer-events:none;transition:opacity .22s ease,transform .22s ease,visibility .22s ease}
+.paste-toast.is-visible{opacity:1;transform:translate(-50%,0);visibility:visible}
+.paste-toast.success{background:#166534}.paste-toast.error{background:#b91c1c}.paste-toast.info{background:#3730a3}
+.paste-rendered{white-space:normal;overflow-wrap:anywhere}
+.paste-rendered p.paste-copy-line{white-space:pre-wrap;margin:0;padding:5px 8px;min-height:1.85em;line-height:1.85}
+.paste-rendered p.paste-empty-line{height:1.85em;min-height:1.85em;margin:0;padding:0}
+.paste-password-box{color:var(--text-primary,#172033)}
+.theme-dark .paste-password-box,.dark .paste-password-box,[data-theme="dark"] .paste-password-box{background:var(--surface,#171923);color:var(--text-primary,#f1f5f9)}
+.theme-dark .paste-password-box input,.dark .paste-password-box input,[data-theme="dark"] .paste-password-box input{background:#111827;color:#f8fafc;border-color:#475569}
