@@ -54,8 +54,8 @@ begin
  return jsonb_build_object('slug',r.slug,'title',r.title,'content',r.content,'created_at',r.created_at,'expires_at',r.expires_at,'password_required',false);
 end; $$;
 
-revoke all on function public.create_pastelink(text,text) from public;
-revoke all on function public.get_pastelink(text) from public;
 revoke all on function public.get_pastelink(text,text) from public;
+revoke all on function public.create_pastelink(text,text,text,integer) from public;
 grant execute on function public.create_pastelink(text,text,text,integer) to anon, authenticated;
+revoke all on function public.get_pastelink(text,text) from public;
 grant execute on function public.get_pastelink(text,text) to anon, authenticated;
