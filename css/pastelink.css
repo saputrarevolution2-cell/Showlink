@@ -86,3 +86,10 @@ body.dark .paste-card .paste-editor *,
 .paste-password-box{margin:18px 0;padding:16px;border:1px solid var(--paste-border,#d8dce8);border-radius:14px}
 .paste-password-box label{display:block;margin-bottom:6px}
 @media(max-width:560px){.paste-options{grid-template-columns:1fr}}
+
+/* Larger PasteLink writing area and spaced security options below content. */
+.paste-card .paste-editor{min-height:420px; padding:18px; font-size:16px;}
+.paste-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:18px;}
+.paste-options>div{min-width:0;}
+.paste-options select{display:block;width:100%;box-sizing:border-box;padding:13px;border:1px solid #dbe2ef;border-radius:12px;background:var(--surface,#fff);color:var(--text-primary,#172033);font:inherit;}
+@media(max-width:600px){.paste-card .paste-editor{min-height:360px}.paste-options{grid-template-columns:1fr;gap:4px}}
