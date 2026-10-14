@@ -37,11 +37,13 @@ editor.addEventListener('paste',e=>{
 btn.addEventListener('click',async()=>{
  const text=Array.from(editor.childNodes).map(markdown).join('').replace(/\n{3,}/g,'\n\n').trim();
  const title=$('#paste-title').value.trim();
+ const password=$('#paste-password').value;
+ const expiry=$('#paste-expiry').value;
  if(!text){msg.textContent='Isi PasteLink tidak boleh kosong.';return}
  btn.disabled=true;msg.textContent='Menyimpan…';
  try{
   const c=await window.ShowLinkSupabase.load();
-  const {data,error}=await c.rpc('create_pastelink',{p_title:title||'PasteLink',p_content:text});
+  const {data,error}=await c.rpc('create_pastelink',{p_title:title||'PasteLink',p_content:text,p_password:password||null,p_expiry_hours:expiry?Number(expiry):null});
   if(error)throw error;
   const slug=data?.slug||data?.[0]?.slug;
   if(!slug)throw new Error('Database tidak mengembalikan slug. Periksa SQL migration sudah dijalankan.');
@@ -50,6 +52,7 @@ btn.addEventListener('click',async()=>{
   $('#paste-result').innerHTML='<strong>PasteLink berhasil dibuat!</strong><a id="paste-url" href="'+url+'">'+url+'</a><button type="button" id="copy-url"><i class="fa-regular fa-copy"></i> Salin tautan</button><a class="paste-open" href="'+url+'" target="_blank" rel="noopener">Buka PasteLink</a>';
   $('#copy-url').onclick=async()=>{try{await navigator.clipboard.writeText(url);msg.textContent='Tautan disalin.'}catch{msg.textContent='Salin tautan dari alamat di atas.'}};
   msg.textContent='Berhasil disimpan.';
+  $('#paste-password').value=''; $('#paste-expiry').value='';
  }catch(e){msg.textContent=(e.message||'Gagal menyimpan.')+' Jika tabel belum tersedia, jalankan file SQL migration yang disertakan di ZIP.'}
  finally{btn.disabled=false}
 });
