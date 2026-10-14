@@ -101,3 +101,15 @@ body.dark .paste-card .paste-editor *,
 /* Ensure native hidden state wins over component display rules. */
 [hidden]{display:none!important}
 .paste-mood{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;margin:0 auto 20px}.paste-mood i{font-size:clamp(3rem,12vw,4.5rem);line-height:1.1;color:#6366f1;transition:transform .2s,color .2s}.paste-mood.is-correct i{color:#16a34a;transform:scale(1.05)}.paste-mood.is-wrong i{color:#ef4444;transform:scale(1.05)}.paste-password-box{width:100%;max-width:460px;margin:20px auto;padding:clamp(18px,4vw,28px);box-sizing:border-box;border:1px solid var(--paste-border,#e2e8f0);border-radius:20px;background:var(--paste-card-bg,#fff);box-shadow:0 12px 35px rgba(15,23,42,.06)}.paste-password-box input{box-sizing:border-box;width:100%}.paste-loading[hidden],.paste-password-box[hidden],.paste-rendered[hidden],#copy-all[hidden],.paste-message[hidden]{display:none!important}
+
+/* v3: loading progress, floating toast, and theme-aware password form */
+.paste-loading-track{width:min(260px,80%);height:6px;border-radius:99px;overflow:hidden;background:var(--border,#e2e8f0);margin-top:2px}
+#paste-loading-progress{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6366f1,#a78bfa);transition:width .12s linear}
+.paste-toast{position:fixed;z-index:99999;left:50%;bottom:24px;transform:translate(-50%,16px);opacity:0;pointer-events:none;max-width:calc(100vw - 32px);width:max-content;padding:12px 18px;border-radius:14px;background:#172033;color:#fff;box-shadow:0 12px 36px #0003;font-size:14px;font-weight:650;text-align:center;transition:opacity .2s ease,transform .2s ease}
+.paste-toast.is-visible{opacity:1;transform:translate(-50%,0)}
+.paste-toast.success{background:#166534;color:#fff}.paste-toast.error{background:#991b1b;color:#fff}
+.paste-password-box{background:var(--surface,#fff);color:var(--text-primary,#172033);border-color:var(--border,#dbe2ef)}
+.paste-password-box input{background:var(--input-bg,var(--surface,#fff));color:var(--text-primary,#172033);border-color:var(--border,#dbe2ef);-webkit-text-fill-color:var(--text-primary,#172033)}
+.theme-dark .paste-password-box,.dark .paste-password-box,[data-theme="dark"] .paste-password-box{background:var(--surface,#111827)!important;color:var(--text-primary,#f8fafc)!important;border-color:var(--border,#374151)!important}
+.theme-dark .paste-password-box input,.dark .paste-password-box input,[data-theme="dark"] .paste-password-box input{background:var(--input-bg,#1f2937)!important;color:var(--text-primary,#f8fafc)!important;border-color:var(--border,#4b5563)!important;-webkit-text-fill-color:#f8fafc!important}
+.theme-dark .paste-password-box input::placeholder,.dark .paste-password-box input::placeholder,[data-theme="dark"] .paste-password-box input::placeholder{color:#9ca3af!important;-webkit-text-fill-color:#9ca3af!important}
