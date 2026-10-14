@@ -105,18 +105,16 @@ body.dark .paste-card .paste-editor *,
 /* v3: loading progress, floating toast, and theme-aware password form */
 .paste-loading-track{width:min(260px,80%);height:6px;border-radius:99px;overflow:hidden;background:var(--border,#e2e8f0);margin-top:2px}
 #paste-loading-progress{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6366f1,#a78bfa);transition:width .12s linear}
-.paste-toast{position:fixed;z-index:99999;left:50%;bottom:24px;transform:translate(-50%,16px);opacity:0;pointer-events:none;max-width:calc(100vw - 32px);width:max-content;padding:12px 18px;border-radius:14px;background:#172033;color:#fff;box-shadow:0 12px 36px #0003;font-size:14px;font-weight:650;text-align:center;transition:opacity .2s ease,transform .2s ease}
-.paste-toast.is-visible{opacity:1;transform:translate(-50%,0)}
-.paste-toast.success{background:#166534;color:#fff}.paste-toast.error{background:#991b1b;color:#fff}
 .paste-password-box{background:var(--surface,#fff);color:var(--text-primary,#172033);border-color:var(--border,#dbe2ef)}
 .paste-password-box input{background:var(--input-bg,var(--surface,#fff));color:var(--text-primary,#172033);border-color:var(--border,#dbe2ef);-webkit-text-fill-color:var(--text-primary,#172033)}
 .theme-dark .paste-password-box,.dark .paste-password-box,[data-theme="dark"] .paste-password-box{background:var(--surface,#111827)!important;color:var(--text-primary,#f8fafc)!important;border-color:var(--border,#374151)!important}
 .theme-dark .paste-password-box input,.dark .paste-password-box input,[data-theme="dark"] .paste-password-box input{background:var(--input-bg,#1f2937)!important;color:var(--text-primary,#f8fafc)!important;border-color:var(--border,#4b5563)!important;-webkit-text-fill-color:#f8fafc!important}
 .theme-dark .paste-password-box input::placeholder,.dark .paste-password-box input::placeholder,[data-theme="dark"] .paste-password-box input::placeholder{color:#9ca3af!important;-webkit-text-fill-color:#9ca3af!important}
-/* PasteLink viewer: floating, self-dismissing notifications */
-.paste-toast{position:fixed;z-index:99999;top:calc(env(safe-area-inset-top,0px) + 18px);left:50%;width:max-content;max-width:min( calc(100vw - 32px), 520px );box-sizing:border-box;padding:13px 18px;border-radius:14px;background:#172033;color:#fff;box-shadow:0 12px 38px #0003;font-weight:700;line-height:1.45;text-align:center;opacity:0;transform:translate(-50%,-18px);visibility:hidden;pointer-events:none;transition:opacity .22s ease,transform .22s ease,visibility .22s ease}
-.paste-toast.is-visible{opacity:1;transform:translate(-50%,0);visibility:visible}
-.paste-toast.success{background:#166534}.paste-toast.error{background:#b91c1c}.paste-toast.info{background:#3730a3}
+/* Compact floating notifications: size to the message, never stretch full-width. */
+#paste-toast.paste-toast{position:fixed!important;z-index:2147483647!important;top:calc(env(safe-area-inset-top,0px) + 14px)!important;left:50%!important;right:auto!important;bottom:auto!important;width:fit-content!important;max-width:min( calc(100vw - 36px), 340px )!important;min-width:0!important;box-sizing:border-box!important;margin:0!important;padding:10px 14px!important;border-radius:12px!important;background:#172033!important;color:#fff!important;font-size:14px!important;font-weight:600!important;line-height:1.4!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;box-shadow:0 8px 24px #0003!important;opacity:0!important;visibility:hidden!important;transform:translate(-50%,-10px)!important;pointer-events:none!important;transition:opacity .2s ease,transform .2s ease,visibility .2s ease!important}
+#paste-toast.paste-toast.is-visible{opacity:1!important;visibility:visible!important;transform:translate(-50%,0)!important}
+#paste-toast.paste-toast.success{background:#166534!important}#paste-toast.paste-toast.error{background:#b91c1c!important}#paste-toast.paste-toast.info{background:#3730a3!important}
+@media(min-width:600px){#paste-toast.paste-toast{max-width:380px!important}}
 .paste-rendered{white-space:normal;overflow-wrap:anywhere}
 .paste-rendered p.paste-copy-line{white-space:pre-wrap;margin:0;padding:5px 8px;min-height:1.85em;line-height:1.85}
 .paste-rendered p.paste-empty-line{height:1.85em;min-height:1.85em;margin:0;padding:0}
