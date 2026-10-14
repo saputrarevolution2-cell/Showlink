@@ -80,3 +80,9 @@ body.dark .paste-card .paste-editor *,
   color:#f8fafc !important;
   -webkit-text-fill-color:#f8fafc !important;
 }
+
+.paste-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0}
+.paste-options>div{min-width:0}.paste-options input,.paste-options select,.paste-password-box input{box-sizing:border-box;width:100%;margin-top:7px;padding:12px 14px;border:1px solid var(--paste-border,#d8dce8);border-radius:12px;font:inherit;background:var(--paste-input-bg,#fff);color:inherit}
+.paste-password-box{margin:18px 0;padding:16px;border:1px solid var(--paste-border,#d8dce8);border-radius:14px}
+.paste-password-box label{display:block;margin-bottom:6px}
+@media(max-width:560px){.paste-options{grid-template-columns:1fr}}
