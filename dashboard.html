@@ -32,11 +32,7 @@
   </section>
 
   <section class="dashboard-section-title"><h2 data-i18n="walletStats">Statistik Saldo &amp; Semua Pendapatan</h2></section>
-  <section class="stat-grid" aria-label="Wallet statistics">
-    <article class="stat-card"><div class="stat-icon blue"><i class="fa-solid fa-link"></i></div><div><span data-i18n="totalLinks">Total Payment Link</span><strong data-metric="totalPaymentLinks">0</strong><small data-stat-sub="activeLinks">0 aktif</small></div></article>
-    <article class="stat-card"><div class="stat-icon purple"><i class="fa-solid fa-chart-column"></i></div><div><span data-i18n="totalViews">Total Views</span><strong data-metric="paymentViews">0</strong><small data-stat-sub="uniqueViews">0 unique views</small></div></article>
-    <article class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-cart-shopping"></i></div><div><span data-i18n="totalSales">Total Terjual</span><strong data-metric="paymentSales">0</strong><small data-stat-sub="successfulSales">transaksi berhasil</small></div></article>
-    <article class="stat-card"><div class="stat-icon orange"><i class="fa-solid fa-wallet"></i></div><div><span data-i18n="netIncome">Pendapatan Bersih</span><strong data-metric="paymentIncome">Rp0</strong><small data-i18n="afterPlatform">Sudah setelah potongan platform</small></div></article>
+  <section class="stat-grid wallet-grid" aria-label="Wallet statistics">
     <article class="stat-card"><div class="stat-icon cyan"><i class="fa-solid fa-circle-check"></i></div><div><span data-i18n="availableBalance">Saldo Tersedia</span><strong data-metric="availableBalance">Rp0</strong><small data-i18n="readyToWithdraw">Siap dicairkan</small></div></article>
     <article class="stat-card"><div class="stat-icon yellow"><i class="fa-solid fa-clock"></i></div><div><span data-i18n="pendingBalance">Saldo Pending</span><strong data-metric="pendingBalance">Rp0</strong><small data-i18n="pendingSettlement">Menunggu settlement</small></div></article>
   </section>
@@ -45,6 +41,12 @@
   <section class="analytics-card module-placeholder"><div class="placeholder-inner"><i class="fa-solid fa-hammer"></i><span data-i18n="moduleDeveloping">Fitur sedang dikembangkan</span></div></section>
 
   <section class="dashboard-section-title"><h2 data-i18n="paymentAnalytics">Statistik dan Analitik Payment Link</h2></section>
+  <section class="stat-grid payment-analytics-grid" aria-label="Payment Link analytics">
+    <button type="button" class="stat-card stat-card-button" data-popup="paymentTotal"><div class="stat-icon blue"><i class="fa-solid fa-link"></i></div><div><span data-i18n="paymentTotalLinks">Total Link</span><strong data-metric="totalPaymentLinks">0</strong><small data-i18n="clickForDetails">Klik untuk detail</small></div></button>
+    <button type="button" class="stat-card stat-card-button" data-popup="incomeToday"><div class="stat-icon green"><i class="fa-solid fa-calendar-day"></i></div><div><span data-i18n="incomeToday">Pendapatan Hari Ini</span><strong data-metric="incomeToday">Rp0</strong><small data-i18n="clickForIncome">Klik untuk lihat pendapatan</small></div></button>
+    <button type="button" class="stat-card stat-card-button" data-popup="incomeMonth"><div class="stat-icon orange"><i class="fa-solid fa-calendar-days"></i></div><div><span data-i18n="incomeMonth">Pendapatan Bulan Ini</span><strong data-metric="incomeMonth">Rp0</strong><small data-i18n="clickForIncome">Klik untuk lihat pendapatan</small></div></button>
+    <button type="button" class="stat-card stat-card-button" data-popup="incomeTotal"><div class="stat-icon purple"><i class="fa-solid fa-wallet"></i></div><div><span data-i18n="incomeTotal">Total Pendapatan</span><strong data-metric="incomeTotal">Rp0</strong><small data-i18n="clickForIncome">Klik untuk lihat pendapatan</small></div></button>
+  </section>
   <section class="analytics-card">
     <div class="section-head">
       <div><span class="dash-kicker"><i class="fa-solid fa-chart-line"></i> <span data-i18n="statistics">STATISTIK</span></span><h2 data-i18n="sevenDayStats">Aktivitas 7 hari terakhir</h2><p data-i18n="sevenDayStatsSub">Ringkasan penjualan dan pendapatan bersih berdasarkan transaksi berhasil.</p></div>
@@ -55,8 +57,8 @@
 
   <section class="dashboard-section-title"><h2 data-i18n="pasteAnalytics">Statistik dan Analitik PasteLink</h2></section>
   <section class="stat-grid pastelink-stat-grid" aria-label="PasteLink statistics">
-    <article class="stat-card"><div class="stat-icon purple"><i class="fa-solid fa-file-lines"></i></div><div><span data-i18n="totalPasteLinks">Total PasteLink</span><strong data-metric="totalPasteLinks">0</strong><small data-i18n="yourPasteLinksOnly">PasteLink milik kamu</small></div></article>
-    <article class="stat-card"><div class="stat-icon cyan"><i class="fa-solid fa-eye"></i></div><div><span data-i18n="totalPasteViews">Total View PasteLink</span><strong data-metric="pasteLinkViews">0</strong><small data-i18n="viewsAllYourPasteLinks">View semua PasteLink kamu</small></div></article>
+    <button type="button" class="stat-card stat-card-button" data-popup="pasteTotal"><div class="stat-icon purple"><i class="fa-solid fa-file-lines"></i></div><div><span data-i18n="totalPasteLinks">Total PasteLink</span><strong data-metric="totalPasteLinks">0</strong><small data-i18n="yourPasteLinksOnly">PasteLink milik kamu</small></div></button>
+    <button type="button" class="stat-card stat-card-button" data-popup="pasteViews"><div class="stat-icon cyan"><i class="fa-solid fa-eye"></i></div><div><span data-i18n="totalPasteViews">Total View PasteLink</span><strong data-metric="pasteLinkViews">0</strong><small data-metric="pasteViewTrend" data-i18n="clickForViews">Klik untuk melihat statistik view</small></div></button>
   </section>
 
   <section class="links-card">
@@ -73,12 +75,17 @@
     <div class="pagination" id="links-pagination" hidden></div>
   </section>
 
+  <section class="links-card">
+    <div class="section-head links-head"><div><span class="dash-kicker"><i class="fa-solid fa-file-lines"></i> PASTELINK</span><h2 data-i18n="yourPasteLinks">PasteLink Kamu</h2><p data-i18n="yourPasteLinksSub">Kelola PasteLink dan pantau jumlah view milikmu.</p></div><a class="dash-btn primary" href="/pastelink.html"><i class="fa-solid fa-plus"></i><span data-i18n="createPasteLink">Buat PasteLink Baru</span></a></div>
+    <div class="links-table-wrap"><table class="links-table"><thead><tr><th data-i18n="pasteTitle">Judul</th><th>Slug</th><th data-i18n="views">Views</th><th data-i18n="created">Dibuat</th><th></th></tr></thead><tbody id="dashboard-pastelinks-body"><tr><td colspan="5" class="table-loading"><i class="fa-solid fa-spinner fa-spin"></i><span data-i18n="loading">Memuat data...</span></td></tr></tbody></table></div>
+  </section>
   <section class="dashboard-bottom">
     <a class="quick-card" href="/payment-link.html"><span class="quick-icon purple"><i class="fa-solid fa-plus"></i></span><span><b data-i18n="createNewLink">Buat Payment Link baru</b><small data-i18n="createNewLinkSub">Tambahkan produk dan mulai menerima pembayaran.</small></span><i class="fa-solid fa-chevron-right"></i></a>
     <a class="quick-card" href="/withdraw.html"><span class="quick-icon green"><i class="fa-solid fa-money-bill-transfer"></i></span><span><b data-i18n="withdraw">Withdraw</b><small data-i18n="withdrawSub">Cairkan saldo yang tersedia.</small></span><i class="fa-solid fa-chevron-right"></i></a>
   </section>
 </div>
 </main>
+<div id="dashboard-toast" class="dashboard-toast" role="status" aria-live="polite" hidden></div>
 <div data-showlink-footer></div>
 
 <script src="/js/dashboard.js" defer></script>
