@@ -25,15 +25,16 @@ async function copy(t){
  }catch{$('#view-message').textContent=tr('copyFail')}
 }
 async function init(){
- const box=$('#view-password-box'), input=$('#view-password'), unlock=$('#unlock-paste');
+ const box=$('#view-password-box'), input=$('#view-password'), unlock=$('#unlock-paste'), loading=$('#paste-loading'), content=$('#view-content'), copyAll=$('#copy-all'), message=$('#view-message');
+ loading.hidden=false; box.hidden=true; content.hidden=true; copyAll.hidden=true; message.hidden=true; $('#view-title').hidden=true;
  async function loadPaste(password){
   const c=await window.ShowLinkSupabase.load();
   const {data,error}=await c.rpc('get_pastelink',{p_slug:slug,p_password:password||null});
   if(error)throw error;
   const row=Array.isArray(data)?data[0]:data;
   if(!row){const err=new Error(tr('missing'));err.code='PASTE_NOT_FOUND';throw err}
-  if(row.password_required){box.hidden=false;$('#view-title').hidden=true;$('#view-message').textContent=password?tr('passwordWrong'):tr('passwordRequired');if(password){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');}return false}
-  box.hidden=true;$('#paste-loading').hidden=true;$('#view-title').hidden=false;$('#paste-mood-icon').className='fa-solid fa-face-smile';$('#paste-mood').classList.remove('is-wrong');if(password){$('#view-message').textContent=tr('passwordRight');$('#paste-mood').classList.add('is-correct');} 
+  if(row.password_required){loading.hidden=true;box.hidden=false;content.hidden=true;copyAll.hidden=true;$('#view-title').hidden=true;message.hidden=false;message.textContent=password?tr('passwordWrong'):tr('passwordRequired');if(password){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');$('#paste-mood').classList.remove('is-correct');}return false}
+  box.hidden=true;loading.hidden=true;content.hidden=false;copyAll.hidden=false;$('#view-title').hidden=false;$('#paste-mood-icon').className='fa-solid fa-face-smile';$('#paste-mood').classList.remove('is-wrong');message.hidden=!!password;if(password){message.textContent=tr('passwordRight');message.hidden=false;$('#paste-mood').classList.add('is-correct');} 
   if(!row.content){throw new Error('Isi PasteLink tidak tersedia.')}
   $('#view-title').textContent=row.title||'PasteLink';
   $('#view-content').innerHTML=render(row.content);
@@ -48,13 +49,13 @@ async function init(){
  }
  try{
   if(!slug||slug==='pastelink-view.html')throw new Error(tr('badSlug'));
-  const loading=$('#paste-loading');loading.hidden=false;
+  loading.hidden=false;
   await loadPaste(null);
-  unlock.onclick=async()=>{if(!input.value){$('#view-message').textContent=tr('passwordMissing');return}unlock.disabled=true;$('#view-message').textContent=tr('loading');$('#paste-mood-icon').className='fa-solid fa-robot fa-bounce';$('#paste-mood').classList.remove('is-wrong','is-correct');try{const opened=await loadPaste(input.value);if(opened===false){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');$('#view-message').textContent=tr('passwordWrong');}}catch(e){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');$('#view-message').textContent=tr('passwordWrong')}finally{unlock.disabled=false}};
+  unlock.onclick=async()=>{if(!input.value){message.hidden=false;message.textContent=tr('passwordMissing');return}unlock.disabled=true;message.hidden=false;message.textContent=tr('loading');$('#paste-mood-icon').className='fa-solid fa-robot fa-bounce';$('#paste-mood').classList.remove('is-wrong','is-correct');try{const opened=await loadPaste(input.value);if(opened===false){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');$('#view-message').textContent=tr('passwordWrong');}}catch(e){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');$('#view-message').textContent=tr('passwordWrong')}finally{unlock.disabled=false}};
  }catch(e){
-  $('#paste-loading').hidden=true;$('#view-title').hidden=false;$('#view-title').textContent=tr('loadFail');
-  $('#view-message').textContent=e.message||'Gagal memuat PasteLink.';
-  $('#copy-all').hidden=true;
+  loading.hidden=true;box.hidden=true;content.hidden=true;$('#view-title').hidden=false;$('#view-title').textContent=tr('loadFail');
+  message.hidden=false;message.textContent=e.message||'Gagal memuat PasteLink.';
+  copyAll.hidden=true;
  }
 }
 document.addEventListener('DOMContentLoaded',init);
