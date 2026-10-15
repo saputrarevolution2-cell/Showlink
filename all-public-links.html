@@ -9,30 +9,37 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="/css/navbar.css?v=20261009-nav35">
 <link rel="stylesheet" href="/css/footer.css">
-<link rel="stylesheet" href="/css/all-public-links.css?v=20261015-public-private1">
+<link rel="stylesheet" href="/css/all-public-links.css?v=20261016-directory2">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-config.js"></script><script src="/js/supabase-client.js"></script>
 <script src="/js/navbar.js?v=20261013-nav36" defer></script>
 <script src="/js/footer.js" defer></script>
 <script src="/js/language.js?v=20261009-nav35" defer></script>
-<script src="/js/all-public-links.js?v=20261015-public-private1" defer></script>
+<script src="/js/all-public-links.js?v=20261016-directory2" defer></script>
 </head>
-<body class="app-page coming-page" data-page-title-id="Semua tautan publik — ShowLink" data-page-title-en="All Public Links — ShowLink">
+<body class="app-page public-directory-page" data-page-title-id="Semua tautan publik — ShowLink" data-page-title-en="All Public Links — ShowLink">
 <div data-showlink-navbar></div>
-<main class="cs-shell public-links-shell">
-<section class="cs-card public-links-card" aria-labelledby="cs-title">
-<div class="cs-copy">
-<div class="cs-kicker"><span class="cs-live-dot"></span><span data-i18n="kicker">SHOWLINK · TAUTAN PUBLIK</span></div>
-<h1 id="cs-title" data-i18n="title">Semua tautan publik</h1>
-<p class="cs-description" data-i18n="description">Jelajahi tautan yang dibagikan secara publik oleh pengguna ShowLink.</p>
-<div id="public-links-status" role="status" class="cs-status">Memuat tautan publik…</div>
-<div id="public-links-list" class="public-links-list"></div>
-<a class="cs-back" href="/dashboard.html"><i class="fa-solid fa-arrow-left"></i><span data-i18n="back">Kembali ke Dashboard</span></a>
-</div>
-<div class="cs-art" style="--art-bg:linear-gradient(135deg,#e0f2fe,#ede9fe)">
-<div class="cs-float cs-float-one"><i class="fa-solid fa-globe"></i></div><div class="cs-float cs-float-two"><i class="fa-solid fa-link"></i></div><div class="cs-float cs-float-three"><i class="fa-solid fa-lock-open"></i></div>
-<img src="/assets/coming-soon-anime.png" alt="ShowLink public links" class="cs-anime">
-<div class="cs-art-caption"><span class="cs-caption-icon"><i class="fa-solid fa-heart"></i></span><span>ShowLink Public Links</span></div>
-</div></section></main>
+<main class="public-directory-shell">
+  <header class="public-directory-header">
+    <div class="directory-kicker"><i class="fa-solid fa-globe"></i><span data-i18n="kicker">SHOWLINK · DIREKTORI TAUTAN</span></div>
+    <h1 data-i18n="title">Semua tautan publik</h1>
+    <p data-i18n="description">Temukan Shortlink, PasteLink, dan Payment Link yang dibagikan secara publik.</p>
+    <div class="directory-total-row"><div id="public-links-status" role="status">Memuat tautan publik…</div><div class="directory-total-views"><i class="fa-solid fa-eye"></i><span data-i18n="totalViews">Total view</span><strong id="public-links-total-views">0</strong></div></div>
+  </header>
+  <nav class="public-link-filters" aria-label="Filter tautan" id="public-link-filters">
+    <button type="button" class="directory-filter is-active" data-filter="all"><i class="fa-solid fa-layer-group"></i><span data-i18n="allLinks">All Link</span></button>
+    <button type="button" class="directory-filter" data-filter="pastelink"><i class="fa-solid fa-file-lines"></i><span>PasteLink</span></button>
+    <button type="button" class="directory-filter" data-filter="shortlink"><i class="fa-solid fa-link"></i><span>Shortlink</span></button>
+    <button type="button" class="directory-filter" data-filter="paymentlink"><i class="fa-solid fa-credit-card"></i><span>PaymentLink</span></button>
+    <button type="button" class="directory-filter" data-filter="top10"><i class="fa-solid fa-trophy"></i><span data-i18n="top10">Top 10 Link</span></button>
+    <button type="button" class="directory-filter" data-filter="new"><i class="fa-solid fa-clock"></i><span data-i18n="newLinks">New Link</span></button>
+  </nav>
+  <section class="public-directory-panel" aria-live="polite">
+    <div class="directory-list-heading"><h2 id="directory-section-title">All Link</h2><span id="directory-page-summary"></span></div>
+    <div id="public-links-list" class="public-links-list"></div>
+    <div id="public-links-pagination" class="public-links-pagination" aria-label="Pagination"></div>
+  </section>
+  <a class="directory-back" href="/dashboard.html"><i class="fa-solid fa-arrow-left"></i><span data-i18n="back">Kembali ke Dashboard</span></a>
+</main>
 <div data-showlink-footer></div>
 </body></html>
