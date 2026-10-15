@@ -3,25 +3,26 @@ const $=s=>document.querySelector(s);
 const editor=$('#paste-content'),msg=$('#paste-message'),btn=$('#create-paste');
 const plain=()=>editor.innerText.replace(/\u00a0/g,' ');
 function markdown(node){
-  if(node.nodeType===Node.TEXT_NODE)return node.nodeValue.replace(/\r/g,'');
-  if(node.nodeType!==Node.ELEMENT_NODE)return '';
-  const tag=node.tagName.toLowerCase();
-  if(tag==='br')return '\n';
-  const block=['div','p','blockquote'].includes(tag);
-  let inner='';
-  for(const child of node.childNodes){
-    const part=markdown(child);
-    if(child.nodeType===Node.ELEMENT_NODE&&['div','p','blockquote'].includes(child.tagName.toLowerCase())){
-      if(inner&&!inner.endsWith('\n'))inner+='\n';
-      inner+=part;
-    }else inner+=part;
-  }
-  if(tag==='b'||tag==='strong')return inner.trim()?`**${inner}**`:inner;
-  if(tag==='i'||tag==='em')return inner.trim()?`*${inner}*`:inner;
-  if(tag==='s'||tag==='strike'||tag==='del')return inner.trim()?`~~${inner}~~`:inner;
-  if(tag==='blockquote')return inner.split('\n').map(line=>line?'> '+line:'>').join('\n');
-  if(block)return inner.replace(/\n+$/,'')+'\n';
-  return inner;
+ // Serialize contenteditable DOM while preserving both <br> and browser-created
+ // block elements (Enter may create DIV/P depending on the browser).
+ if(node.nodeType===Node.TEXT_NODE)return node.nodeValue.replace(/\r\n?/g,'');
+ if(node.nodeType!==Node.ELEMENT_NODE)return '';
+ const tag=node.tagName.toLowerCase();
+ if(tag==='br')return '\n';
+ let inner=Array.from(node.childNodes).map(markdown).join('');
+ if(tag==='b'||tag==='strong')return inner.trim()?`**${inner}**`:inner;
+ if(tag==='i'||tag==='em')return inner.trim()?`*${inner}*`:inner;
+ if(tag==='s'||tag==='strike'||tag==='del')return inner.trim()?`~~${inner}~~`:inner;
+ if(tag==='blockquote')return inner.replace(/\n+$/,'').split('\n').map(line=>line?'> '+line:'>').join('\n')+'\n';
+ if(['div','p','li','pre','h1','h2','h3','h4','h5','h6'].includes(tag))return inner.replace(/\n+$/,'')+'\n';
+ return inner;
+}
+function editorMarkdown(){
+ // Process editor children as a sequence so block boundaries and <br> are both
+ // retained; normalize only duplicate boundary newlines, not real blank lines.
+ let text=Array.from(editor.childNodes).map(markdown).join('');
+ text=text.replace(/\r\n?/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+ return text;
 }
 function selectedText(){const sel=window.getSelection();return sel?sel.toString():''}
 function format(cmd){
@@ -45,7 +46,7 @@ editor.addEventListener('paste',e=>{
  document.execCommand('insertHTML',false,html);
 });
 btn.addEventListener('click',async()=>{
- const text=Array.from(editor.childNodes).map(markdown).join('').replace(/\n{3,}/g,'\n\n').trim();
+ const text=editorMarkdown();
  const title=$('#paste-title').value.trim();
  const password=$('#paste-password').value;
  const expiry=$('#paste-expiry').value;
