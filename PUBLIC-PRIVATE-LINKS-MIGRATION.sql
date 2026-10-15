@@ -9,6 +9,11 @@ alter table public.shortlinks add column if not exists visibility text not null 
 alter table public.payment_links add column if not exists visibility text not null default 'public'
   check (visibility in ('public','private'));
 
+-- View counters used by the public directory (safe for existing installations).
+alter table public.pastelinks add column if not exists views bigint not null default 0;
+alter table public.shortlinks add column if not exists views bigint not null default 0;
+alter table public.payment_links add column if not exists views bigint not null default 0;
+
 -- Keep the existing PasteLink behavior (password and expiration), adding visibility.
 create or replace function public.create_pastelink(
  p_title text, p_content text, p_password text default null,
@@ -64,13 +69,13 @@ create or replace function public.get_all_public_links()
 returns jsonb language sql stable security definer set search_path=public as $$
  select coalesce(jsonb_agg(item order by created_at desc),'[]'::jsonb)
  from (
-   select jsonb_build_object('type','Pastelink','title',title,'url','https://showlink.my.id/a/'||slug,'created_at',created_at) as item, created_at
+   select jsonb_build_object('type','Pastelink','title',title,'url','https://showlink.my.id/a/'||slug,'created_at',created_at,'views',coalesce(views,0)) as item, created_at
    from public.pastelinks where visibility='public' and (expires_at is null or expires_at>now())
    union all
-   select jsonb_build_object('type','Payment Link','title',title,'url','https://showlink.my.id/p/'||slug,'created_at',coalesce(published_at,created_at)) as item, coalesce(published_at,created_at) as created_at
+   select jsonb_build_object('type','Payment Link','title',title,'url','https://showlink.my.id/p/'||slug,'created_at',coalesce(published_at,created_at),'views',coalesce(views,0)) as item, coalesce(published_at,created_at) as created_at
    from public.payment_links where visibility='public' and status='active'
    union all
-   select jsonb_build_object('type','Shortlink','title',coalesce(title,slug),'url','https://showlink.my.id/s/'||slug,'created_at',created_at) as item, created_at
+   select jsonb_build_object('type','Shortlink','title',coalesce(title,slug),'url','https://showlink.my.id/s/'||slug,'created_at',created_at,'views',coalesce(views,0)) as item, created_at
    from public.shortlinks where visibility='public'
  ) public_items;
 $$;
