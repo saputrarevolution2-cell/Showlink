@@ -127,3 +127,9 @@ body.dark .paste-card .paste-editor *,
 .paste-rendered{white-space:pre-wrap!important;overflow-wrap:anywhere}
 .paste-rendered p.paste-copy-line{white-space:pre-wrap!important;margin:0;padding:5px 8px;min-height:1.85em;line-height:1.85}
 .paste-rendered p.paste-empty-line{height:1.85em;min-height:1.85em;margin:0;padding:0}
+
+
+/* PasteLink newline fix v3: block-per-line rendering, independent of global p styles. */
+.paste-rendered .paste-copy-line{display:block!important;white-space:pre-wrap!important;overflow-wrap:anywhere;min-height:1.85em;line-height:1.85;margin:0!important;padding:5px 8px;box-sizing:border-box}
+.paste-rendered .paste-empty-line{height:1.85em;min-height:1.85em;padding:0!important;line-height:1.85}
+.paste-rendered .paste-quote{border-left:3px solid #818cf8;padding-left:12px;background:rgba(99,102,241,.07);border-radius:0 8px 8px 0}
