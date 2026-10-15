@@ -80,6 +80,15 @@
           <small class="field-error" data-price-warning hidden><i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="payment.price_error">Harga harus antara Rp2.000 dan Rp100.000.</span></small>
         </div>
 
+        <div class="payment-field">
+          <label for="payment-visibility" data-i18n="payment.visibility_label">Visibilitas tautan</label>
+          <select id="payment-visibility" name="visibility">
+            <option value="public" data-i18n="payment.visibility_public">Tautan publik — tampil di All Public Links</option>
+            <option value="private" data-i18n="payment.visibility_private">Pribadi — tidak tampil di daftar publik</option>
+          </select>
+          <small class="field-detail" data-i18n="payment.visibility_detail">Pengaturan ini menentukan apakah tautan ditampilkan di daftar All Public Links.</small>
+        </div>
+
         <div class="payment-warning">
           <i class="fa-solid fa-triangle-exclamation"></i>
           <div>
