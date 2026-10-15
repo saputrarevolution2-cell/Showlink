@@ -111,8 +111,8 @@
     const now=new Date(), today=dayKey(now), month=today.slice(0,7);
     const incomeToday=paid.filter(o=>dayKey(o.paid_at||o.completed_at||o.created_at)===today).reduce((n,o)=>n+Number(o.seller_amount||0),0);
     const incomeMonth=paid.filter(o=>dayKey(o.paid_at||o.completed_at||o.created_at).slice(0,7)===month).reduce((n,o)=>n+Number(o.seller_amount||0),0);
-    state.income={today:incomeToday,month:incomeMonth,total:income};state.available=Number(wallet.available_balance||0);state.pending=Number(wallet.pending_balance||0);state.sales=paid.length;state.paymentViews=views;state.income7d=0;
     const views=links.reduce((n,x)=>n+Number(x.views||0),0), unique=links.reduce((n,x)=>n+Number(x.unique_views||0),0), sales=links.reduce((n,x)=>n+Number(x.sales_count||0),0);
+    state.income={today:incomeToday,month:incomeMonth,total:income};state.available=Number(wallet.available_balance||0);state.pending=Number(wallet.pending_balance||0);state.sales=paid.length;state.paymentViews=views;state.income7d=0;
     state.pasteLinks=pasteLinks;state.pasteViews=pasteLinks.reduce((n,x)=>n+Number(x.views||0),0);state.pastePrevViews=Number(pastePayload.previous_period_views||0);state.pasteCurrentPeriodViews=Number(pastePayload.current_period_views||0);
     metric("totalPasteLinks",pasteLinks.length);metric("pasteLinkViews",state.pasteViews);metric("incomeToday",incomeToday,true);metric("incomeMonth",incomeMonth,true);metric("incomeTotal",income,true);
     metric("totalPaymentLinks",links.length);metric("paymentViews",views);metric("paymentSales",sales);metric("paymentIncome",income,true);metric("availableBalance",wallet.available_balance||0,true);metric("pendingBalance",wallet.pending_balance||0,true);
@@ -122,5 +122,5 @@
     const incomeByLink={}; for(const o of paid)incomeByLink[o.payment_link_id]=(incomeByLink[o.payment_link_id]||0)+Number(o.seller_amount||0);
     state.links=links.map(x=>({...x,income:incomeByLink[x.id]||0}));state.page=1;renderLinks();renderPasteLinks();renderChart(orders);
   }
-  document.addEventListener("DOMContentLoaded",()=>{translate();load().catch(e=>{console.error(e);const b=$("#dashboard-links-body");if(b)b.innerHTML=`<tr><td colspan="8" class="empty-row error-row"><i class="fa-solid fa-triangle-exclamation"></i>${t("error")}</td></tr>`;});window.addEventListener("showlink:language-change",()=>{translate();renderLinks();renderPasteLinks();});});
+  document.addEventListener("DOMContentLoaded",()=>{translate();load().catch(e=>{console.error("ShowLink dashboard load failed:",e);const b=$("#dashboard-links-body");if(b)b.innerHTML=`<tr><td colspan="8" class="empty-row error-row"><i class="fa-solid fa-triangle-exclamation"></i>${t("error")}</td></tr>`;showToast(t("error"),`<p>${esc(e?.message||String(e))}</p>`);});window.addEventListener("showlink:language-change",()=>{translate();renderLinks();renderPasteLinks();});});
 })();
