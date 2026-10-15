@@ -9,13 +9,13 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="/css/navbar.css?v=20261009-nav35">
 <link rel="stylesheet" href="/css/footer.css">
-<link rel="stylesheet" href="/css/all-public-links.css?v=20261016-directory2">
+<link rel="stylesheet" href="/css/all-public-links.css?v=20261016-directory3">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-config.js"></script><script src="/js/supabase-client.js"></script>
 <script src="/js/navbar.js?v=20261013-nav36" defer></script>
 <script src="/js/footer.js" defer></script>
 <script src="/js/language.js?v=20261009-nav35" defer></script>
-<script src="/js/all-public-links.js?v=20261016-directory2" defer></script>
+<script src="/js/all-public-links.js?v=20261016-directory3" defer></script>
 </head>
 <body class="app-page public-directory-page" data-page-title-id="Semua tautan publik — ShowLink" data-page-title-en="All Public Links — ShowLink">
 <div data-showlink-navbar></div>
@@ -28,14 +28,15 @@
   </header>
   <nav class="public-link-filters" aria-label="Filter tautan" id="public-link-filters">
     <button type="button" class="directory-filter is-active" data-filter="all"><i class="fa-solid fa-layer-group"></i><span data-i18n="allLinks">All Link</span></button>
-    <button type="button" class="directory-filter" data-filter="pastelink"><i class="fa-solid fa-file-lines"></i><span>PasteLink</span></button>
     <button type="button" class="directory-filter" data-filter="shortlink"><i class="fa-solid fa-link"></i><span>Shortlink</span></button>
+    <button type="button" class="directory-filter" data-filter="pastelink"><i class="fa-solid fa-file-lines"></i><span>PasteLink</span></button>
     <button type="button" class="directory-filter" data-filter="paymentlink"><i class="fa-solid fa-credit-card"></i><span>PaymentLink</span></button>
     <button type="button" class="directory-filter" data-filter="top10"><i class="fa-solid fa-trophy"></i><span data-i18n="top10">Top 10 Link</span></button>
     <button type="button" class="directory-filter" data-filter="new"><i class="fa-solid fa-clock"></i><span data-i18n="newLinks">New Link</span></button>
   </nav>
   <section class="public-directory-panel" aria-live="polite">
     <div class="directory-list-heading"><h2 id="directory-section-title">All Link</h2><span id="directory-page-summary"></span></div>
+    <div id="directory-stats" class="directory-stats" aria-live="polite"></div>
     <div id="public-links-list" class="public-links-list"></div>
     <div id="public-links-pagination" class="public-links-pagination" aria-label="Pagination"></div>
   </section>

@@ -9,12 +9,19 @@ alter table public.shortlinks add column if not exists visibility text not null 
 alter table public.payment_links add column if not exists visibility text not null default 'public'
   check (visibility in ('public','private'));
 
+-- Reuse the existing migration file: add only columns required by the current directory.
+-- PasteLink owner_id is already used by the existing analytics RPC.
+alter table public.pastelinks add column if not exists owner_id uuid references auth.users(id) on delete set null;
+
 -- View counters used by the public directory (safe for existing installations).
 alter table public.pastelinks add column if not exists views bigint not null default 0;
 alter table public.shortlinks add column if not exists views bigint not null default 0;
 alter table public.payment_links add column if not exists views bigint not null default 0;
 
--- Keep the existing PasteLink behavior (password and expiration), adding visibility.
+-- Remove the older 4-argument overload to avoid ambiguous PostgREST RPC resolution.
+drop function if exists public.create_pastelink(text,text,text,integer);
+
+-- Keep password/expiry behavior, and preserve owner ownership for analytics.
 create or replace function public.create_pastelink(
  p_title text, p_content text, p_password text default null,
  p_expiry_hours integer default null, p_visibility text default 'public'
@@ -29,9 +36,9 @@ begin
  for i in 1..12 loop
    s := ''; for j in 1..3 loop s := s || substr(alphabet, 1+floor(random()*length(alphabet))::int,1); end loop;
    begin
-    insert into public.pastelinks(slug,title,content,password_hash,expires_at,visibility)
+    insert into public.pastelinks(slug,title,content,password_hash,expires_at,visibility,owner_id)
     values(s,coalesce(nullif(left(trim(p_title),120),''),'PasteLink'),p_content,
-      case when nullif(p_password,'') is null then null else extensions.crypt(p_password,extensions.gen_salt('bf')) end, exp,vis);
+      case when nullif(p_password,'') is null then null else extensions.crypt(p_password,extensions.gen_salt('bf')) end, exp,vis,auth.uid());
     return jsonb_build_object('slug',s,'expires_at',exp,'password_protected',nullif(p_password,'') is not null,'visibility',vis);
    exception when unique_violation then continue; end;
  end loop;
@@ -72,10 +79,10 @@ returns jsonb language sql stable security definer set search_path=public as $$
    select jsonb_build_object('type','Pastelink','title',title,'url','https://showlink.my.id/a/'||slug,'created_at',created_at,'views',coalesce(views,0)) as item, created_at
    from public.pastelinks where visibility='public' and (expires_at is null or expires_at>now())
    union all
-   select jsonb_build_object('type','Payment Link','title',title,'url','https://showlink.my.id/p/'||slug,'created_at',coalesce(published_at,created_at),'views',coalesce(views,0)) as item, coalesce(published_at,created_at) as created_at
+   select jsonb_build_object('type','Payment Link','title',title,'url','https://showlink.my.id/p/'||slug,'created_at',coalesce(published_at,created_at),'views',coalesce(views,0),'sales_count',coalesce(sales_count,0)) as item, coalesce(published_at,created_at) as created_at
    from public.payment_links where visibility='public' and status='active'
    union all
-   select jsonb_build_object('type','Shortlink','title',coalesce(title,slug),'url','https://showlink.my.id/s/'||slug,'created_at',created_at,'views',coalesce(views,0)) as item, created_at
+   select jsonb_build_object('type','Shortlink','title',coalesce(title,slug),'url','https://showlink.my.id/s/'||slug,'created_at',created_at,'views',coalesce(views,0),'clicks',coalesce(clicks,0)) as item, created_at
    from public.shortlinks where visibility='public'
  ) public_items;
 $$;

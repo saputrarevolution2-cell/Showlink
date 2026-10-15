@@ -1,0 +1,29 @@
+SHOWLINK — AUDIT DAN PERBAIKAN ALL PUBLIC LINKS v19
+===================================================
+
+File sumber yang diaudit: ShowLink-Shortlink-URL-Wider-Fixed-v15.zip / source v17 yang diunggah.
+Fokus: all-public-links.html, js/all-public-links.js, css/all-public-links.css, PUBLIC-PRIVATE-LINKS-MIGRATION.sql, shortlink route.
+
+TEMUAN UTAMA
+1. CSS halaman direktori masih membawa banyak style lama "Coming Soon" dan ilustrasi (.cs-art/.cs-anime), walaupun HTML sudah menjadi direktori. CSS tersebut sudah dibersihkan dan diganti stylesheet khusus direktori yang responsif.
+2. Fungsi get_all_public_links() sebelumnya hanya mengirim title/type/url/date/views. Data sales_count Payment Link dan clicks Shortlink tidak ikut dikirim ke UI. RPC pada file PUBLIC-PRIVATE-LINKS-MIGRATION.sql yang SUDAH ADA diperbarui untuk mengirim sales_count dan clicks.
+3. Fungsi create_pastelink 4-arg dari PASTELINK-ANALYTICS-MIGRATION.sql dapat bentrok dengan versi 5-arg yang menerima p_visibility. Migration yang sudah ada kini menghapus overload 4-arg sebelum membuat fungsi 5-arg, dan mengisi owner_id supaya analitik pemilik tetap konsisten.
+4. Shortlink dibentuk sebagai /s/:slug, tetapi ZIP tidak memiliki Pages Function functions/s/[slug].js. Route tersebut sekarang mengalihkan ke flow go.html?slug=... agar tautan dari direktori tidak berakhir di route yang tidak ada.
+5. Tampilan statistik:
+   - PasteLink: total views.
+   - Payment Link: total views dan total terjual (sales_count).
+   - Shortlink: total views. View iklan dan pembayaran Shortlink ditandai "Belum tersedia" karena tidak ditemukan pencatatan event/checkout yang benar-benar terhubung di source. shortlink-payment.js secara eksplisit menyatakan checkout belum dihubungkan ke payment gateway; angka tersebut sengaja tidak dipalsukan sebagai 0.
+6. Tidak dibuat file SQL migration baru. File PUBLIC-PRIVATE-LINKS-MIGRATION.sql yang sudah ada diperbarui agar dapat digunakan kembali dengan aman. Jalankan hanya file ini jika perubahan SQL di dalamnya belum diterapkan; backup database lebih dahulu.
+
+PERUBAHAN UI
+- Urutan filter: All Link, Shortlink, PasteLink, Payment Link, Top 10 Link, New Link.
+- Lima tautan per halaman untuk kategori/daftar; pagination tampil saat jumlah item melebihi lima.
+- Bahasa Indonesia/Inggris mengikuti pilihan bahasa ShowLink.
+- Kartu statistik lebih ringkas, bersih, responsif, dan mendukung dark mode.
+- Total view global hanya menjumlahkan tautan yang dikembalikan RPC publik (bukan tautan private).
+
+PENGUJIAN LOKAL
+- Sintaks JavaScript all-public-links.js: lulus node --check.
+- Sintaks Pages Function functions/s/[slug].js: lulus node --check.
+- ZIP integrity dan struktur HTML diperiksa.
+- Tidak dapat menguji database Supabase live dari arsip lokal. Setelah deploy, verifikasi RPC dan nilai statistik pada project Supabase yang digunakan.
