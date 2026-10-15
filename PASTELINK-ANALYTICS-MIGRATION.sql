@@ -47,3 +47,44 @@ revoke all on function public.create_pastelink(text,text,text,integer) from publ
 grant execute on function public.create_pastelink(text,text,text,integer) to anon, authenticated;
 revoke all on function public.get_pastelink(text,text) from public;
 grant execute on function public.get_pastelink(text,text) to anon, authenticated;
+
+-- Daily view history supports real up/down comparisons in the dashboard.
+create table if not exists public.pastelink_view_daily (
+  pastelink_id bigint not null references public.pastelinks(id) on delete cascade,
+  view_date date not null default (timezone('utc',now())::date),
+  view_count bigint not null default 0,
+  primary key (pastelink_id, view_date)
+);
+revoke all on public.pastelink_view_daily from anon, authenticated;
+
+create or replace function public.get_pastelink(p_slug text, p_password text default null)
+returns jsonb language plpgsql volatile security definer set search_path=public,extensions as $$
+declare r public.pastelinks%rowtype;
+begin
+ select * into r from public.pastelinks where slug=p_slug limit 1;
+ if not found or (r.expires_at is not null and r.expires_at <= now()) then return null; end if;
+ if r.password_hash is not null and (p_password is null or extensions.crypt(p_password,r.password_hash) <> r.password_hash) then
+  return jsonb_build_object('slug',r.slug,'title',r.title,'password_required',true,'expires_at',r.expires_at);
+ end if;
+ update public.pastelinks set views=views+1 where id=r.id returning * into r;
+ insert into public.pastelink_view_daily(pastelink_id,view_date,view_count) values(r.id,timezone('utc',now())::date,1)
+ on conflict(pastelink_id,view_date) do update set view_count=public.pastelink_view_daily.view_count+1;
+ return jsonb_build_object('slug',r.slug,'title',r.title,'content',r.content,'created_at',r.created_at,'expires_at',r.expires_at,'password_required',false);
+end; $$;
+revoke all on function public.get_pastelink(text,text) from public;
+grant execute on function public.get_pastelink(text,text) to anon, authenticated;
+
+-- Authenticated owner-only read API for dashboard PasteLink stats and view history.
+create or replace function public.get_my_pastelink_analytics()
+returns jsonb language plpgsql stable security definer set search_path=public,auth as $$
+declare uid uuid := auth.uid();
+begin
+ if uid is null then raise exception 'Authentication required'; end if;
+ return jsonb_build_object(
+  'links',(select coalesce(jsonb_agg(jsonb_build_object('id',p.id,'slug',p.slug,'title',p.title,'created_at',p.created_at,'views',p.views) order by p.created_at desc),'[]'::jsonb) from public.pastelinks p where p.owner_id=uid),
+  'current_period_views',(select coalesce(sum(d.view_count),0) from public.pastelink_view_daily d join public.pastelinks p on p.id=d.pastelink_id where p.owner_id=uid and d.view_date >= timezone('utc',now())::date-6),
+  'previous_period_views',(select coalesce(sum(d.view_count),0) from public.pastelink_view_daily d join public.pastelinks p on p.id=d.pastelink_id where p.owner_id=uid and d.view_date >= timezone('utc',now())::date-13 and d.view_date < timezone('utc',now())::date-6)
+ );
+end; $$;
+revoke all on function public.get_my_pastelink_analytics() from public;
+grant execute on function public.get_my_pastelink_analytics() to authenticated;
