@@ -754,3 +754,6 @@ html[data-theme="dark"] .app-card,html[data-theme="dark"] .app-stat,html[data-th
 @media(max-width:850px){.app-wrap{width:min(100% - 24px,1120px);padding:100px 0 36px}.app-grid,.app-row{grid-template-columns:1fr}.app-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.app-hero{align-items:flex-start;flex-direction:column}.app-card{padding:18px}.app-table{min-width:650px}.page-scroll-table{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}}
 @media(max-width:420px){.app-wrap{width:calc(100% - 20px)}.app-stats{gap:10px}.app-stat{padding:13px}.app-stat strong{font-size:19px}.app-card{border-radius:15px}}
 
+
+/* Public/private visibility selector */
+.payment-field select[name="visibility"]{width:100%;min-height:46px;padding:11px 13px;border:1px solid var(--border-color,#d9dce8);border-radius:12px;background:var(--input-bg,#fff);color:var(--text-color,inherit);font:inherit}

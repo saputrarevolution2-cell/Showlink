@@ -133,3 +133,6 @@ body.dark .paste-card .paste-editor *,
 .paste-rendered .paste-copy-line{display:block!important;white-space:pre-wrap!important;overflow-wrap:anywhere;min-height:1.85em;line-height:1.85;margin:0!important;padding:5px 8px;box-sizing:border-box}
 .paste-rendered .paste-empty-line{height:1.85em;min-height:1.85em;padding:0!important;line-height:1.85}
 .paste-rendered .paste-quote{border-left:3px solid #818cf8;padding-left:12px;background:rgba(99,102,241,.07);border-radius:0 8px 8px 0}
+
+/* Visibility selector */
+.paste-visibility{margin:14px 0}.paste-visibility label{display:block;margin-bottom:7px;font-weight:700}.paste-visibility select{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--paste-border,#d9dced);border-radius:12px;background:var(--paste-input-bg,#fff);color:var(--paste-text,#222);font:inherit}

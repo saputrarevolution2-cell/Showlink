@@ -125,3 +125,6 @@ html[data-theme="dark"] .app-card,html[data-theme="dark"] .app-stat,html[data-th
   .showlink-tool-btn { min-width:40px; width:40px; padding:0; }
   .showlink-tool-text, .showlink-lang-label { display:none; }
 }
+
+/* Public link directory cards */
+.public-links-list{display:grid;gap:12px;margin:18px 0}.public-link-item{display:grid;gap:7px;padding:14px;border:1px solid #e4e7f1;border-radius:14px;background:rgba(255,255,255,.78)}.public-link-item strong{overflow-wrap:anywhere}.public-link-item a{font-weight:700;color:#5b4df5;text-decoration:none}.public-link-item small{opacity:.7}.public-link-type{justify-self:start;border-radius:999px;padding:4px 9px;background:#eeecff;color:#5948dc;font-size:12px;font-weight:800}
