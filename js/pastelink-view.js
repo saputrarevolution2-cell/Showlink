@@ -11,17 +11,24 @@ function toast(text,kind='info'){
  clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.classList.remove('is-visible');setTimeout(()=>{if(!el.classList.contains('is-visible'))el.textContent=''},250)},2000);
 }
 function render(text){
- return String(text).replace(/\r\n?/g,'\n').split('\n').map(line=>{
-  if(!line)return '<p class="paste-empty-line">&nbsp;</p>';
+ // Render each source line as its own block. Do not rely on CSS white-space
+ // alone: global paragraph styles can otherwise collapse the visual spacing.
+ const lines=String(text??'').replace(/\r\n?/g,'\n').split('\n');
+ return lines.map(line=>{
+  if(line==='') return '<div class="paste-copy-line paste-empty-line" aria-hidden="true">&nbsp;</div>';
   const quoted=line.startsWith('> ');
   let s=esc(quoted?line.slice(2):line);
-  s=s.replace(/~~(.+?)~~/gs,'<del>$1</del>').replace(/\*\*(.+?)\*\*/gs,'<strong>$1</strong>').replace(/\*(.+?)\*/gs,'<em>$1</em>');
+  s=s.replace(/~~(.+?)~~/g,'<del>$1</del>')
+     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+     .replace(/\*(.+?)\*/g,'<em>$1</em>');
   s=s.replace(/(https?:\/\/[^\s<]+|www\.[^\s<]+)/g,u=>{
    const clean=u.replace(/[.,!?;:)\]]+$/,'');const tail=u.slice(clean.length);
    const href=clean.startsWith('www.')?'https://'+clean:clean;
    return '<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">'+clean+'</a>'+tail;
   });
-  return quoted?'<blockquote class="paste-quote paste-copy-line" title="Ketuk untuk menyalin baris ini">'+s+'</blockquote>':'<p class="paste-copy-line" title="Ketuk untuk menyalin baris ini">'+s+'</p>';
+  return quoted
+   ? '<div class="paste-copy-line paste-quote" title="Ketuk untuk menyalin baris ini">'+s+'</div>'
+   : '<div class="paste-copy-line" title="Ketuk untuk menyalin baris ini">'+s+'</div>';
  }).join('');
 }
 async function copy(t){
@@ -48,7 +55,7 @@ async function init(){
   if(password){$('#paste-mood').classList.add('is-correct');toast(tr('passwordRight'),'success');await new Promise(r=>setTimeout(r,2100));}
   $('#view-title').textContent=row.title||'PasteLink';$('#view-title').hidden=false;
   content.innerHTML=render(row.content);content.hidden=false;copyAll.hidden=false;
-  content.onclick=e=>{if(e.target.closest('a'))return;const p=e.target.closest('p.paste-copy-line,blockquote.paste-copy-line');if(p&&!p.classList.contains('paste-empty-line'))copy(p.textContent)};
+  content.onclick=e=>{if(e.target.closest('a'))return;const p=e.target.closest('.paste-copy-line:not(.paste-empty-line)');if(p&&!p.classList.contains('paste-empty-line'))copy(p.textContent)};
   copyAll.onclick=()=>copy(row.content.replace(/^> ?/gm,'').replace(/~~(.+?)~~/gs,'$1').replace(/\*\*(.+?)\*\*/gs,'$1').replace(/\*(.+?)\*/gs,'$1'));
   document.title=(row.title||'PasteLink')+' — ShowLink';return true;
  }
