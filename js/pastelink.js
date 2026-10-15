@@ -7,12 +7,20 @@ function markdown(node){
   if(node.nodeType!==Node.ELEMENT_NODE)return '';
   const tag=node.tagName.toLowerCase();
   if(tag==='br')return '\n';
-  let inner=Array.from(node.childNodes).map(markdown).join('');
+  const block=['div','p','blockquote'].includes(tag);
+  let inner='';
+  for(const child of node.childNodes){
+    const part=markdown(child);
+    if(child.nodeType===Node.ELEMENT_NODE&&['div','p','blockquote'].includes(child.tagName.toLowerCase())){
+      if(inner&&!inner.endsWith('\n'))inner+='\n';
+      inner+=part;
+    }else inner+=part;
+  }
   if(tag==='b'||tag==='strong')return inner.trim()?`**${inner}**`:inner;
   if(tag==='i'||tag==='em')return inner.trim()?`*${inner}*`:inner;
   if(tag==='s'||tag==='strike'||tag==='del')return inner.trim()?`~~${inner}~~`:inner;
-  if(tag==='blockquote')return inner.split('\n').map(line=>line?'> '+line:'>').join('\n')+'\n';
-  if(tag==='div'||tag==='p')return inner+'\n';
+  if(tag==='blockquote')return inner.split('\n').map(line=>line?'> '+line:'>').join('\n');
+  if(block)return inner.replace(/\n+$/,'')+'\n';
   return inner;
 }
 function selectedText(){const sel=window.getSelection();return sel?sel.toString():''}
@@ -31,8 +39,10 @@ $('#copy-selected').addEventListener('click',async()=>{
  catch{msg.textContent='Clipboard tidak tersedia; salin teks pilihan secara manual.'}
 });
 editor.addEventListener('paste',e=>{
- e.preventDefault();const text=(e.clipboardData||window.clipboardData).getData('text/plain');
- document.execCommand('insertText',false,text);
+ e.preventDefault();
+ const text=(e.clipboardData||window.clipboardData).getData('text/plain').replace(/\r\n?/g,'\n');
+ const html=text.split('\n').map(line=>line?line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'<br>').join('<br>');
+ document.execCommand('insertHTML',false,html);
 });
 btn.addEventListener('click',async()=>{
  const text=Array.from(editor.childNodes).map(markdown).join('').replace(/\n{3,}/g,'\n\n').trim();

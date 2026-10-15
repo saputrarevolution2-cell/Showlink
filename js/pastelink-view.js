@@ -11,7 +11,7 @@ function toast(text,kind='info'){
  clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.classList.remove('is-visible');setTimeout(()=>{if(!el.classList.contains('is-visible'))el.textContent=''},250)},2000);
 }
 function render(text){
- return String(text).split('\n').map(line=>{
+ return String(text).replace(/\r\n?/g,'\n').split('\n').map(line=>{
   if(!line)return '<p class="paste-empty-line">&nbsp;</p>';
   const quoted=line.startsWith('> ');
   let s=esc(quoted?line.slice(2):line);
