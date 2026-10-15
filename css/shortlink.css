@@ -153,13 +153,9 @@ body.shortlink-app {
   .shortlink-app .sl-container { width: calc(100% - 24px); }
   .shortlink-app #short-destination,
   .shortlink-app #short-destination:focus {
-    width: calc(100% + 24px) !important;
+    width: calc(100% + 32px) !important;
   }
 }
 @media (max-width: 420px) {
   .shortlink-app .sl-container { width: calc(100% - 20px); }
-  .shortlink-app #short-destination,
-  .shortlink-app #short-destination:focus {
-    width: calc(100% + 20px) !important;
-  }
 }
