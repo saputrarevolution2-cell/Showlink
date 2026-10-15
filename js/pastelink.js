@@ -3,35 +3,39 @@ const $=s=>document.querySelector(s);
 const editor=$('#paste-content'),msg=$('#paste-message'),btn=$('#create-paste');
 const plain=()=>editor.innerText.replace(/\u00a0/g,' ');
 function markdown(node){
- // Serialize contenteditable DOM while preserving both <br> and browser-created
- // block elements (Enter may create DIV/P depending on the browser).
+ // Convert editor DOM to text while preserving explicit BRs and block boundaries.
+ // Return line-oriented content; never concatenate separate block elements.
  if(node.nodeType===Node.TEXT_NODE)return node.nodeValue.replace(/\r\n?/g,'\n');
  if(node.nodeType!==Node.ELEMENT_NODE)return '';
  const tag=node.tagName.toLowerCase();
  if(tag==='br')return '\n';
- // Serialize siblings with explicit boundaries between adjacent block nodes.
- // iOS Safari may leave the first line as a bare text node and wrap the next
- // line in a DIV; without this boundary, "Aaa" + "Bbb" becomes "AaaBbb".
+ const blocks=['div','p','li','pre','h1','h2','h3','h4','h5','h6','blockquote'];
  let inner='';
  for(const child of Array.from(node.childNodes)){
-  const isBlock=child.nodeType===Node.ELEMENT_NODE &&
-   ['div','p','li','pre','h1','h2','h3','h4','h5','h6','blockquote'].includes(child.tagName.toLowerCase());
+  const isBlock=child.nodeType===Node.ELEMENT_NODE && blocks.includes(child.tagName.toLowerCase());
   if(isBlock && inner && !inner.endsWith('\n')) inner+='\n';
   inner+=markdown(child);
+  if(isBlock && !inner.endsWith('\n')) inner+='\n';
  }
  if(tag==='b'||tag==='strong')return inner.trim()?`**${inner}**`:inner;
  if(tag==='i'||tag==='em')return inner.trim()?`*${inner}*`:inner;
  if(tag==='s'||tag==='strike'||tag==='del')return inner.trim()?`~~${inner}~~`:inner;
  if(tag==='blockquote')return inner.replace(/\n+$/,'').split('\n').map(line=>line?'> '+line:'>').join('\n')+'\n';
- if(['div','p','li','pre','h1','h2','h3','h4','h5','h6'].includes(tag))return inner.replace(/\n+$/,'')+'\n';
+ if(blocks.includes(tag))return inner.replace(/\n+$/,'')+'\n';
  return inner;
 }
 function editorMarkdown(){
- // Process editor children as a sequence so block boundaries and <br> are both
- // retained; normalize only duplicate boundary newlines, not real blank lines.
- let text=Array.from(editor.childNodes).map(markdown).join('');
- text=text.replace(/\r\n?/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
- return text;
+ // Use a single recursive DOM serialization so boundaries are preserved whether
+ // iOS Safari represents Enter as BR, DIV/P blocks, or a bare text node + block.
+ let text='';
+ const blocks=['div','p','li','pre','h1','h2','h3','h4','h5','h6','blockquote'];
+ for(const node of Array.from(editor.childNodes)){
+  const isBlock=node.nodeType===Node.ELEMENT_NODE && blocks.includes(node.tagName.toLowerCase());
+  if(isBlock && text && !text.endsWith('\n')) text+='\n';
+  text+=markdown(node);
+  if(isBlock && !text.endsWith('\n')) text+='\n';
+ }
+ return text.replace(/\r\n?/g,'\n').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
 }
 function selectedText(){const sel=window.getSelection();return sel?sel.toString():''}
 function format(cmd){
