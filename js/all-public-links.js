@@ -1,25 +1,222 @@
 (() => {
- const $=s=>document.querySelector(s);
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const PAGE_SIZE=5;
- const translations={
-  id:{kicker:'SHOWLINK · DIREKTORI TAUTAN',title:'Semua tautan publik',description:'Temukan Shortlink, PasteLink, dan Payment Link yang dibagikan secara publik.',totalViews:'Total view',allLinks:'All Link',top10:'Top 10 Link',newLinks:'New Link',back:'Kembali ke Dashboard',loading:'Memuat tautan publik…',empty:'Belum ada tautan publik untuk kategori ini.',error:'Gagal memuat tautan publik. Periksa PUBLIC-PRIVATE-LINKS-MIGRATION.sql di Supabase.',open:'Buka tautan',views:'view',page:'Halaman',of:'dari',prev:'Sebelumnya',next:'Berikutnya',shortlink:'Shortlink',pastelink:'PasteLink',paymentlink:'PaymentLink',allTitle:'All Link',topTitle:'Top 10 Link',newTitle:'New Link'},
-  en:{kicker:'SHOWLINK · LINK DIRECTORY',title:'All Public Links',description:'Discover public Shortlinks, PasteLinks, and Payment Links.',totalViews:'Total views',allLinks:'All Link',top10:'Top 10 Link',newLinks:'New Link',back:'Back to Dashboard',loading:'Loading public links…',empty:'There are no public links in this category yet.',error:'Could not load public links. Check PUBLIC-PRIVATE-LINKS-MIGRATION.sql in Supabase.',open:'Open link',views:'views',page:'Page',of:'of',prev:'Previous',next:'Next',shortlink:'Shortlink',pastelink:'PasteLink',paymentlink:'PaymentLink',allTitle:'All Link',topTitle:'Top 10 Link',newTitle:'New Link'}
- };
- const state={rows:[],filter:'all',page:1};
- const lang=()=>{const x=localStorage.getItem('showlink_language')||localStorage.getItem('showlink-language')||localStorage.getItem('language')||document.documentElement.lang||'id';return /^en/i.test(x)?'en':'id'};
- const typeKey=r=>{const t=String(r.type||'').toLowerCase().replace(/[^a-z]/g,'');if(t.includes('short'))return 'shortlink';if(t.includes('paste'))return 'pastelink';return 'paymentlink'};
- const typeOrder={'shortlink':0,'pastelink':1,'paymentlink':2};
- function applyLanguage(){const d=translations[lang()];document.documentElement.lang=lang();document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(d[k])el.textContent=d[k]});}
- function getRows(){let rows=[...state.rows];if(state.filter==='pastelink'||state.filter==='shortlink'||state.filter==='paymentlink')rows=rows.filter(r=>typeKey(r)===state.filter);if(state.filter==='top10')return rows.sort((a,b)=>Number(b.views||0)-Number(a.views||0)).slice(0,10);if(state.filter==='new')return rows.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));return rows.sort((a,b)=>(typeOrder[typeKey(a)]-typeOrder[typeKey(b)])||(new Date(b.created_at||0)-new Date(a.created_at||0)));}
- function titleForFilter(){const d=translations[lang()];return ({all:d.allTitle,pastelink:d.pastelink,shortlink:d.shortlink,paymentlink:d.paymentlink,top10:d.topTitle,new:d.newTitle})[state.filter]||d.allTitle;}
- function render(){const d=translations[lang()],rows=getRows(),list=$('#public-links-list'),pager=$('#public-links-pagination');$('#directory-section-title').textContent=titleForFilter();$('#directory-page-summary').textContent=rows.length?`${rows.length} ${lang()==='en'?'links':'tautan'}`:'';
-  const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));state.page=Math.min(state.page,pages);const shown=rows.slice((state.page-1)*PAGE_SIZE,state.page*PAGE_SIZE);
-  if(!shown.length){list.innerHTML=`<div class="directory-empty"><i class="fa-regular fa-folder-open"></i><p>${esc(d.empty)}</p></div>`;pager.innerHTML='';return;}
-  list.innerHTML=shown.map((r,i)=>{const key=typeKey(r),views=Math.max(0,Number(r.views||0));const date=r.created_at?new Date(r.created_at).toLocaleDateString(lang()==='en'?'en-US':'id-ID',{year:'numeric',month:'short',day:'numeric'}):'—';return `<article class="public-link-item"><div class="directory-item-icon ${key}"><i class="fa-solid ${key==='shortlink'?'fa-link':key==='pastelink'?'fa-file-lines':'fa-credit-card'}"></i></div><div class="directory-item-main"><div class="directory-item-meta"><span class="public-link-type ${key}">${esc(d[key])}</span><span class="directory-created">${esc(date)}</span></div><strong>${esc(r.title||r.slug||d[key])}</strong><div class="directory-item-stats"><span><i class="fa-solid fa-eye"></i> ${views.toLocaleString()} ${esc(d.views)}</span></div><a class="directory-open-link" href="${esc(r.url||'#')}" target="_blank" rel="noopener noreferrer">${esc(d.open)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a></div></article>`}).join('');
-  if(pages<=1){pager.innerHTML='';return;}pager.innerHTML=`<button type="button" data-page="${state.page-1}" ${state.page===1?'disabled':''}><i class="fa-solid fa-chevron-left"></i> ${esc(d.prev)}</button><span>${esc(d.page)} ${state.page} ${esc(d.of)} ${pages}</span><button type="button" data-page="${state.page+1}" ${state.page===pages?'disabled':''}>${esc(d.next)} <i class="fa-solid fa-chevron-right"></i></button>`;
- }
- async function load(){applyLanguage();const d=translations[lang()],status=$('#public-links-status'),list=$('#public-links-list');status.textContent=d.loading;list.innerHTML='';try{const sb=await window.ShowLinkSupabase.load();const {data,error}=await sb.rpc('get_all_public_links');if(error)throw error;state.rows=Array.isArray(data)?data:(data||[]);$('#public-links-total-views').textContent=state.rows.reduce((n,r)=>n+Math.max(0,Number(r.views||0)),0).toLocaleString();status.textContent=`${state.rows.length} ${lang()==='en'?'public links':'tautan publik'}`;render();}catch(e){status.textContent=d.error;list.innerHTML='';$('#public-links-pagination').innerHTML='';console.error(e)}}
- document.addEventListener('click',e=>{const filter=e.target.closest('[data-filter]');if(filter){state.filter=filter.dataset.filter;state.page=1;document.querySelectorAll('.directory-filter').forEach(b=>b.classList.toggle('is-active',b===filter));render();return;}const page=e.target.closest('[data-page]');if(page&&!page.disabled){state.page=Number(page.dataset.page);render();window.scrollTo({top:0,behavior:'smooth'});}});
- document.addEventListener('DOMContentLoaded',load);window.addEventListener('storage',load);document.addEventListener('showlink:language-changed',()=>{applyLanguage();render()});
+  'use strict';
+  const $ = (selector) => document.querySelector(selector);
+  const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[char]));
+  const PAGE_SIZE = 5;
+  const translations = {
+    id: {
+      kicker: 'SHOWLINK · DIREKTORI TAUTAN', title: 'Semua tautan publik',
+      description: 'Temukan Shortlink, PasteLink, dan Payment Link yang dibagikan secara publik.',
+      totalViews: 'Total view', allLinks: 'All Link', top10: 'Top 10 Link', newLinks: 'New Link',
+      back: 'Kembali ke Dashboard', loading: 'Memuat tautan publik…',
+      empty: 'Belum ada tautan publik untuk kategori ini.',
+      error: 'Gagal memuat tautan publik. Periksa konfigurasi database dan fungsi direktori yang sudah ada.',
+      open: 'Buka tautan', views: 'view', sold: 'Terjual', adViews: 'View iklan',
+      shortPayments: 'Pembayaran Shortlink', unavailable: 'Belum tersedia',
+      page: 'Halaman', of: 'dari', prev: 'Sebelumnya', next: 'Berikutnya',
+      shortlink: 'Shortlink', pastelink: 'PasteLink', paymentlink: 'Payment Link',
+      allTitle: 'All Link', topTitle: 'Top 10 Link', newTitle: 'New Link',
+      links: 'tautan', viewStat: 'Total view', soldStat: 'Total terjual',
+      shortPaymentsStat: 'Total pembayaran Shortlink',
+      unavailableNote: 'Belum terhubung ke pencatatan iklan/pembayaran Shortlink.',
+      noDate: 'Tanggal tidak tersedia'
+    },
+    en: {
+      kicker: 'SHOWLINK · LINK DIRECTORY', title: 'All Public Links',
+      description: 'Discover public Shortlinks, PasteLinks, and Payment Links.',
+      totalViews: 'Total views', allLinks: 'All Link', top10: 'Top 10 Link', newLinks: 'New Link',
+      back: 'Back to Dashboard', loading: 'Loading public links…',
+      empty: 'There are no public links in this category yet.',
+      error: 'Could not load public links. Check the existing database configuration and directory RPC.',
+      open: 'Open link', views: 'views', sold: 'Sold', adViews: 'Ad views',
+      shortPayments: 'Shortlink payments', unavailable: 'Not available yet',
+      page: 'Page', of: 'of', prev: 'Previous', next: 'Next',
+      shortlink: 'Shortlink', pastelink: 'PasteLink', paymentlink: 'Payment Link',
+      allTitle: 'All Link', topTitle: 'Top 10 Link', newTitle: 'New Link',
+      links: 'links', viewStat: 'Total views', soldStat: 'Total sold',
+      shortPaymentsStat: 'Total Shortlink payments',
+      unavailableNote: 'Shortlink ad/payment tracking is not connected yet.',
+      noDate: 'Date unavailable'
+    }
+  };
+  const state = { rows: [], filter: 'all', page: 1 };
+  const lang = () => {
+    const value = localStorage.getItem('showlink_language') ||
+      localStorage.getItem('showlink-language') || localStorage.getItem('language') ||
+      document.documentElement.lang || 'id';
+    return /^en/i.test(value) ? 'en' : 'id';
+  };
+  const typeKey = (row) => {
+    const type = String(row.type || '').toLowerCase().replace(/[^a-z]/g, '');
+    if (type.includes('short')) return 'shortlink';
+    if (type.includes('paste')) return 'pastelink';
+    return 'paymentlink';
+  };
+  const typeOrder = { shortlink: 0, pastelink: 1, paymentlink: 2 };
+  const number = (value) => Math.max(0, Number(value) || 0);
+  const formatted = (value) => number(value).toLocaleString(lang() === 'en' ? 'en-US' : 'id-ID');
+
+  function applyLanguage() {
+    const dictionary = translations[lang()];
+    document.documentElement.lang = lang();
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+      const key = element.dataset.i18n;
+      if (dictionary[key]) element.textContent = dictionary[key];
+    });
+  }
+
+  function getRows() {
+    let rows = [...state.rows];
+    if (['pastelink', 'shortlink', 'paymentlink'].includes(state.filter)) {
+      rows = rows.filter((row) => typeKey(row) === state.filter);
+    }
+    if (state.filter === 'top10') {
+      return rows.sort((a, b) => number(b.views) - number(a.views) ||
+        new Date(b.created_at || 0) - new Date(a.created_at || 0)).slice(0, 10);
+    }
+    if (state.filter === 'new') {
+      return rows.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    }
+    return rows.sort((a, b) => typeOrder[typeKey(a)] - typeOrder[typeKey(b)] ||
+      new Date(b.created_at || 0) - new Date(a.created_at || 0));
+  }
+
+  function titleForFilter() {
+    const dictionary = translations[lang()];
+    return ({
+      all: dictionary.allTitle, pastelink: dictionary.pastelink, shortlink: dictionary.shortlink,
+      paymentlink: dictionary.paymentlink, top10: dictionary.topTitle, new: dictionary.newTitle
+    })[state.filter] || dictionary.allTitle;
+  }
+
+  function renderStats(rows) {
+    const dictionary = translations[lang()];
+    const stats = $('#directory-stats');
+    if (!stats) return;
+    document.querySelectorAll('.directory-stats-note').forEach((note) => note.remove());
+    const views = rows.reduce((sum, row) => sum + number(row.views), 0);
+    let cards = [];
+    if (state.filter === 'paymentlink') {
+      const sold = rows.reduce((sum, row) => sum + number(row.sales_count), 0);
+      cards = [
+        [dictionary.viewStat, formatted(views), 'fa-eye'],
+        [dictionary.soldStat, formatted(sold), 'fa-bag-shopping']
+      ];
+    } else if (state.filter === 'shortlink') {
+      cards = [
+        [dictionary.viewStat, formatted(views), 'fa-eye'],
+        [dictionary.adViews, dictionary.unavailable, 'fa-rectangle-ad'],
+        [dictionary.shortPaymentsStat, dictionary.unavailable, 'fa-money-bill-transfer']
+      ];
+    } else if (state.filter === 'pastelink') {
+      cards = [[dictionary.viewStat, formatted(views), 'fa-eye']];
+    } else {
+      cards = [[dictionary.viewStat, formatted(views), 'fa-eye']];
+    }
+    stats.innerHTML = cards.map(([label, value, icon]) =>
+      `<div class="directory-stat-card"><span class="directory-stat-icon"><i class="fa-solid ${icon}"></i></span><span class="directory-stat-copy"><small>${esc(label)}</small><strong>${esc(value)}</strong></span></div>`
+    ).join('');
+    if (state.filter === 'shortlink') {
+      stats.insertAdjacentHTML('afterend', `<p class="directory-stats-note">${esc(dictionary.unavailableNote)}</p>`);
+    }
+  }
+
+  function render() {
+    const dictionary = translations[lang()];
+    const rows = getRows();
+    const list = $('#public-links-list');
+    const pager = $('#public-links-pagination');
+    $('#directory-section-title').textContent = titleForFilter();
+    $('#directory-page-summary').textContent = rows.length
+      ? `${rows.length.toLocaleString(lang() === 'en' ? 'en-US' : 'id-ID')} ${dictionary.links}` : '';
+    renderStats(rows);
+
+    const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+    state.page = Math.min(state.page, pages);
+    const shown = rows.slice((state.page - 1) * PAGE_SIZE, state.page * PAGE_SIZE);
+    if (!shown.length) {
+      list.innerHTML = `<div class="directory-empty"><i class="fa-regular fa-folder-open"></i><p>${esc(dictionary.empty)}</p></div>`;
+      pager.innerHTML = '';
+      return;
+    }
+
+    list.innerHTML = shown.map((row) => {
+      const key = typeKey(row);
+      const views = number(row.views);
+      const date = row.created_at
+        ? new Date(row.created_at).toLocaleDateString(lang() === 'en' ? 'en-US' : 'id-ID',
+          { year: 'numeric', month: 'short', day: 'numeric' })
+        : dictionary.noDate;
+      const extraMetric = key === 'paymentlink'
+        ? `<span><i class="fa-solid fa-bag-shopping"></i> ${esc(dictionary.sold)}: ${formatted(row.sales_count)}</span>`
+        : '';
+      const url = String(row.url || '#');
+      return `<article class="public-link-item">
+        <div class="directory-item-icon ${key}"><i class="fa-solid ${key === 'shortlink' ? 'fa-link' : key === 'pastelink' ? 'fa-file-lines' : 'fa-credit-card'}"></i></div>
+        <div class="directory-item-main">
+          <div class="directory-item-meta"><span class="public-link-type ${key}">${esc(dictionary[key])}</span><span class="directory-created">${esc(date)}</span></div>
+          <strong class="directory-item-title">${esc(row.title || row.slug || dictionary[key])}</strong>
+          <div class="directory-item-stats"><span><i class="fa-solid fa-eye"></i> ${formatted(views)} ${esc(dictionary.views)}</span>${extraMetric}</div>
+          <a class="directory-open-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(dictionary.open)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </div>
+      </article>`;
+    }).join('');
+
+    if (pages <= 1) {
+      pager.innerHTML = '';
+      return;
+    }
+    pager.innerHTML = `<button type="button" data-page="${state.page - 1}" ${state.page === 1 ? 'disabled' : ''}><i class="fa-solid fa-chevron-left"></i> ${esc(dictionary.prev)}</button><span>${esc(dictionary.page)} ${state.page} ${esc(dictionary.of)} ${pages}</span><button type="button" data-page="${state.page + 1}" ${state.page === pages ? 'disabled' : ''}>${esc(dictionary.next)} <i class="fa-solid fa-chevron-right"></i></button>`;
+  }
+
+  async function load() {
+    applyLanguage();
+    const dictionary = translations[lang()];
+    const status = $('#public-links-status');
+    const list = $('#public-links-list');
+    status.textContent = dictionary.loading;
+    list.innerHTML = '';
+    try {
+      if (!window.ShowLinkSupabase || typeof window.ShowLinkSupabase.load !== 'function') {
+        throw new Error('Supabase client helper is unavailable');
+      }
+      const client = await window.ShowLinkSupabase.load();
+      const { data, error } = await client.rpc('get_all_public_links');
+      if (error) throw error;
+      state.rows = Array.isArray(data) ? data : (Array.isArray(data?.links) ? data.links : []);
+      $('#public-links-total-views').textContent = formatted(state.rows.reduce((sum, row) => sum + number(row.views), 0));
+      status.textContent = `${state.rows.length.toLocaleString(lang() === 'en' ? 'en-US' : 'id-ID')} ${lang() === 'en' ? 'public links' : 'tautan publik'}`;
+      render();
+    } catch (error) {
+      status.textContent = dictionary.error;
+      list.innerHTML = '';
+      $('#directory-stats').innerHTML = '';
+      $('#directory-pagination')?.replaceChildren();
+      $('#public-links-pagination').innerHTML = '';
+      console.error('[ShowLink All Public Links]', error);
+    }
+  }
+
+  document.addEventListener('click', (event) => {
+    const filter = event.target.closest('[data-filter]');
+    if (filter) {
+      state.filter = filter.dataset.filter;
+      state.page = 1;
+      document.querySelectorAll('.directory-filter').forEach((button) =>
+        button.classList.toggle('is-active', button === filter));
+      render();
+      return;
+    }
+    const page = event.target.closest('[data-page]');
+    if (page && !page.disabled) {
+      state.page = Number(page.dataset.page);
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+  document.addEventListener('DOMContentLoaded', load);
+  window.addEventListener('storage', load);
+  document.addEventListener('showlink:language-changed', () => { applyLanguage(); render(); });
 })();
