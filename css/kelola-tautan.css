@@ -610,6 +610,3 @@ html[data-theme="dark"] .app-card,html[data-theme="dark"] .app-stat,html[data-th
 @media(max-width:850px){.app-wrap{width:min(100% - 24px,1120px);padding:100px 0 36px}.app-grid,.app-row{grid-template-columns:1fr}.app-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.app-hero{align-items:flex-start;flex-direction:column}.app-card{padding:18px}.app-table{min-width:650px}.page-scroll-table{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}}
 @media(max-width:420px){.app-wrap{width:calc(100% - 20px)}.app-stats{gap:10px}.app-stat{padding:13px}.app-stat strong{font-size:19px}.app-card{border-radius:15px}}
 
-
-/* Pagination for Payment Link and PasteLink lists */
-.sl-pagination-host{padding:16px 18px 20px}.sl-pagination{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;color:var(--text-secondary,#667085);font-size:13px}.sl-pagination button{border:1px solid var(--border-color,#e4e7ec);background:var(--card-bg,#fff);color:var(--text-color,inherit);border-radius:10px;padding:9px 13px;font:inherit;font-weight:600;cursor:pointer}.sl-pagination button:disabled{opacity:.4;cursor:not-allowed}.sl-pagination button:not(:disabled):hover{border-color:var(--primary,#6366f1)}@media(max-width:520px){.sl-pagination-host{padding:12px}.sl-pagination{gap:8px}.sl-pagination button{padding:8px 10px}}

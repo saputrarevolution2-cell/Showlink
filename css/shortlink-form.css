@@ -1,0 +1,2 @@
+/* Page-specific styles for shortlink.html */
+.form-grid small{display:block;color:var(--sl-muted);line-height:1.5}.form-grid input:focus,.form-grid textarea:focus{outline:2px solid #c8c4ff;border-color:var(--sl-purple)}
