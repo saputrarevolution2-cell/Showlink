@@ -1,0 +1,1 @@
+document.addEventListener('DOMContentLoaded',async()=>{let F=SLF,$=F.$;try{let d=await F.get();$('#title').textContent=d.title||'Konten asli';let u=new URL(d.content_url);if(!['http:','https:'].includes(u.protocol))throw Error('URL konten tidak aman');$('#open').href=u.href;$('#status').textContent='Konten siap dibuka.'}catch(e){$('#status').textContent=e.message}});
