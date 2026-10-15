@@ -1,4 +1,5 @@
 /* All Public Links — clean, responsive directory styles. */
+/* Explicitly bind directory colors to the shared ShowLink theme tokens. */
 :root {
   --apl-bg: var(--sl-bg, #f6f8fc);
   --apl-surface: var(--sl-surface, #fff);
@@ -7,6 +8,26 @@
   --apl-muted: var(--sl-muted, #64748b);
   --apl-border: var(--sl-border, #e2e8f0);
   --apl-primary: var(--sl-primary, #4f46e5);
+  --apl-shadow: var(--sl-shadow-sm, 0 12px 30px rgba(15, 23, 42, .055));
+}
+html[data-theme="dark"] {
+  --apl-bg: #0b1220;
+  --apl-surface: #111c2e;
+  --apl-soft: #172338;
+  --apl-text: #f8fafc;
+  --apl-muted: #a8b4c7;
+  --apl-border: rgba(148, 163, 184, .22);
+  --apl-primary: #a5b4fc;
+  --apl-shadow: 0 18px 48px rgba(0, 0, 0, .24);
+}
+html[data-theme="light"] {
+  --apl-bg: #f8fafc;
+  --apl-surface: #ffffff;
+  --apl-soft: #f1f5f9;
+  --apl-text: #172033;
+  --apl-muted: #64748b;
+  --apl-border: #e2e8f0;
+  --apl-primary: #4f46e5;
   --apl-shadow: 0 12px 30px rgba(15, 23, 42, .055);
 }
 .public-directory-page { min-height: 100vh; background: var(--apl-bg); color: var(--apl-text); }
@@ -28,6 +49,16 @@
 .directory-filter { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 14px; border: 1px solid var(--apl-border); border-radius: 12px; background: var(--apl-surface); color: var(--apl-muted); font: inherit; font-size: 12px; font-weight: 750; cursor: pointer; transition: border-color .18s, background .18s, color .18s, transform .18s; }
 .directory-filter:hover { border-color: #a5b4fc; color: var(--apl-primary); transform: translateY(-1px); }
 .directory-filter.is-active { color: #fff; border-color: transparent; background: linear-gradient(135deg, #4f46e5, #2563eb); box-shadow: 0 5px 14px rgba(79, 70, 229, .2); }
+html[data-theme="dark"] .directory-filter:not(.is-active) { background: #111c2e; color: #cbd5e1; }
+html[data-theme="dark"] .public-directory-header,
+html[data-theme="dark"] .public-directory-panel,
+html[data-theme="dark"] .public-link-item,
+html[data-theme="dark"] .directory-back { background: #111c2e; }
+html[data-theme="dark"] .directory-total-views,
+html[data-theme="dark"] .directory-stat-card { background: #172338; }
+html[data-theme="dark"] .directory-item-title,
+html[data-theme="dark"] .directory-list-heading h2 { color: #f8fafc; }
+html[data-theme="dark"] .public-links-pagination button { background: #172338; color: #f8fafc; }
 .public-directory-panel { padding: clamp(15px, 3vw, 24px); }
 .directory-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
 .directory-list-heading h2 { margin: 0; font-size: 19px; font-weight: 850; letter-spacing: -.025em; }
@@ -70,6 +101,9 @@
 .directory-back { display: inline-flex; align-items: center; gap: 9px; margin-top: 20px; padding: 11px 14px; border: 1px solid var(--apl-border); border-radius: 11px; background: var(--apl-surface); color: var(--apl-text); text-decoration: none; font-size: 12px; font-weight: 800; }
 .directory-back:hover { border-color: #a5b4fc; color: var(--apl-primary); }
 html[data-theme="dark"] .directory-stat-icon, body.dark .directory-stat-icon { background: rgba(129, 140, 248, .16); }
+html[data-theme="dark"] .directory-filter:focus-visible,
+html[data-theme="dark"] .public-links-pagination button:focus-visible,
+html[data-theme="dark"] .directory-back:focus-visible { outline: 2px solid #a5b4fc; outline-offset: 2px; }
 html[data-theme="dark"] .directory-item-icon.shortlink, html[data-theme="dark"] .public-link-type.shortlink, body.dark .directory-item-icon.shortlink, body.dark .public-link-type.shortlink { color: #99f6e4; background: rgba(13, 148, 136, .18); }
 html[data-theme="dark"] .directory-item-icon.pastelink, html[data-theme="dark"] .public-link-type.pastelink, body.dark .directory-item-icon.pastelink, body.dark .public-link-type.pastelink { color: #ddd6fe; background: rgba(124, 58, 237, .2); }
 html[data-theme="dark"] .directory-item-icon.paymentlink, html[data-theme="dark"] .public-link-type.paymentlink, body.dark .directory-item-icon.paymentlink, body.dark .public-link-type.paymentlink { color: #bfdbfe; background: rgba(37, 99, 235, .2); }
