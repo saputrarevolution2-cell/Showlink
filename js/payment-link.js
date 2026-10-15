@@ -131,7 +131,8 @@
       p_price: price,
       p_content_html: contentHtml,
       p_content_text: content,
-      p_thumbnail_url: null
+      p_thumbnail_url: null,
+      p_visibility: form.elements.visibility?.value || "public"
     });
 
     if (error) throw error;
@@ -240,6 +241,10 @@ window.SHOWLINK_PAYMENT_I18N = {
     "payment.form_title":"Isi detail Payment Link",
     "payment.form_subtitle":"Lengkapi empat bagian di bawah. Data ini akan tampil di halaman pembayaran.",
     "payment.title_label":"Judul <span>*</span>",
+    "payment.visibility_label":"Visibilitas tautan",
+    "payment.visibility_public":"Tautan publik — tampil di All Public Links",
+    "payment.visibility_private":"Pribadi — tidak tampil di daftar publik",
+    "payment.visibility_detail":"Pengaturan ini menentukan apakah tautan ditampilkan di daftar All Public Links.",
     "payment.title_placeholder":"Contoh: Premium Content",
     "payment.title_detail":"Gunakan judul yang singkat dan mudah dipahami buyer.",
     "payment.title_error":"Judul wajib diisi.",
@@ -271,6 +276,10 @@ window.SHOWLINK_PAYMENT_I18N = {
     "payment.form_title":"Enter Payment Link details",
     "payment.form_subtitle":"Complete the four sections below. This information will appear on the payment page.",
     "payment.title_label":"Title <span>*</span>",
+    "payment.visibility_label":"Link visibility",
+    "payment.visibility_public":"Public link — appears in All Public Links",
+    "payment.visibility_private":"Private — hidden from the public list",
+    "payment.visibility_detail":"Controls whether this link appears in All Public Links.",
     "payment.title_placeholder":"Example: Premium Content",
     "payment.title_detail":"Use a short title that is easy for buyers to understand.",
     "payment.title_error":"Title is required.",
