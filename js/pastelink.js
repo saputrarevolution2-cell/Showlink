@@ -5,11 +5,20 @@ const plain=()=>editor.innerText.replace(/\u00a0/g,' ');
 function markdown(node){
  // Serialize contenteditable DOM while preserving both <br> and browser-created
  // block elements (Enter may create DIV/P depending on the browser).
- if(node.nodeType===Node.TEXT_NODE)return node.nodeValue.replace(/\r\n?/g,'');
+ if(node.nodeType===Node.TEXT_NODE)return node.nodeValue.replace(/\r\n?/g,'\n');
  if(node.nodeType!==Node.ELEMENT_NODE)return '';
  const tag=node.tagName.toLowerCase();
  if(tag==='br')return '\n';
- let inner=Array.from(node.childNodes).map(markdown).join('');
+ // Serialize siblings with explicit boundaries between adjacent block nodes.
+ // iOS Safari may leave the first line as a bare text node and wrap the next
+ // line in a DIV; without this boundary, "Aaa" + "Bbb" becomes "AaaBbb".
+ let inner='';
+ for(const child of Array.from(node.childNodes)){
+  const isBlock=child.nodeType===Node.ELEMENT_NODE &&
+   ['div','p','li','pre','h1','h2','h3','h4','h5','h6','blockquote'].includes(child.tagName.toLowerCase());
+  if(isBlock && inner && !inner.endsWith('\n')) inner+='\n';
+  inner+=markdown(child);
+ }
  if(tag==='b'||tag==='strong')return inner.trim()?`**${inner}**`:inner;
  if(tag==='i'||tag==='em')return inner.trim()?`*${inner}*`:inner;
  if(tag==='s'||tag==='strike'||tag==='del')return inner.trim()?`~~${inner}~~`:inner;
