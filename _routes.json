@@ -1,1 +1,10 @@
-{"version":1,"include":["/p/*","/a/*","/d/*"],"exclude":[]}
+{
+  "version": 1,
+  "include": [
+    "/p/*",
+    "/a/*",
+    "/s/*",
+    "/d/*"
+  ],
+  "exclude": []
+}
