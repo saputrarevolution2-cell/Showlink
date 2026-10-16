@@ -41,7 +41,7 @@
       noDate: 'Date unavailable', seeAll: 'View all', categoryLinks: 'links', categoryViews: 'total views'
     }
   };
-  const state = { rows: [], filter: 'all', page: 1 };
+  const state = { rows: [], filter: 'all', page: 1, categoryPages: { pastelink: 1, paymentlink: 1, shortlink: 1 } };
   const lang = () => {
     const value = localStorage.getItem('showlink_language') ||
       localStorage.getItem('showlink-language') || localStorage.getItem('language') ||
@@ -167,8 +167,16 @@
         const items = state.rows.filter((row) => typeKey(row) === key)
           .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
         const totalViews = items.reduce((sum, row) => sum + number(row.views), 0);
-        const preview = items.slice(0, 5);
+        const categoryPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+        const categoryPage = Math.min(state.categoryPages[key] || 1, categoryPages);
+        state.categoryPages[key] = categoryPage;
+        const preview = items.slice((categoryPage - 1) * PAGE_SIZE, categoryPage * PAGE_SIZE);
         const emptyText = dictionary.empty;
+        const pageControls = categoryPages > 1 ? `<nav class="directory-category-pagination" aria-label="${esc(dictionary[key])} pagination">
+          <button type="button" class="directory-page-arrow" data-category-page="${key}" data-page="${categoryPage - 1}" ${categoryPage === 1 ? 'disabled' : ''} aria-label="${esc(dictionary.prev)}"><i class="fa-solid fa-chevron-left"></i><span>${esc(dictionary.prev)}</span></button>
+          <div class="directory-page-numbers">${Array.from({ length: categoryPages }, (_, index) => index + 1).map(pageNumber => `<button type="button" class="directory-page-number ${pageNumber === categoryPage ? 'is-current' : ''}" data-category-page="${key}" data-page="${pageNumber}" ${pageNumber === categoryPage ? 'aria-current="page"' : ''}>${pageNumber}</button>`).join('')}</div>
+          <button type="button" class="directory-page-arrow" data-category-page="${key}" data-page="${categoryPage + 1}" ${categoryPage === categoryPages ? 'disabled' : ''} aria-label="${esc(dictionary.next)}"><span>${esc(dictionary.next)}</span><i class="fa-solid fa-chevron-right"></i></button>
+        </nav>` : '';
         return `<section class="directory-category-section ${key}">
           <header class="directory-category-heading">
             <div class="directory-category-title-wrap">
@@ -178,6 +186,7 @@
             ${items.length ? `<button type="button" class="directory-see-all" data-filter="${key}">${esc(dictionary.seeAll)} <i class="fa-solid fa-arrow-right"></i></button>` : ''}
           </header>
           <div class="public-links-list directory-category-list">${preview.length ? preview.map(renderLinkCard).join('') : `<div class="directory-empty directory-category-empty"><i class="fa-regular fa-folder-open"></i><p>${esc(emptyText)}</p></div>`}</div>
+          ${pageControls}
         </section>`;
       });
       list.innerHTML = sections.join('');
@@ -239,7 +248,17 @@
       render();
       return;
     }
-    const page = event.target.closest('[data-page]');
+    const categoryPage = event.target.closest('[data-category-page][data-page]');
+    if (categoryPage && !categoryPage.disabled) {
+      const key = categoryPage.dataset.categoryPage;
+      if (Object.prototype.hasOwnProperty.call(state.categoryPages, key)) {
+        state.categoryPages[key] = Number(categoryPage.dataset.page);
+        render();
+        categoryPage.closest('.directory-category-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      return;
+    }
+    const page = event.target.closest('#public-links-pagination [data-page]');
     if (page && !page.disabled) {
       state.page = Number(page.dataset.page);
       render();
