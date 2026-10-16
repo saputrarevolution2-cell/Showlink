@@ -60,7 +60,27 @@ html[data-theme="dark"]{
 .sl-brand{transition:opacity .2s ease,transform .2s ease}.sl-brand:hover{opacity:.94;transform:translateY(-1px)}
 .sl-brand-mark{transition:transform .24s cubic-bezier(.22,.61,.36,1),box-shadow .24s ease}
 .sl-brand:hover .sl-brand-mark{transform:rotate(-2deg) scale(1.025);box-shadow:0 10px 34px rgba(124,58,237,.24),0 0 22px rgba(6,214,255,.10)}
-.showlink-tools{gap:6px}
+/* Shared theme/language controls are owned by navbar.css to avoid per-page CSS collisions. */
+.showlink-tools{display:flex;align-items:center;justify-content:flex-end;gap:6px}
+.showlink-tool{position:relative;display:inline-flex;align-items:center}
+.showlink-tool-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;min-width:92px;padding:0 12px;border:1px solid rgba(124,58,237,.22);border-radius:12px;background:linear-gradient(135deg,rgba(124,58,237,.10),rgba(6,214,255,.09));color:var(--sl-nav-text);cursor:pointer;font:inherit;font-size:12px;font-weight:800;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 7px 24px rgba(36,28,86,.07);transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease}
+.showlink-tool-btn:hover{transform:translateY(-1px);border-color:rgba(124,58,237,.42);box-shadow:0 10px 32px rgba(124,58,237,.20)}
+.showlink-tool-btn .sl-tool-icon,.sl-option-icon{width:19px;min-width:19px;display:inline-flex;align-items:center;justify-content:center}
+[data-theme-tool]>.showlink-tool-btn .sl-tool-icon{color:#f59e0b}
+[data-language-tool]>.showlink-tool-btn .sl-tool-icon{color:#06b6d4}
+[data-theme-tool] .showlink-tool-option:first-child .sl-option-icon{color:#f59e0b}
+[data-theme-tool] .showlink-tool-option:nth-child(2) .sl-option-icon{color:#8b5cf6}
+[data-language-tool] .showlink-tool-option:first-child .sl-option-icon{color:#16a34a}
+[data-language-tool] .showlink-tool-option:nth-child(2) .sl-option-icon{color:#0ea5e9}
+.showlink-tool-text,.showlink-lang-label{white-space:nowrap}
+.showlink-lang-label{min-width:22px;text-align:center}
+.showlink-tool-menu{position:absolute;top:calc(100% + 8px);right:0;min-width:158px;padding:6px;border:1px solid var(--sl-line);border-radius:14px;background:var(--sl-drawer-bg);color:var(--sl-nav-text);box-shadow:0 18px 50px rgba(10,15,40,.20);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);z-index:10050;opacity:0;visibility:hidden;transform:translateY(-5px);transition:opacity .16s ease,transform .16s ease,visibility .16s ease}
+.showlink-tool.is-open .showlink-tool-menu{opacity:1;visibility:visible;transform:translateY(0)}
+.showlink-tool-option{width:100%;min-height:40px;display:flex;align-items:center;gap:9px;padding:9px 10px;border:0;border-radius:9px;background:transparent;color:var(--sl-nav-text);cursor:pointer;font:inherit;font-size:13px;text-align:left}
+.showlink-tool-option:hover,.showlink-tool-option.is-active{background:rgba(124,58,237,.10)}
+.showlink-tool-option .sl-check{margin-left:auto;width:18px;min-width:18px;text-align:center;color:#8b5cf6}
+.sl-option-sun{color:#f59e0b}.sl-option-moon{color:#8b5cf6}
+@media(max-width:820px){.showlink-tools{gap:6px}.showlink-tool-btn{width:40px;min-width:40px;padding:0}.showlink-tool-text,.showlink-lang-label{display:none}}
 @media(max-width:620px){.sl-nav-actions::before{display:none}.sl-nav-actions{gap:5px}.sl-nav-shell{padding:0}}
 
 /* ============================================================
@@ -168,7 +188,7 @@ html[data-theme="dark"]{
   -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
 }
 html[data-theme="dark"] .sl-bottom-nav{background:rgba(12,19,34,.94);color:#cbd5e1;border-color:rgba(148,163,184,.2);box-shadow:0 12px 42px rgba(0,0,0,.35)}
-.sl-bottom-item{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:0;border-radius:15px;background:transparent;color:inherit;text-decoration:none;font:inherit;font-size:10px;font-weight:800;line-height:1.1;cursor:pointer;transition:background .18s ease,transform .18s ease}
+.sl-bottom-item{min-width:0;width:100%;min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border:0;border-radius:15px;background:transparent;color:inherit;text-decoration:none;font:inherit;font-size:0;font-weight:800;line-height:1;cursor:pointer;transition:background .18s ease,transform .18s ease;-webkit-tap-highlight-color:transparent}
 .sl-bottom-item>i{font-size:18px;line-height:1.1}
 .sl-bottom-item[data-bottom-link="dashboard"]>i{color:#3b82f6}
 .sl-bottom-item[data-bottom-link="all"]>i{color:#8b5cf6}
@@ -177,6 +197,10 @@ html[data-theme="dark"] .sl-bottom-nav{background:rgba(12,19,34,.94);color:#cbd5
 .sl-bottom-item.is-active{background:linear-gradient(135deg,rgba(99,102,241,.13),rgba(6,182,212,.09));color:#4f46e5}
 html[data-theme="dark"] .sl-bottom-item.is-active{color:#c4b5fd;background:linear-gradient(135deg,rgba(99,102,241,.22),rgba(6,182,212,.13))}
 .sl-bottom-item:active{transform:scale(.96)}
+.sl-bottom-item:focus-visible{outline:2px solid #8b5cf6;outline-offset:2px}
+.sl-bottom-item>i{display:block}
+.sl-bottom-create{align-items:center;justify-content:center;padding:0}
+.sl-bottom-create-icon{flex:none}
 .sl-bottom-create-wrap{position:relative;display:flex;min-width:0}
 .sl-bottom-create{width:100%;color:#7c3aed}
 .sl-bottom-create-icon{display:grid;place-items:center;width:34px;height:34px;margin-top:-18px;border:3px solid rgba(255,255,255,.92);border-radius:13px;background:linear-gradient(135deg,#ec4899,#8b5cf6,#3b82f6);color:#fff;box-shadow:0 5px 15px rgba(124,58,237,.32)}
@@ -190,7 +214,7 @@ html[data-theme="dark"] .sl-bottom-create-icon{border-color:#111c2e}
 body.showlink-authenticated{padding-bottom:100px}
 @media(max-width:480px){
  .sl-bottom-nav{width:calc(100% - 16px);bottom:max(7px,env(safe-area-inset-bottom));min-height:64px;padding:6px 5px calc(6px + env(safe-area-inset-bottom));border-radius:19px;gap:2px}
- .sl-bottom-item{font-size:9px;gap:4px}
+ .sl-bottom-item{font-size:0;gap:0;min-height:46px}
  .sl-bottom-item>i{font-size:17px}
  .sl-bottom-create-icon{width:32px;height:32px;border-radius:12px}
 }
