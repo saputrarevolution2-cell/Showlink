@@ -21,7 +21,7 @@
       links: 'tautan', viewStat: 'Total view', soldStat: 'Total terjual',
       shortPaymentsStat: 'Total pembayaran Shortlink',
       unavailableNote: 'Belum terhubung ke pencatatan iklan/pembayaran Shortlink.',
-      noDate: 'Tanggal tidak tersedia', seeAll: 'Lihat semua', categoryLinks: 'tautan', categoryViews: 'total view'
+      noDate: 'Tanggal tidak tersedia'
     },
     en: {
       kicker: 'SHOWLINK · LINK DIRECTORY', title: 'All Public Links',
@@ -38,10 +38,10 @@
       links: 'links', viewStat: 'Total views', soldStat: 'Total sold',
       shortPaymentsStat: 'Total Shortlink payments',
       unavailableNote: 'Shortlink ad/payment tracking is not connected yet.',
-      noDate: 'Date unavailable', seeAll: 'View all', categoryLinks: 'links', categoryViews: 'total views'
+      noDate: 'Date unavailable'
     }
   };
-  const state = { rows: [], filter: 'all', page: 1, categoryPages: { pastelink: 1, paymentlink: 1, shortlink: 1 } };
+  const state = { rows: [], filter: 'all', page: 1 };
   const lang = () => {
     const value = localStorage.getItem('showlink_language') ||
       localStorage.getItem('showlink-language') || localStorage.getItem('language') ||
@@ -123,29 +123,6 @@
     }
   }
 
-  function renderLinkCard(row) {
-    const dictionary = translations[lang()];
-    const key = typeKey(row);
-    const views = number(row.views);
-    const date = row.created_at
-      ? new Date(row.created_at).toLocaleDateString(lang() === 'en' ? 'en-US' : 'id-ID',
-          { year: 'numeric', month: 'short', day: 'numeric' })
-      : dictionary.noDate;
-    const extraMetric = key === 'paymentlink'
-      ? `<span><i class="fa-solid fa-bag-shopping"></i> ${esc(dictionary.sold)}: ${formatted(row.sales_count)}</span>`
-      : '';
-    const url = String(row.url || '#');
-    return `<article class="public-link-item">
-      <div class="directory-item-icon ${key}"><i class="fa-solid ${key === 'shortlink' ? 'fa-link' : key === 'pastelink' ? 'fa-file-lines' : 'fa-credit-card'}"></i></div>
-      <div class="directory-item-main">
-        <div class="directory-item-meta"><span class="public-link-type ${key}">${esc(dictionary[key])}</span><span class="directory-created">${esc(date)}</span></div>
-        <strong class="directory-item-title">${esc(row.title || row.slug || dictionary[key])}</strong>
-        <div class="directory-item-stats"><span><i class="fa-solid fa-eye"></i> ${formatted(views)} ${esc(dictionary.views)}</span>${extraMetric}</div>
-        <a class="directory-open-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(dictionary.open)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-      </div>
-    </article>`;
-  }
-
   function render() {
     const dictionary = translations[lang()];
     const rows = getRows();
@@ -156,44 +133,6 @@
       ? `${rows.length.toLocaleString(lang() === 'en' ? 'en-US' : 'id-ID')} ${dictionary.links}` : '';
     renderStats(rows);
 
-    // The All view is intentionally grouped by link type so unrelated links never mix.
-    if (state.filter === 'all') {
-      const categories = [
-        { key: 'pastelink', icon: 'fa-file-lines' },
-        { key: 'paymentlink', icon: 'fa-credit-card' },
-        { key: 'shortlink', icon: 'fa-link' }
-      ];
-      const sections = categories.map(({ key, icon }) => {
-        const items = state.rows.filter((row) => typeKey(row) === key)
-          .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-        const totalViews = items.reduce((sum, row) => sum + number(row.views), 0);
-        const categoryPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
-        const categoryPage = Math.min(state.categoryPages[key] || 1, categoryPages);
-        state.categoryPages[key] = categoryPage;
-        const preview = items.slice((categoryPage - 1) * PAGE_SIZE, categoryPage * PAGE_SIZE);
-        const emptyText = dictionary.empty;
-        const pageControls = categoryPages > 1 ? `<nav class="directory-category-pagination" aria-label="${esc(dictionary[key])} pagination">
-          <button type="button" class="directory-page-arrow" data-category-page="${key}" data-page="${categoryPage - 1}" ${categoryPage === 1 ? 'disabled' : ''} aria-label="${esc(dictionary.prev)}"><i class="fa-solid fa-chevron-left"></i><span>${esc(dictionary.prev)}</span></button>
-          <div class="directory-page-numbers">${Array.from({ length: categoryPages }, (_, index) => index + 1).map(pageNumber => `<button type="button" class="directory-page-number ${pageNumber === categoryPage ? 'is-current' : ''}" data-category-page="${key}" data-page="${pageNumber}" ${pageNumber === categoryPage ? 'aria-current="page"' : ''}>${pageNumber}</button>`).join('')}</div>
-          <button type="button" class="directory-page-arrow" data-category-page="${key}" data-page="${categoryPage + 1}" ${categoryPage === categoryPages ? 'disabled' : ''} aria-label="${esc(dictionary.next)}"><span>${esc(dictionary.next)}</span><i class="fa-solid fa-chevron-right"></i></button>
-        </nav>` : '';
-        return `<section class="directory-category-section ${key}">
-          <header class="directory-category-heading">
-            <div class="directory-category-title-wrap">
-              <span class="directory-category-icon ${key}"><i class="fa-solid ${icon}"></i></span>
-              <div><h3>${esc(dictionary[key])}</h3><p>${items.length.toLocaleString(lang() === 'en' ? 'en-US' : 'id-ID')} ${esc(dictionary.categoryLinks)} <span aria-hidden="true">·</span> ${formatted(totalViews)} ${esc(dictionary.categoryViews)}</p></div>
-            </div>
-            ${items.length ? `<button type="button" class="directory-see-all" data-filter="${key}">${esc(dictionary.seeAll)} <i class="fa-solid fa-arrow-right"></i></button>` : ''}
-          </header>
-          <div class="public-links-list directory-category-list">${preview.length ? preview.map(renderLinkCard).join('') : `<div class="directory-empty directory-category-empty"><i class="fa-regular fa-folder-open"></i><p>${esc(emptyText)}</p></div>`}</div>
-          ${pageControls}
-        </section>`;
-      });
-      list.innerHTML = sections.join('');
-      pager.innerHTML = '';
-      return;
-    }
-
     const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
     state.page = Math.min(state.page, pages);
     const shown = rows.slice((state.page - 1) * PAGE_SIZE, state.page * PAGE_SIZE);
@@ -202,7 +141,29 @@
       pager.innerHTML = '';
       return;
     }
-    list.innerHTML = shown.map(renderLinkCard).join('');
+
+    list.innerHTML = shown.map((row) => {
+      const key = typeKey(row);
+      const views = number(row.views);
+      const date = row.created_at
+        ? new Date(row.created_at).toLocaleDateString(lang() === 'en' ? 'en-US' : 'id-ID',
+          { year: 'numeric', month: 'short', day: 'numeric' })
+        : dictionary.noDate;
+      const extraMetric = key === 'paymentlink'
+        ? `<span><i class="fa-solid fa-bag-shopping"></i> ${esc(dictionary.sold)}: ${formatted(row.sales_count)}</span>`
+        : '';
+      const url = String(row.url || '#');
+      return `<article class="public-link-item">
+        <div class="directory-item-icon ${key}"><i class="fa-solid ${key === 'shortlink' ? 'fa-link' : key === 'pastelink' ? 'fa-file-lines' : 'fa-credit-card'}"></i></div>
+        <div class="directory-item-main">
+          <div class="directory-item-meta"><span class="public-link-type ${key}">${esc(dictionary[key])}</span><span class="directory-created">${esc(date)}</span></div>
+          <strong class="directory-item-title">${esc(row.title || row.slug || dictionary[key])}</strong>
+          <div class="directory-item-stats"><span><i class="fa-solid fa-eye"></i> ${formatted(views)} ${esc(dictionary.views)}</span>${extraMetric}</div>
+          <a class="directory-open-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(dictionary.open)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </div>
+      </article>`;
+    }).join('');
+
     if (pages <= 1) {
       pager.innerHTML = '';
       return;
@@ -244,21 +205,11 @@
       state.filter = filter.dataset.filter;
       state.page = 1;
       document.querySelectorAll('.directory-filter').forEach((button) =>
-        button.classList.toggle('is-active', button.dataset.filter === state.filter));
+        button.classList.toggle('is-active', button === filter));
       render();
       return;
     }
-    const categoryPage = event.target.closest('[data-category-page][data-page]');
-    if (categoryPage && !categoryPage.disabled) {
-      const key = categoryPage.dataset.categoryPage;
-      if (Object.prototype.hasOwnProperty.call(state.categoryPages, key)) {
-        state.categoryPages[key] = Number(categoryPage.dataset.page);
-        render();
-        categoryPage.closest('.directory-category-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      return;
-    }
-    const page = event.target.closest('#public-links-pagination [data-page]');
+    const page = event.target.closest('[data-page]');
     if (page && !page.disabled) {
       state.page = Number(page.dataset.page);
       render();
