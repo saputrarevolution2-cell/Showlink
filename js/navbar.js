@@ -46,7 +46,11 @@
     }
     return authUser;
   }
-  const t=k=>window.ShowLinkLanguage?.t?.(k)||({orders:"Order",withdraw:"Withdraw",myPaymentLinks:"My Links",profile:"Profile",settings:"Settings",about:"About",notifications:"Notifications",paymentLink:"Payment Link",dashboard:"Dashboard",signOut:"Sign out",home:"Home",support:"Support",login:"Login",register:"Register",allPublicLinks:"All Public Links",pastelink:"Pastelink",shortlink:"Shortlink",comingSoon:"Coming soon",create:(document.documentElement.lang==="id"?"Buat":"Create"),allPublicLinks:(document.documentElement.lang==="id"?"All Link":"All Link"),profile:(document.documentElement.lang==="id"?"Profil":"Profile"),withdraw:"Withdraw"}[k]||k);
+  const t=k=>{
+    const isId=(document.documentElement.lang||"id").toLowerCase().startsWith("id");
+    const fallback={orders:isId?"Pesanan":"Orders",withdraw:isId?"Penarikan":"Withdraw",myPaymentLinks:isId?"Link Saya":"My Links",profile:isId?"Profil":"Profile",settings:isId?"Pengaturan":"Settings",about:isId?"Tentang":"About",notifications:isId?"Notifikasi":"Notifications",paymentLink:"Payment Link",dashboard:"Dashboard",signOut:isId?"Keluar":"Sign out",home:isId?"Beranda":"Home",support:isId?"Bantuan":"Support",login:isId?"Masuk":"Login",register:isId?"Daftar":"Register",allPublicLinks:"All Link",pastelink:"PasteLink",shortlink:"Shortlink",comingSoon:isId?"Segera hadir":"Coming soon",create:isId?"Buat":"Create"};
+    return window.ShowLinkLanguage?.t?.(k)||fallback[k]||k;
+  };
   const icon=(cls,name)=>`<i class="fa-solid ${name}${cls?` ${cls}`:""}" aria-hidden="true"></i>`;
   const link=(href,ic,key,extra="")=>`<a class="sl-nav-link" href="${href}" data-nav-link ${extra}><span>${icon(ic.cls,ic.name)}</span><span class="sl-nav-link-label" data-i18n="${key}">${t(key)}</span></a>`;
   const soon=(href,ic,key)=>`${link(href,ic,key)}<span class="sl-new-badge sl-new-gray">${t("comingSoon")}</span>`;
@@ -78,10 +82,14 @@
     document.body.classList.toggle("showlink-authenticated",!!is);
     const menu=nav.querySelector("[data-bottom-create-menu]");
     const create=nav.querySelector("[data-bottom-create]");
+    if(create){const isId=(document.documentElement.lang||"id").toLowerCase().startsWith("id");create.setAttribute("aria-label",isId?"Buat":"Create");create.title=isId?"Buat":"Create";}
     const closeCreate=()=>{if(menu)menu.hidden=true;if(create)create.setAttribute("aria-expanded","false");};
     const path=location.pathname.replace(/\/$/,"")||"/";
+    const isId=(document.documentElement.lang||"id").toLowerCase().startsWith("id");
+    const labels={dashboard:isId?"Dasbor":"Dashboard",all:isId?"Semua Link":"All Links",withdraw:isId?"Penarikan":"Withdraw",profile:isId?"Profil":"Profile",create:isId?"Buat":"Create"};
     nav.querySelectorAll("[data-bottom-link]").forEach(a=>{
       const key=a.dataset.bottomLink;
+      a.setAttribute("aria-label",labels[key]||key);a.title=labels[key]||key;
       const active=(key==="dashboard"&&path==="/dashboard.html")||
         (key==="all"&&path==="/all-public-links.html")||
         (key==="withdraw"&&path==="/withdraw.html")||
