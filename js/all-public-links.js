@@ -21,7 +21,7 @@
       links: 'tautan', viewStat: 'Total view', soldStat: 'Total terjual',
       shortPaymentsStat: 'Total pembayaran Shortlink',
       unavailableNote: 'Belum terhubung ke pencatatan iklan/pembayaran Shortlink.',
-      noDate: 'Tanggal tidak tersedia'
+      noDate: 'Tanggal tidak tersedia', seeAll: 'Lihat semua', categoryLinks: 'tautan', categoryViews: 'total view'
     },
     en: {
       kicker: 'SHOWLINK · LINK DIRECTORY', title: 'All Public Links',
@@ -38,7 +38,7 @@
       links: 'links', viewStat: 'Total views', soldStat: 'Total sold',
       shortPaymentsStat: 'Total Shortlink payments',
       unavailableNote: 'Shortlink ad/payment tracking is not connected yet.',
-      noDate: 'Date unavailable'
+      noDate: 'Date unavailable', seeAll: 'View all', categoryLinks: 'links', categoryViews: 'total views'
     }
   };
   const state = { rows: [], filter: 'all', page: 1 };
@@ -123,6 +123,29 @@
     }
   }
 
+  function renderLinkCard(row) {
+    const dictionary = translations[lang()];
+    const key = typeKey(row);
+    const views = number(row.views);
+    const date = row.created_at
+      ? new Date(row.created_at).toLocaleDateString(lang() === 'en' ? 'en-US' : 'id-ID',
+          { year: 'numeric', month: 'short', day: 'numeric' })
+      : dictionary.noDate;
+    const extraMetric = key === 'paymentlink'
+      ? `<span><i class="fa-solid fa-bag-shopping"></i> ${esc(dictionary.sold)}: ${formatted(row.sales_count)}</span>`
+      : '';
+    const url = String(row.url || '#');
+    return `<article class="public-link-item">
+      <div class="directory-item-icon ${key}"><i class="fa-solid ${key === 'shortlink' ? 'fa-link' : key === 'pastelink' ? 'fa-file-lines' : 'fa-credit-card'}"></i></div>
+      <div class="directory-item-main">
+        <div class="directory-item-meta"><span class="public-link-type ${key}">${esc(dictionary[key])}</span><span class="directory-created">${esc(date)}</span></div>
+        <strong class="directory-item-title">${esc(row.title || row.slug || dictionary[key])}</strong>
+        <div class="directory-item-stats"><span><i class="fa-solid fa-eye"></i> ${formatted(views)} ${esc(dictionary.views)}</span>${extraMetric}</div>
+        <a class="directory-open-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(dictionary.open)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+      </div>
+    </article>`;
+  }
+
   function render() {
     const dictionary = translations[lang()];
     const rows = getRows();
@@ -133,6 +156,35 @@
       ? `${rows.length.toLocaleString(lang() === 'en' ? 'en-US' : 'id-ID')} ${dictionary.links}` : '';
     renderStats(rows);
 
+    // The All view is intentionally grouped by link type so unrelated links never mix.
+    if (state.filter === 'all') {
+      const categories = [
+        { key: 'pastelink', icon: 'fa-file-lines' },
+        { key: 'paymentlink', icon: 'fa-credit-card' },
+        { key: 'shortlink', icon: 'fa-link' }
+      ];
+      const sections = categories.map(({ key, icon }) => {
+        const items = state.rows.filter((row) => typeKey(row) === key)
+          .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        const totalViews = items.reduce((sum, row) => sum + number(row.views), 0);
+        const preview = items.slice(0, 5);
+        const emptyText = dictionary.empty;
+        return `<section class="directory-category-section ${key}">
+          <header class="directory-category-heading">
+            <div class="directory-category-title-wrap">
+              <span class="directory-category-icon ${key}"><i class="fa-solid ${icon}"></i></span>
+              <div><h3>${esc(dictionary[key])}</h3><p>${items.length.toLocaleString(lang() === 'en' ? 'en-US' : 'id-ID')} ${esc(dictionary.categoryLinks)} <span aria-hidden="true">·</span> ${formatted(totalViews)} ${esc(dictionary.categoryViews)}</p></div>
+            </div>
+            ${items.length ? `<button type="button" class="directory-see-all" data-filter="${key}">${esc(dictionary.seeAll)} <i class="fa-solid fa-arrow-right"></i></button>` : ''}
+          </header>
+          <div class="public-links-list directory-category-list">${preview.length ? preview.map(renderLinkCard).join('') : `<div class="directory-empty directory-category-empty"><i class="fa-regular fa-folder-open"></i><p>${esc(emptyText)}</p></div>`}</div>
+        </section>`;
+      });
+      list.innerHTML = sections.join('');
+      pager.innerHTML = '';
+      return;
+    }
+
     const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
     state.page = Math.min(state.page, pages);
     const shown = rows.slice((state.page - 1) * PAGE_SIZE, state.page * PAGE_SIZE);
@@ -141,29 +193,7 @@
       pager.innerHTML = '';
       return;
     }
-
-    list.innerHTML = shown.map((row) => {
-      const key = typeKey(row);
-      const views = number(row.views);
-      const date = row.created_at
-        ? new Date(row.created_at).toLocaleDateString(lang() === 'en' ? 'en-US' : 'id-ID',
-          { year: 'numeric', month: 'short', day: 'numeric' })
-        : dictionary.noDate;
-      const extraMetric = key === 'paymentlink'
-        ? `<span><i class="fa-solid fa-bag-shopping"></i> ${esc(dictionary.sold)}: ${formatted(row.sales_count)}</span>`
-        : '';
-      const url = String(row.url || '#');
-      return `<article class="public-link-item">
-        <div class="directory-item-icon ${key}"><i class="fa-solid ${key === 'shortlink' ? 'fa-link' : key === 'pastelink' ? 'fa-file-lines' : 'fa-credit-card'}"></i></div>
-        <div class="directory-item-main">
-          <div class="directory-item-meta"><span class="public-link-type ${key}">${esc(dictionary[key])}</span><span class="directory-created">${esc(date)}</span></div>
-          <strong class="directory-item-title">${esc(row.title || row.slug || dictionary[key])}</strong>
-          <div class="directory-item-stats"><span><i class="fa-solid fa-eye"></i> ${formatted(views)} ${esc(dictionary.views)}</span>${extraMetric}</div>
-          <a class="directory-open-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(dictionary.open)} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-        </div>
-      </article>`;
-    }).join('');
-
+    list.innerHTML = shown.map(renderLinkCard).join('');
     if (pages <= 1) {
       pager.innerHTML = '';
       return;
@@ -205,7 +235,7 @@
       state.filter = filter.dataset.filter;
       state.page = 1;
       document.querySelectorAll('.directory-filter').forEach((button) =>
-        button.classList.toggle('is-active', button === filter));
+        button.classList.toggle('is-active', button.dataset.filter === state.filter));
       render();
       return;
     }
