@@ -70,22 +70,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     try { return sessionStorage.getItem(`sl_task${task}_complete_${slug}`) === 'true'; } catch (_) { return false; }
   }
 
-  async function recordFinalEvent(eventName) {
-    if (!slug || !window.ShowLinkSupabase?.load) return;
-    try {
-      const sb = await window.ShowLinkSupabase.load();
-      const { error } = await sb.rpc('record_shortlink_final_event', { p_slug: slug, p_event: eventName });
-      if (error) console.warn('Shortlink Final analytics:', error.message);
-    } catch (error) { console.warn('Shortlink Final analytics unavailable:', error?.message || error); }
-  }
-  try {
-    const viewKey = `sl_final_view_recorded_${slug}`;
-    if (slug && sessionStorage.getItem(viewKey) !== 'true') {
-      await recordFinalEvent('view');
-      sessionStorage.setItem(viewKey, 'true');
-    }
-  } catch (_) { if (slug) await recordFinalEvent('view'); }
-
   const initialLoading = countdown(initialStatus, 5000, 'Menyiapkan pemeriksaan awal');
 
   try {
@@ -111,7 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   downloadButton?.addEventListener('click', async () => {
     if (verifying || verified || !humanCheck?.checked) return;
     verifying = true; downloadButton.disabled = true; downloadButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa tahapan';
-    await recordFinalEvent('click');
     await countdown(status, 10000, 'Memeriksa Task 1, Task 2, dan Task 3');
     const missing = [1, 2, 3].filter((task) => !completeForTask(task));
     verifying = false;
@@ -135,18 +118,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (status) status.textContent = '';
   });
 
-  goButton?.addEventListener('click', async () => {
-    if (!verified || !destination || goButton.disabled) return;
-    goButton.disabled = true;
-    goButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Membuka tujuan…';
-    // A redirect and its CPM-based revenue are recorded only after the visitor presses GO.
-    const redirectKey = `sl_final_redirect_recorded_${slug}`;
-    try {
-      if (!slug || sessionStorage.getItem(redirectKey) !== 'true') {
-        await recordFinalEvent('redirect');
-        if (slug) sessionStorage.setItem(redirectKey, 'true');
-      }
-    } catch (_) { await recordFinalEvent('redirect'); }
+  goButton?.addEventListener('click', () => {
+    if (!verified || !destination) return;
     const configured = String(goButton.dataset.adminDestination || '').trim();
     const target = /^https?:\/\//i.test(configured) ? configured : destination;
     location.assign(target);
