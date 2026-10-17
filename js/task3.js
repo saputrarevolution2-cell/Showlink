@@ -99,6 +99,7 @@
           next.button.classList.remove('hide');
           scrollTo(next.button);
         } else if (completedSteps === steps.length) {
+          try { sessionStorage.setItem(`sl_task3_complete_${flow.slug()}`, 'true'); } catch (_) {}
           redirectButton?.classList.remove('hide');
           if (redirectButton) redirectButton.disabled = false;
           if (redirectStatus) redirectStatus.textContent = 'Semua langkah selesai. Kamu sekarang dapat membuka halaman Final.';

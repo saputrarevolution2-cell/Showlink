@@ -72,6 +72,7 @@
       up.classList.add('hide'); sponsor?.classList.add('hide'); down?.classList.add('hide'); summary?.classList.add('hide'); first?.classList.add('hide');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       window.setTimeout(() => {
+        try { sessionStorage.setItem(`sl_task2_complete_${flow.slug()}`, 'true'); } catch (_) {}
         if (success) { success.textContent = '✓ Success — Task 2 Done'; success.classList.remove('hide'); }
         if (next) { next.textContent = 'Lanjut ke Task 3'; next.classList.remove('hide'); next.disabled = false; }
         completionArea?.classList.add('is-visible'); if (status) status.textContent = '';

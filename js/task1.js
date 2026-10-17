@@ -78,6 +78,7 @@
       summaryDownload?.classList.add('hide'); firstDownload?.classList.add('hide');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       window.setTimeout(() => {
+        try { sessionStorage.setItem(`sl_task1_complete_${flow.slug()}`, 'true'); } catch (_) {}
         if (successMessage) { successMessage.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Success — Task 1 Done'; successMessage.classList.remove('hide'); }
         if (continueButton) { continueButton.textContent = 'Lanjut ke Task 2'; continueButton.classList.remove('hide'); continueButton.disabled = false; }
         notice?.classList.add('is-visible'); if (status) status.textContent = ''; continueButton?.focus({ preventScroll: true });
