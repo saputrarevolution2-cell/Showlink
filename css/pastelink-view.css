@@ -1,0 +1,27 @@
+/* PasteLink viewer-only layout. Shared editor/viewer controls remain in pastelink.css. */
+.paste-shell {
+  width: min(850px, calc(100% - 24px));
+}
+#view-title {
+  overflow-wrap: anywhere;
+}
+#view-content {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+#view-content[hidden],
+#view-password-box[hidden],
+#paste-loading[hidden],
+#copy-all[hidden],
+#view-message[hidden] {
+  display: none !important;
+}
+#view-message {
+  margin-top: 14px;
+  line-height: 1.6;
+}
+@media (max-width: 600px) {
+  .paste-shell {
+    width: calc(100% - 20px);
+  }
+}
