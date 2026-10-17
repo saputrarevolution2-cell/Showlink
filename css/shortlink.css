@@ -52,11 +52,6 @@ html[data-theme="dark"] .app-card,html[data-theme="dark"] .app-stat,html[data-th
 @media(max-width:420px){.app-wrap{width:calc(100% - 20px)}.app-stats{gap:10px}.app-stat{padding:13px}.app-stat strong{font-size:19px}.app-card{border-radius:15px}}
 
 
-/* Shortlink destination URL field: taller and easier to review on mobile */
-.shortlink-app #short-destination{display:block;min-height:124px;height:124px;resize:vertical;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;}
-.shortlink-app #short-destination::placeholder{white-space:normal;overflow-wrap:anywhere;}
-@media(max-width:600px){.shortlink-app #short-destination{min-height:140px;height:140px;padding:13px;}}
-
 /* Shared ShowLink navbar theme/language controls — aligned with Admin */
 .showlink-tools { display:flex; align-items:center; justify-content:flex-end; gap:8px; }
 .showlink-tool { position:relative; display:inline-flex; align-items:center; }
