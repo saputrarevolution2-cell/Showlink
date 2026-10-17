@@ -28,7 +28,12 @@
     const flow = window.SLF, status = $('#status'), status2 = $('#status2');
     const directSlug = new URLSearchParams(location.search).get("slug") || sessionStorage.getItem("sl_slug") || "";
     const directAccessLink = document.getElementById("sl-direct-access-link");
+    const directNotice = $('#sl-direct-floating-notice'), directNoticeClose = $('#sl-direct-notice-close');
     if (directAccessLink && directSlug) directAccessLink.href = "/shortlink-payment.html?slug=" + encodeURIComponent(directSlug);
+    // Akses langsung adalah notifikasi mandiri: tampil sejak halaman dibuka,
+    // tidak menunggu Task 1 selesai dan tidak bergantung pada notifikasi sukses.
+    directNotice?.classList.add('is-visible');
+    directNoticeClose?.addEventListener('click', () => directNotice?.classList.remove('is-visible'));
     const firstDownload = $('#top'), sponsorButton = $('#save'), scrollDownButton = $('#down');
     const summaryDownload = $('#now'), scrollUpButton = $('#up'), continueButton = $('#next');
     const successMessage = $('#success'), notice = $('#task-completion-area'), noticeClose = $('#task-notice-close');

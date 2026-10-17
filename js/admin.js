@@ -24,7 +24,10 @@
     $('#image-ad-enabled').checked=!!s.image_ad_enabled;
     $('#image-ad-url').value=s.image_ad_url||'';
     $('#image-ad-target').value=s.image_ad_target_url||'';
-    $('#adsterra-slots').value=(s.adsterra_slots||[]).map(x=>x.code||'').filter(Boolean).join('\n');
+    const adSlots=Array.isArray(s.adsterra_slots)?s.adsterra_slots:[];
+    for(let i=1;i<=10;i++){const field=$(`#adsterra-slot-${i}`);if(field){const item=adSlots.find(x=>Number(x.slot)===i);field.value=item?.code||'';}}
+    const endorsements=Array.isArray(s.endorsement_slots)?s.endorsement_slots:[];
+    for(let i=1;i<=5;i++){const item=endorsements.find(x=>Number(x.slot)===i)||{};const image=$(`#endorse-image-${i}`),target=$(`#endorse-target-${i}`),enabled=$(`#endorse-enabled-${i}`),preview=$(`#endorse-preview-${i}`);if(image)image.value=item.image_url||'';if(target)target.value=item.target_url||'';if(enabled)enabled.checked=!!item.enabled;if(preview&&item.image_url){preview.src=item.image_url;preview.hidden=false;}}
     $('#shortlink-redirect-enabled').checked=s.shortlink_redirect_enabled!==false;
     $('#shortlink-redirect-label').value=s.shortlink_redirect_label||'Lanjutkan';
     $('#shortlink-redirect-url').value=s.shortlink_redirect_url||'';
@@ -33,23 +36,27 @@
   }
   function collectNavVisibility(){const out={};document.querySelectorAll('[data-navbar-key]').forEach(el=>out[el.dataset.navbarKey]=el.checked);return out;}
   async function saveControlCenterSettings(){
-    const slots=$('#adsterra-slots').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    if(slots.length>12)throw new Error('Maksimal 12 slot Adsterra. Hapus baris berlebih.');
+    const slots=[];
+    for(let i=1;i<=10;i++){const code=$(`#adsterra-slot-${i}`)?.value.trim()||'';if(code)slots.push({slot:i,enabled:true,code});}
     const imageUrl=$('#image-ad-url').value.trim(),target=$('#image-ad-target').value.trim();
-    if($('#image-ad-enabled').checked&&(!/^https?:\/\//i.test(imageUrl)||!/^https?:\/\//i.test(target)))throw new Error('Iklan gambar aktif memerlukan URL gambar dan URL tujuan yang valid.');
+    if($('#image-ad-enabled').checked&&(!/^https?:\/\//i.test(imageUrl)||!/^https?:\/\//i.test(target)))throw new Error('Iklan gambar utama aktif memerlukan URL gambar dan URL tujuan yang valid.');
+    const endorsements=[];
+    for(let i=1;i<=5;i++){const image=$(`#endorse-image-${i}`)?.value.trim()||'',dest=$(`#endorse-target-${i}`)?.value.trim()||'',enabled=!!$(`#endorse-enabled-${i}`)?.checked;if(enabled&&(!/^https?:\/\//i.test(image)||!/^https?:\/\//i.test(dest)))throw new Error(`Endorsement ${i} aktif memerlukan URL gambar dan link tujuan yang valid.`);endorsements.push({slot:i,enabled,image_url:image,target_url:dest,alt:`Endorsement ${i}`});}
     const r=await rpc('admin_save_control_center_settings',{
       p_cpm:Number($('#admin-cpm').value),p_navbar_visibility:collectNavVisibility(),
-      p_adsterra_slots:slots.map((code,i)=>({slot:i+1,enabled:true,code})),
+      p_adsterra_slots:slots,
       p_image_ad_enabled:$('#image-ad-enabled').checked,p_image_ad_url:imageUrl,p_image_ad_target_url:target,
       p_shortlink_redirect_enabled:$('#shortlink-redirect-enabled').checked,
       p_shortlink_redirect_label:$('#shortlink-redirect-label').value.trim()||'Lanjutkan',
       p_shortlink_redirect_url:$('#shortlink-redirect-url').value.trim(),
-      p_shortlink_flow:{task1:true,task2:true,task3:true}
+      p_shortlink_flow:{task1:true,task2:true,task3:true},p_endorsement_slots:endorsements
     });
     return r;
   }
   $('#control-center-form').addEventListener('submit',async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await saveControlCenterSettings();msg('CPM dan pengaturan iklan berhasil disimpan.',true);}catch(x){msg(x.message||'Gagal menyimpan CPM/iklan');}finally{b.disabled=false;}});
   $('#shortlink-config-form').addEventListener('submit',async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await saveControlCenterSettings();msg('Pengaturan redirect dan navbar berhasil disimpan.',true);}catch(x){msg(x.message||'Gagal menyimpan pengaturan');}finally{b.disabled=false;}});
+  document.querySelectorAll('[data-endorse-file]').forEach(input=>input.addEventListener('change',async()=>{const slot=Number(input.dataset.endorseFile),file=input.files&&input.files[0];if(!file)return;if(!file.type.startsWith('image/')){msg('File harus berupa gambar.');input.value='';return;}if(file.size>5*1024*1024){msg('Ukuran gambar maksimal 5 MB.');input.value='';return;}input.disabled=true;try{const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';const path=`endorse-${slot}/${Date.now()}-${crypto.randomUUID()}.${ext}`;const {error}=await sb.storage.from('showlink-endorsements').upload(path,file,{upsert:true,contentType:file.type,cacheControl:'3600'});if(error)throw error;const {data}=sb.storage.from('showlink-endorsements').getPublicUrl(path);const field=$(`#endorse-image-${slot}`),preview=$(`#endorse-preview-${slot}`);field.value=data.publicUrl;preview.src=data.publicUrl;preview.hidden=false;const enabled=$(`#endorse-enabled-${slot}`);if(enabled)enabled.checked=true;msg(`Gambar endorsement ${slot} berhasil diunggah. Klik Simpan CPM & Iklan untuk menerapkan.`,true);}catch(err){msg(err.message||'Upload gambar gagal. Pastikan migrasi bucket endorsement sudah dijalankan.');}finally{input.disabled=false;}}));
+  document.querySelectorAll('[data-endorse-image]').forEach(input=>input.addEventListener('input',()=>{const preview=$(`#endorse-preview-${input.dataset.endorseImage}`);if(!preview)return;const value=input.value.trim();if(/^https?:\/\//i.test(value)){preview.src=value;preview.hidden=false;}else preview.hidden=true;}));
   const supportFields={email:'support-email',telegram:'support-telegram',youtube:'support-youtube',whatsapp:'support-whatsapp',facebook:'support-facebook'};
   async function loadSupport(){const {data,error}=await sb.from('showlink_support_contacts').select('*').eq('id',1).maybeSingle();if(error)throw error;const d=data||{};for(const [k,id] of Object.entries(supportFields)){$('#'+id).value=d[k]||'';$('#support-'+k+'-visible').checked=d[k+'_visible']!==false;}}
   $('#support-form').addEventListener('submit',async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{const row={id:1,updated_at:new Date().toISOString()};for(const [k,id] of Object.entries(supportFields)){row[k]=$('#'+id).value.trim();row[k+'_visible']=$('#support-'+k+'-visible').checked;}const {error}=await sb.from('showlink_support_contacts').upsert(row,{onConflict:'id'});if(error)throw error;msg('Kontak Support berhasil disimpan.',true);}catch(x){msg((x.message||'Gagal menyimpan kontak Support')+' Pastikan SUPPORT-CONTACTS-MIGRATION.sql sudah dijalankan di Supabase.');}finally{b.disabled=false;}});

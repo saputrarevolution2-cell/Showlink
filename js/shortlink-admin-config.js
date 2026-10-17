@@ -1,21 +1,19 @@
-/* Admin-configured sponsor placements and final destination control. */
+/* Public rendering for admin-managed Shortlink ads and endorsements. */
 (()=>{'use strict';
-async function run(){try{
- const c=window.SHOWLINK_SUPABASE||{};if(!window.supabase||!c.url||!c.anonKey)return;
- const sb=window.supabase.createClient(c.url,c.anonKey);const {data,error}=await sb.rpc('get_public_shortlink_control_settings');if(error||!data)return;
- const slots=Array.isArray(data.adsterra_slots)?data.adsterra_slots.slice(0,12):[];
+function validHttp(value){try{const u=new URL(String(value||''),location.href);return u.protocol==='http:'||u.protocol==='https:';}catch{return false;}}
+function mountAdCode(target,code){
+  if(!target||!code)return;const wrap=document.createElement('div');wrap.className='sl-admin-ad-slot';
+  const doc=new DOMParser().parseFromString(String(code),'text/html');
+  const appendNode=(parent,node)=>{if(node.nodeType===Node.TEXT_NODE){parent.appendChild(document.createTextNode(node.textContent||''));return;}if(node.nodeType!==Node.ELEMENT_NODE)return;const tag=node.tagName.toLowerCase();if(tag==='script'){const script=document.createElement('script');for(const a of [...node.attributes])script.setAttribute(a.name,a.value);script.text=node.textContent||'';parent.appendChild(script);return;}if(tag==='iframe'){const frame=document.createElement('iframe');for(const a of [...node.attributes]){if(a.name.toLowerCase().startsWith('on'))continue;frame.setAttribute(a.name,a.value);}frame.setAttribute('loading','lazy');frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-forms');parent.appendChild(frame);return;}if(!/^(div|span|a|ins|img|p|br|strong|b|em|i|small|section|article|picture|source|noscript|style)$/.test(tag))return;const el=document.createElement(tag);for(const a of [...node.attributes]){if(a.name.toLowerCase().startsWith('on'))continue;if(['href','src','data','poster'].includes(a.name.toLowerCase())&&!validHttp(a.value)&&!a.value.startsWith('//'))continue;el.setAttribute(a.name,a.value);}for(const child of [...node.childNodes])appendNode(el,child);parent.appendChild(el);};
+  for(const node of [...doc.body.childNodes])appendNode(wrap,node);target.prepend(wrap);
+}
+async function run(){try{const c=window.SHOWLINK_SUPABASE||{};if(!window.supabase||!c.url||!c.anonKey)return;const sb=window.supabase.createClient(c.url,c.anonKey);const {data,error}=await sb.rpc('get_public_shortlink_control_settings');if(error||!data)return;
+ const slots=Array.isArray(data.adsterra_slots)?data.adsterra_slots:[];
+ for(const slot of slots){const n=Number(slot.slot);if(!Number.isInteger(n)||n<1||n>10||!slot.code||slot.enabled===false)continue;const target=document.querySelector(`[data-shortlink-ad-slot="${n}"]`);if(target)mountAdCode(target,slot.code);}
  const placeholders=[...document.querySelectorAll('[data-shortlink-ad-slot]')];
- if(data.image_ad_enabled&&/^https?:\/\//i.test(data.image_ad_url||'')&&/^https?:\/\//i.test(data.image_ad_target_url||'')){
-   const wrap=document.createElement('div');wrap.className='sl-admin-image-ad';const a=document.createElement('a');a.href=data.image_ad_target_url;a.target='_blank';a.rel='noopener noreferrer sponsored';const img=document.createElement('img');img.src=data.image_ad_url;img.alt='Iklan sponsor';img.loading='lazy';img.style.cssText='display:block;width:100%;height:auto;max-height:320px;object-fit:contain;border-radius:12px';a.appendChild(img);wrap.appendChild(a);if(placeholders[0])placeholders[0].prepend(wrap);
- }
- if(data.image_ad_enabled&&/^https?:\/\//i.test(data.image_ad_url||'')&&/^https?:\/\//i.test(data.image_ad_target_url||'')){
-   const area=document.getElementById('showlink-endorsement');
-   if(area){const placeholder=area.querySelector('.endorsement-placeholder');if(placeholder)placeholder.remove();const link=document.createElement('a');link.className='sl-endorsement-button';link.href=data.image_ad_target_url;link.target='_blank';link.rel='noopener noreferrer sponsored';link.innerHTML='<i class="fa-solid fa-handshake-angle" aria-hidden="true"></i> Kunjungi Sponsor';area.appendChild(link);}
- }
- slots.forEach((slot,i)=>{if(!slot||!slot.code)return;const target=placeholders[i]||placeholders[placeholders.length-1];if(!target)return;const wrap=document.createElement('div');wrap.className='sl-admin-ad-slot';wrap.dataset.slot=String(i+1);wrap.innerHTML=slot.code;target.prepend(wrap);});
- if(document.body.dataset.shortlinkFinal==='true'&&data.shortlink_redirect_enabled){
-   const b=document.getElementById('final-admin-redirect');if(b){b.textContent=data.shortlink_redirect_label||'Lanjut ke tujuan';const adminUrl=String(data.shortlink_redirect_url||'').trim();if(/^https?:\/\//i.test(adminUrl)){b.dataset.adminDestination=adminUrl;} }
- }
+ if(data.image_ad_enabled&&validHttp(data.image_ad_url)&&validHttp(data.image_ad_target_url)&&placeholders.length){const wrap=document.createElement('div');wrap.className='sl-admin-image-ad';const a=document.createElement('a');a.href=data.image_ad_target_url;a.target='_blank';a.rel='noopener noreferrer sponsored';const img=document.createElement('img');img.src=data.image_ad_url;img.alt='Iklan sponsor';img.loading='lazy';img.style.cssText='display:block;width:100%;height:auto;max-height:320px;object-fit:contain;border-radius:12px';a.appendChild(img);wrap.appendChild(a);placeholders[0].prepend(wrap);}
+ if(data.image_ad_enabled&&validHttp(data.image_ad_url)&&validHttp(data.image_ad_target_url)){const area=document.getElementById('showlink-endorsement');if(area){area.querySelector('.endorsement-placeholder')?.remove();const link=document.createElement('a');link.className='sl-endorsement-button';link.href=data.image_ad_target_url;link.target='_blank';link.rel='noopener noreferrer sponsored';link.textContent='Kunjungi Sponsor';area.appendChild(link);}}
+ const endorsements=Array.isArray(data.endorsement_slots)?data.endorsement_slots:[];document.querySelectorAll('[data-shortlink-endorsements]').forEach(area=>{area.replaceChildren();for(const item of endorsements){if(!item||item.enabled!==true||!validHttp(item.image_url)||!validHttp(item.target_url))continue;const a=document.createElement('a');a.className='sl-endorsement-card';a.href=item.target_url;a.target='_blank';a.rel='noopener noreferrer sponsored';const img=document.createElement('img');img.src=item.image_url;img.alt=String(item.alt||'Endorsement sponsor');img.loading='lazy';const label=document.createElement('span');label.textContent=String(item.title||'Rekomendasi Sponsor');a.append(img,label);area.appendChild(a);}if(!area.children.length)area.remove();});
+ if(document.body.dataset.shortlinkFinal==='true'&&data.shortlink_redirect_enabled){const b=document.getElementById('final-admin-redirect');if(b){b.textContent=data.shortlink_redirect_label||'Lanjut ke tujuan';const adminUrl=String(data.shortlink_redirect_url||'').trim();if(validHttp(adminUrl))b.dataset.adminDestination=adminUrl;}}
  }catch(e){console.debug('ShowLink sponsor settings not applied',e)}}
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();
-})();
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});else run();})();

@@ -30,7 +30,12 @@
     const status = $('#status'), status2 = $('#status2');
     const slug = new URLSearchParams(location.search).get('slug') || sessionStorage.getItem('sl_slug') || '';
     const directLink = $('#sl-direct-access-link');
+    const directNotice = $('#sl-direct-floating-notice');
+    const directNoticeClose = $('#sl-direct-notice-close');
+    const noticeClose = $('#task-notice-close');
     if (directLink && slug) directLink.href = `/shortlink-payment.html?slug=${encodeURIComponent(slug)}`;
+    directNotice?.classList.add('is-visible');
+    directNoticeClose?.addEventListener('click', () => directNotice?.classList.remove('is-visible'));
     const first = $('#top'), sponsor = $('#save'), down = $('#down'), summary = $('#now'), up = $('#up'), next = $('#next');
     const success = $('#success'), completionArea = $('#task-completion-area');
     let started = false, summaryStarted = false, completed = false, navigating = false;
@@ -45,7 +50,7 @@
       scrollTo(sponsor || down);
     });
     sponsor?.addEventListener('click', () => {
-      const slot = $('[data-shortlink-ad-slot="1"]');
+      const slot = $('[data-shortlink-ad-slot]');
       const link = slot?.querySelector('a[href]');
       if (link && /^https?:$/.test(new URL(link.href).protocol)) window.open(link.href, '_blank', 'noopener,noreferrer');
       else scrollTo(slot);
@@ -76,6 +81,10 @@
     next?.addEventListener('click', async () => {
       if (!completed || navigating || next.disabled) return; navigating = true; setBusy(next, true);
       await countdown(status, 5000, 'Membuka Task 3'); flow.go('task3.html');
+    });
+    noticeClose?.addEventListener('click', () => {
+      completionArea?.classList.remove('is-visible');
+      if (completed && next) { next.classList.remove('hide'); next.style.position='static'; next.style.width='100%'; next.style.marginTop='12px'; const card=document.querySelector('.card'); if(card&&!card.contains(next))card.appendChild(next); }
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
