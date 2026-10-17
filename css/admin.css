@@ -282,3 +282,7 @@ html[data-theme="dark"] .status-pill.status-banned { background: #4a2028; color:
 .admin-endorsement-slot legend{font-weight:800;padding:0 6px}
 .admin-endorse-preview{max-width:100%;max-height:140px;object-fit:contain;border-radius:8px}
 .admin-adsterra-grid textarea{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+
+
+/* Page-specific task ad and endorsement controls */
+.admin-page-ads{display:grid;gap:14px}.admin-page-ads-section{border:1px solid var(--border,#dbe2ef);border-radius:14px;padding:12px;background:var(--surface,#fff)}.admin-page-ads-section>summary{cursor:pointer;font-weight:850;padding:8px 4px}.admin-page-ads-section .admin-adsterra-grid{margin-top:10px}.admin-page-ads-section .admin-endorsement-settings{margin-top:14px}.admin-page-ads-section .admin-endorsement-slot{margin-top:10px}

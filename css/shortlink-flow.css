@@ -15,3 +15,16 @@
 .sl-task-footer nav{display:flex;gap:14px;flex-wrap:wrap}.sl-task-footer nav a{color:inherit;text-decoration:none;font-weight:700}.sl-task-footer nav a:hover{color:#6457e8}
 html[data-theme="dark"] .sl-endorsement-card{background:#131d2f;border-color:#2b3850;color:#e7ecf5}
 html[data-theme="dark"] .sl-task-footer{border-color:#2b3850;color:#aebbd0}
+
+
+/* Shared fixed task navigation and ticker */
+.task-auth-nav{position:sticky;top:0;z-index:1000;box-shadow:0 4px 16px rgba(20,25,50,.06)}
+.sl-promo-ticker{position:relative;z-index:900;overflow:hidden;background:linear-gradient(90deg,#5b4ae6,#276fce);color:#fff;padding:10px 0;font-size:13px;font-weight:800;white-space:nowrap}
+.sl-promo-ticker span{display:inline-block;padding-left:100%;animation:sl-promo-marquee 27s linear infinite}
+.sl-promo-ticker a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.sl-promo-ticker:hover span{animation-play-state:paused}
+@keyframes sl-promo-marquee{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+.sl-direct-floating-notice{z-index:950}
+[data-shortlink-ad-page]{scroll-margin-top:100px}
+
+.sl-generated-ad-slot{display:block;min-height:90px;margin:18px 0;padding:14px;border:1px dashed #c8d1e0;border-radius:14px;background:rgba(120,130,160,.06);scroll-margin-top:100px}.sl-generated-ad-slot>strong{display:block;margin-bottom:8px}.sl-generated-ad-slot p{margin:6px 0;font-size:13px;color:#64748b}.sl-generated-ad-slot .sl-admin-ad-slot{width:100%;overflow:hidden}.sl-generated-ad-slot iframe{max-width:100%}html[data-theme="dark"] .sl-generated-ad-slot{border-color:#34445d;background:rgba(30,42,62,.5)}html[data-theme="dark"] .sl-generated-ad-slot p{color:#b6c2d3}html[data-theme="dark"] .task-auth-nav{background:#111a2b;border-color:#273349}html[data-theme="dark"] .task-auth-brand{color:#f3f6fc}
