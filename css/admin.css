@@ -275,7 +275,7 @@ html[data-theme="dark"] .status-pill.status-banned { background: #4a2028; color:
 
 /* Multi-slot Adsterra and image endorsement controls */
 .admin-adsterra-grid,.admin-endorsement-settings{display:grid;gap:12px;margin-top:18px}
-.admin-adsterra-grid>label,.admin-endorsement-slot{padding:14px;border:1px solid var(--border,#e2e7f0);border-radius:14px;background:var(--card,#fff)}
+.admin-adsterra-grid>label,.admin-endorsement-slot{padding:14px;border:1px solid var(--sl-border);border-radius:14px;background:var(--sl-surface-soft);color:var(--sl-text)}
 .admin-endorsement-settings{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
 .admin-endorsement-settings>strong,.admin-endorsement-settings>p{grid-column:1/-1}
 .admin-endorsement-slot{min-width:0;margin:0;display:grid;gap:10px}
@@ -285,4 +285,28 @@ html[data-theme="dark"] .status-pill.status-banned { background: #4a2028; color:
 
 
 /* Page-specific task ad and endorsement controls */
-.admin-page-ads{display:grid;gap:14px}.admin-page-ads-section{border:1px solid var(--border,#dbe2ef);border-radius:14px;padding:12px;background:var(--surface,#fff)}.admin-page-ads-section>summary{cursor:pointer;font-weight:850;padding:8px 4px}.admin-page-ads-section .admin-adsterra-grid{margin-top:10px}.admin-page-ads-section .admin-endorsement-settings{margin-top:14px}.admin-page-ads-section .admin-endorsement-slot{margin-top:10px}
+.admin-page-ads{display:grid;gap:14px}.admin-page-ads-section{border:1px solid var(--sl-border);border-radius:14px;padding:12px;background:var(--sl-surface);color:var(--sl-text)}.admin-page-ads-section>summary{cursor:pointer;font-weight:850;padding:8px 4px}.admin-page-ads-section .admin-adsterra-grid{margin-top:10px}.admin-page-ads-section .admin-endorsement-settings{margin-top:14px}.admin-page-ads-section .admin-endorsement-slot{margin-top:10px}
+
+/* Pending withdrawal summary and accessible dark-mode form surfaces */
+.admin-list{display:grid;gap:12px;min-width:0}
+.admin-withdraw-item{display:grid;gap:10px;padding:13px;border:1px solid var(--sl-border);border-radius:12px;background:var(--sl-surface-soft);min-width:0}
+.admin-withdraw-item-main{display:grid;gap:3px;min-width:0}
+.admin-withdraw-item-main strong{color:var(--sl-text);overflow-wrap:anywhere}
+.admin-withdraw-item-main span{font-weight:800;color:var(--sl-purple)}
+.admin-withdraw-item-main small,.admin-withdraw-empty span,.admin-withdraw-error span{color:var(--sl-muted);font-size:12px;overflow-wrap:anywhere}
+.admin-withdraw-empty,.admin-withdraw-error{display:grid;gap:8px;padding:16px;border:1px dashed var(--sl-border);border-radius:12px;color:var(--sl-text)}
+.admin-withdraw-empty>i{font-size:22px;color:var(--sl-green)}
+.admin-withdraw-error{border-color:rgba(220,38,38,.4)}
+.admin-withdraw-error strong{color:var(--sl-red)}
+.admin-withdraw-error .app-btn{justify-self:start}
+html[data-theme="dark"] .admin-page .admin-adsterra-grid>label,
+html[data-theme="dark"] .admin-page .admin-endorsement-slot,
+html[data-theme="dark"] .admin-page .admin-page-ads-section{background:var(--sl-surface-soft);border-color:var(--sl-border);color:var(--sl-text)}
+html[data-theme="dark"] .admin-page .admin-adsterra-grid textarea,
+html[data-theme="dark"] .admin-page .admin-endorsement-slot input,
+html[data-theme="dark"] .admin-page .admin-page-ads-section input,
+html[data-theme="dark"] .admin-page .admin-page-ads-section select,
+html[data-theme="dark"] .admin-page .admin-page-ads-section textarea{background:#0b1220;color:#f1f5f9;border-color:#394963;color-scheme:dark}
+html[data-theme="dark"] .admin-page .admin-adsterra-grid textarea::placeholder,
+html[data-theme="dark"] .admin-page .admin-page-ads-section input::placeholder,
+html[data-theme="dark"] .admin-page .admin-page-ads-section textarea::placeholder{color:#9aa9bf}

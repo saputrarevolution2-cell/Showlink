@@ -33,3 +33,16 @@ html[data-theme="dark"] .magazine{background:#131d2f;border-color:#28354a}html[d
 html[data-theme="dark"] .sl-direct-floating-notice{background:#131d2f;border-color:#33415a;color:#e7ecf5}
 html[data-theme="dark"] .sl-direct-notice-close{background:#26324b;color:#dedaff}
 @media(max-width:760px){.sl-direct-floating-notice{top:76px;right:10px;width:calc(100vw - 20px);padding:16px}}
+
+
+/* Consistent compact direct-access notice: unobtrusive and anchored to the bottom. */
+.sl-direct-floating-notice{display:none;position:fixed;z-index:10001;right:14px;bottom:14px;top:auto;width:min(290px,calc(100vw - 24px));max-height:42vh;overflow:auto;padding:12px 13px;background:var(--sl-card,#fff);border:1px solid var(--sl-border,#dfe4f2);border-radius:14px;box-shadow:0 10px 32px rgba(18,25,48,.18);color:var(--sl-text,#253047)}
+.sl-direct-floating-notice.is-visible{display:block;animation:slNoticeIn .22s ease-out}
+.sl-direct-floating-notice .sl-notice-direct{margin:0;padding:0;border:0}
+.sl-direct-floating-notice .sl-notice-direct>strong{display:block;padding-right:24px;font-size:12px;line-height:1.35}
+.sl-direct-floating-notice .sl-notice-direct p{font-size:11px;line-height:1.45;margin:5px 0 8px}
+.sl-direct-floating-notice .sl-direct-access-button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:34px;padding:7px 9px;font-size:11px;border-radius:9px}
+.sl-direct-notice-close{position:absolute;right:6px;top:6px;width:25px;height:25px;border:0;border-radius:8px;background:#eef0ff;color:#4b42bb;cursor:pointer}
+html[data-theme="dark"] .sl-direct-floating-notice{background:#131d2f;border-color:#33415a;color:#e7ecf5}
+html[data-theme="dark"] .sl-direct-notice-close{background:#26324b;color:#dedaff}
+@media(max-width:760px){.sl-direct-floating-notice{right:10px;bottom:10px;top:auto;width:min(270px,calc(100vw - 20px));max-height:35vh;padding:11px}}
