@@ -1,5 +1,9 @@
 -- ShowLink: page-specific Adsterra and endorsement slots (7 + 2 per page).
 -- Run after SHORTLINK-ADS-ENDORSEMENTS-MIGRATION.sql in Supabase SQL Editor.
+-- Self-healing schema guard: some projects may have skipped the earlier endorsement migration.
+ALTER TABLE public.showlink_admin_settings
+  ADD COLUMN IF NOT EXISTS endorsement_slots jsonb NOT NULL DEFAULT '[]'::jsonb;
+
 CREATE OR REPLACE FUNCTION public.admin_save_control_center_settings(
  p_cpm numeric,
  p_navbar_visibility jsonb,
