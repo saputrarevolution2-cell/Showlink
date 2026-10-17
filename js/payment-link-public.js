@@ -396,8 +396,18 @@
     currentView = 'gateway';
     currentData = data;
     const amount = Number(data.buyer_amount ?? data.price ?? 0);
-    let settings={cashi_enabled:true,bayargg_enabled:true};
-    try { const sb=await window.ShowLinkSupabase.load(); const {data:g,error}=await sb.rpc('admin_get_gateway_settings'); if(!error && g) settings=g; } catch (_) {}
+    // Public pages may only read the deliberately limited public RPC, never admin settings.
+    let settings={cashi_enabled:false,bayargg_enabled:false};
+    let settingsLoadFailed=false;
+    try {
+      const sb=await window.ShowLinkSupabase.load();
+      const {data:g,error}=await sb.rpc('get_public_gateway_settings');
+      if(error || !g) throw error || new Error('Gateway settings are unavailable');
+      settings={cashi_enabled:g.cashi_enabled===true,bayargg_enabled:g.bayargg_enabled===true};
+    } catch (error) {
+      settingsLoadFailed=true;
+      console.error('Unable to load public gateway settings:', error);
+    }
     const cashiDisabled=!settings.cashi_enabled, bayarDisabled=!settings.bayargg_enabled;
     app.innerHTML = `
       ${data.thumbnail_url ? `<div class="pl-cover"><img src="${esc(data.thumbnail_url)}" alt=""></div>` : `<div class="pl-cover"><i class="fa-solid fa-server"></i></div>`}
@@ -410,7 +420,7 @@
           ${cashiDisabled?'':`<button class="pl-gateway-card" data-gateway="CASHI" type="button"><span class="pl-gateway-icon"><i class="fa-solid fa-bolt"></i></span><span class="pl-gateway-copy"><strong>${esc(t('server1'))}</strong><b>${esc(t('cashi'))}</b><small>QRIS &amp; payment gateway</small></span><i class="fa-solid fa-chevron-right"></i></button>`}
           ${bayarDisabled?'':`<button class="pl-gateway-card" data-gateway="BAYAR_GG" type="button"><span class="pl-gateway-icon"><i class="fa-solid fa-qrcode"></i></span><span class="pl-gateway-copy"><strong>${esc(t('server2'))}</strong><b>${esc(t('bayarGG'))}</b><small>QRIS &amp; hosted checkout</small></span><i class="fa-solid fa-chevron-right"></i></button>`}
         </div>
-        ${cashiDisabled&&bayarDisabled?`<div class="pl-error"><i class="fa-solid fa-circle-exclamation"></i><p>Semua server pembayaran sedang dinonaktifkan.</p></div>`:''}
+        ${cashiDisabled&&bayarDisabled?`<div class="pl-error"><i class="fa-solid fa-circle-exclamation"></i><p>${settingsLoadFailed?'Pengaturan pembayaran gagal dimuat. Silakan muat ulang beberapa saat lagi.':'Semua server pembayaran sedang dinonaktifkan.'}</p></div>`:''}
         <div class="pl-gateway-note"><i class="fa-solid fa-shield-halved"></i> ${esc(t('gatewaySecure'))}</div>
         <button class="pl-buy pl-back-gateway" id="back-to-link" type="button"><i class="fa-solid fa-arrow-left"></i> ${esc(t('back'))}</button>
       </div>`;
