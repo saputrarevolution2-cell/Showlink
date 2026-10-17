@@ -1,7 +1,152 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Task 3 — ShowLink</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/shortlink-flow.css"><link rel="stylesheet" href="/css/task3.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/supabase-config.js"></script><script src="/js/shortlink-flow.js" defer></script><script src="/js/task3.js" defer></script><script src="/js/theme.js"></script><script src="/js/shortlink-admin-config.js" defer></script></head><body data-task="3"><header class="task-auth-nav" aria-label="Navigasi akun ShowLink"><a class="task-auth-brand" href="/" aria-label="ShowLink beranda"><i class="fa-solid fa-link"></i><span>SHOWLINK</span></a><nav class="task-auth-actions" aria-label="Akun"><a class="task-auth-login" href="/login.html">Login</a><a class="task-auth-register" href="/register.html">Register</a><button class="task-theme-toggle" type="button" data-task-theme-toggle aria-label="Ganti tema" title="Ganti tema"><i class="fa-solid fa-moon" aria-hidden="true"></i></button></nav></header><aside class="sl-direct-access-banner" aria-label="Akses langsung"><div class="sl-direct-access-copy"><strong><i class="fa-solid fa-bolt"></i> Mau langsung akses?</strong><span>Lewati tahapan gratis dan pilih akses langsung melalui pembayaran.</span></div><a href="/shortlink-payment.html" id="sl-direct-access-link" class="sl-direct-access-button">Lanjut Akses Langsung <i class="fa-solid fa-arrow-right"></i></a></aside><main class="wrap"><section class="card"><div class="brand">SHOWLINK · TASK 3</div><h1 id="title">Task 3</h1><p>Selesaikan tahapan untuk melanjutkan. Iklan sponsor ditampilkan secara terpisah dan tidak perlu diklik untuk membuka langkah berikutnya.</p><div class="bar"><span style="width:75%"></span></div><button class="btn" id="top">Download</button><p class="status" id="status" aria-live="polite"></p>
-<div class="ad" data-shortlink-ad-slot="7"><strong>Area iklan sponsor 1</strong><p>Iklan opsional, tidak perlu diklik untuk melanjutkan.</p></div>
-<button class="btn hide" data-step="1">Lanjutkan langkah 1</button>
-<div class="article-space"><p>Silakan tunggu tahapan selesai. Iklan sponsor ditampilkan secara terpisah.</p></div>
-<div class="ad" data-shortlink-ad-slot="8"><strong>Area iklan sponsor 2</strong></div><button class="btn hide" data-step="2" disabled>Lanjutkan langkah 2</button>
-<div class="article-space"><p>Terima kasih sudah menunggu.</p></div><div class="sl-endorsement-grid" data-shortlink-endorsements aria-label="Endorsement sponsor"></div><button class="btn hide" data-step="3" disabled>Lanjutkan langkah 3</button>
-<button class="btn alt hide" id="redirect-final">Redirect ke Final</button></section><footer class="foot sl-task-footer"><div class="sl-footer-brand"><i class="fa-solid fa-link"></i> Copyright ShowLink Best CPM Indonesia</div><nav aria-label="Tautan footer"><a href="/">Home</a><a href="/about.html#terms-policy">Terms &amp; Policy</a><a href="/about.html">About</a></nav></footer></main></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Task 3 — ShowLink</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/shortlink-flow.css">
+  <link rel="stylesheet" href="/css/task3.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase-config.js"></script>
+  <script src="/js/shortlink-flow.js" defer></script>
+  <script src="/js/task3.js" defer></script>
+  <script src="/js/theme.js"></script>
+  <script src="/js/shortlink-admin-config.js" defer></script>
+</head>
+<body data-task="3">
+  <header class="task-auth-nav" aria-label="Navigasi akun ShowLink">
+    <a class="task-auth-brand" href="/" aria-label="ShowLink beranda"><i class="fa-solid fa-link"></i><span>SHOWLINK</span></a>
+    <nav class="task-auth-actions" aria-label="Akun">
+      <a class="task-auth-login" href="/login.html">Login</a>
+      <a class="task-auth-register" href="/register.html">Register</a>
+      <button class="task-theme-toggle" type="button" data-task-theme-toggle aria-label="Ganti tema" title="Ganti tema"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
+    </nav>
+  </header>
+
+  <aside id="sl-direct-floating-notice" class="sl-direct-floating-notice is-visible" aria-label="Akses langsung">
+    <button class="sl-direct-notice-close" id="sl-direct-notice-close" type="button" aria-label="Tutup notifikasi akses langsung"><i class="fa-solid fa-xmark"></i></button>
+    <div class="sl-notice-direct">
+      <strong><i class="fa-solid fa-bolt"></i> Mau langsung akses?</strong>
+      <p>Lewati tahapan gratis dan pilih akses langsung melalui pembayaran.</p>
+      <a href="/shortlink-payment.html" id="sl-direct-access-link" class="sl-direct-access-button">Lanjut Akses Langsung <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+  </aside>
+
+  <main class="wrap task3-wrap">
+    <section class="card task3-intro-card">
+      <div class="brand"><i class="fa-solid fa-handshake-angle"></i> SHOWLINK · FREE ACCESS</div>
+      <h1 id="title">Task 3 — Endorsement & Monetisasi</h1>
+      <p>Selesaikan tiga langkah berurutan untuk membuka halaman Final. Setiap indikator loading muncul tepat di bawah tombol yang sedang diproses. Iklan dan sponsor bersifat opsional—tidak perlu diklik untuk menyelesaikan task.</p>
+      <div class="bar"><span style="width:75%"></span></div>
+      <button class="btn task-action-button" id="top" type="button"><i class="fa-solid fa-play"></i> Mulai Task 3</button>
+      <p class="status task-button-status" id="status-top" aria-live="polite"></p>
+      <div class="ad task-ad-slot" data-shortlink-ad-slot="7"><strong><i class="fa-solid fa-rectangle-ad"></i> Area Iklan Sponsor</strong><p>Iklan ditampilkan terpisah. Klik iklan tidak diperlukan untuk melanjutkan.</p></div>
+    </section>
+
+    <section class="magazine task3-magazine" aria-labelledby="magazine-title">
+      <header class="magazine-hero">
+        <div class="magazine-kicker"><i class="fa-solid fa-handshake-angle"></i> SHOWLINK CREATOR MAGAZINE</div>
+        <h2 id="magazine-title">Panduan Endorsement: Bangun Kepercayaan, Jangkau Audiens, dan Kembangkan Penghasilan</h2>
+        <p class="magazine-deck">Pelajari dasar kerja sama brand, cara menyiapkan media kit, memilih sponsor yang relevan, dan menjaga transparansi kepada audiens.</p>
+        <div class="magazine-meta"><span><i class="fa-regular fa-clock"></i> 7–9 menit membaca</span><span><i class="fa-solid fa-bullhorn"></i> Panduan kreator</span></div>
+        <img class="magazine-cover" src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1400&q=85" alt="Tim kreatif merencanakan kampanye dan kerja sama brand" loading="lazy">
+      </header>
+
+      <div class="magazine-layout">
+        <article class="magazine-article">
+          <section class="magazine-story">
+            <h3><i class="fa-solid fa-handshake"></i> 1. Apa itu endorsement?</h3>
+            <p>Endorsement adalah kerja sama promosi ketika kreator, publisher, komunitas, atau pemilik media membantu memperkenalkan produk maupun layanan kepada audiensnya. Bentuk kerja samanya bisa berupa gambar promosi, ulasan, artikel sponsor, video, tautan afiliasi, atau kampanye khusus sesuai kesepakatan kedua pihak.</p>
+            <p>Kerja sama yang baik tidak hanya menempatkan iklan. Kreator perlu memahami produk, menyampaikan informasi yang akurat, dan menjaga agar promosi tetap relevan dengan kebutuhan pembaca. Kepercayaan audiens merupakan aset jangka panjang; jangan menyampaikan klaim yang belum dapat dibuktikan atau menyamarkan konten berbayar sebagai rekomendasi independen.</p>
+            <img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1100&q=80" alt="Tim bekerja bersama merancang kolaborasi" loading="lazy">
+            <p class="magazine-caption">Kolaborasi yang sehat dimulai dari tujuan kampanye dan komunikasi yang jelas.</p>
+          </section>
+
+          <section class="magazine-story">
+            <h3><i class="fa-solid fa-chart-line"></i> 2. Cara menyiapkan media kit yang profesional</h3>
+            <p>Media kit adalah ringkasan yang membantu calon sponsor memahami profil media dan audiens. Cantumkan topik utama, jenis konten, format promosi yang tersedia, rentang jangkauan yang didukung data, contoh pekerjaan, serta alamat kontak bisnis. Gunakan statistik dengan rentang tanggal yang jelas dan jangan membesar-besarkan jumlah pengunjung atau hasil kampanye.</p>
+            <ul><li><strong>Profil audiens:</strong> jelaskan topik, wilayah, dan karakter audiens jika datanya tersedia.</li><li><strong>Contoh karya:</strong> tampilkan artikel atau kampanye yang relevan.</li><li><strong>Paket yang jelas:</strong> jelaskan format, durasi tayang, revisi, dan laporan yang akan diberikan.</li><li><strong>Kontak bisnis:</strong> gunakan alamat komunikasi yang dapat diakses dan responsif.</li></ul>
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1100&q=80" alt="Dashboard data untuk menyusun laporan media" loading="lazy">
+            <p class="magazine-caption">Gunakan data yang nyata dan mudah diverifikasi saat menawarkan kerja sama.</p>
+          </section>
+
+          <section class="task3-step-section" aria-labelledby="step1-heading">
+            <div class="task3-step-heading"><span class="task3-step-number">1</span><div><h3 id="step1-heading">Langkah 1 — Tinjau peluang sponsor</h3><p>Buka langkah ini untuk melanjutkan proses secara berurutan.</p></div></div>
+            <button class="btn task-action-button hide" data-step="1" type="button"><i class="fa-solid fa-magnifying-glass-chart"></i> Lanjutkan langkah 1</button>
+            <p class="status task-button-status" id="status-step-1" aria-live="polite"></p>
+          </section>
+
+          <div class="ad task-ad-slot" data-shortlink-ad-slot="8"><strong><i class="fa-solid fa-rectangle-ad"></i> Area Iklan Sponsor</strong><p>Slot iklan sponsor kedua. Tidak perlu diklik untuk membuka langkah selanjutnya.</p></div>
+
+          <section class="magazine-story">
+            <h3><i class="fa-solid fa-bullseye"></i> 3. Pilih sponsor yang sesuai dengan audiens</h3>
+            <p>Relevansi lebih penting daripada sekadar banyaknya penawaran. Periksa reputasi brand, kualitas produk, syarat promosi, kebijakan privasi, dan kesesuaian dengan topik media. Hindari produk atau klaim yang menyesatkan. Pastikan juga hak penggunaan gambar, logo, dan materi kampanye telah disepakati sebelum dipublikasikan.</p>
+            <p>Catat tujuan kampanye sejak awal: apakah sponsor ingin meningkatkan pengenalan merek, mendatangkan kunjungan, atau menjelaskan fitur produk. Sepakati tautan tujuan, periode tayang, format laporan, dan siapa yang bertanggung jawab atas revisi. Kesepakatan tertulis membantu mengurangi salah paham.</p>
+            <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1100&q=80" alt="Diskusi tim tentang strategi kampanye" loading="lazy">
+            <p class="magazine-caption">Pilih kemitraan yang sesuai dan sepakati hasil yang realistis sejak awal.</p>
+          </section>
+
+          <section class="task3-step-section" aria-labelledby="step2-heading">
+            <div class="task3-step-heading"><span class="task3-step-number">2</span><div><h3 id="step2-heading">Langkah 2 — Periksa detail kampanye</h3><p>Pastikan informasi dan tujuan tautan jelas sebelum melanjutkan.</p></div></div>
+            <button class="btn task-action-button hide" data-step="2" type="button" disabled><i class="fa-solid fa-list-check"></i> Lanjutkan langkah 2</button>
+            <p class="status task-button-status" id="status-step-2" aria-live="polite"></p>
+          </section>
+
+          <div class="ad task-ad-slot" data-shortlink-ad-slot="9"><strong><i class="fa-solid fa-rectangle-ad"></i> Area Iklan Sponsor</strong><p>Slot iklan sponsor ketiga. Iklan opsional dan tidak memengaruhi penyelesaian task.</p></div>
+
+          <section class="magazine-story">
+            <h3><i class="fa-solid fa-coins"></i> 4. Mengelola pendapatan kerja sama dengan bijak</h3>
+            <p>Pendapatan endorsement tidak selalu sama setiap bulan. Nilainya bergantung pada ruang lingkup pekerjaan, ukuran dan keterlibatan audiens, kebutuhan produksi, hak penggunaan konten, durasi kampanye, serta hasil negosiasi. Tetapkan harga berdasarkan biaya dan nilai pekerjaan yang masuk akal, bukan janji bahwa satu promosi pasti menghasilkan penjualan tertentu.</p>
+            <ul><li>Hitung waktu produksi, biaya aset, dan jumlah revisi yang disepakati.</li><li>Pisahkan biaya produksi dari biaya penggunaan konten untuk iklan berbayar jika relevan.</li><li>Simpan bukti kesepakatan, invoice, dan laporan kampanye.</li><li>Evaluasi hasil berdasarkan metrik yang disepakati, bukan hanya likes.</li></ul>
+            <div class="magazine-tip"><i class="fa-solid fa-lightbulb"></i><div><strong>Tips kreator</strong><p>Gunakan ringkasan performa yang jujur dan jelaskan keterbatasan data. Jangan menjamin CPM, jumlah penjualan, atau pendapatan yang tidak dapat dikendalikan.</p></div></div>
+          </section>
+
+          <section class="magazine-story">
+            <h3><i class="fa-solid fa-images"></i> 5. Etika iklan dan keterbukaan kepada pengunjung</h3>
+            <p>Berikan label yang mudah dipahami seperti “Iklan”, “Sponsor”, atau “Konten berbayar”. Pastikan gambar tidak menyesatkan dan tautan mengarah ke tujuan yang dijelaskan. Jangan meminta pengunjung mengeklik iklan untuk membuka task atau mendapatkan imbalan. Iklan sponsor harus tetap terpisah dari tombol navigasi utama.</p>
+            <p>Jangan memasang gambar atau logo milik pihak lain tanpa izin yang sesuai. Untuk materi yang diunggah admin, gunakan aset yang memiliki hak pakai dan pastikan tautan tujuan menggunakan HTTPS bila tersedia. Periksa tampilan di layar ponsel agar gambar tidak terpotong dan tombol tetap mudah digunakan.</p>
+            <img src="https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1100&q=80" alt="Tim pemasaran meninjau materi promosi" loading="lazy">
+            <p class="magazine-caption">Promosi yang transparan membantu melindungi kepercayaan pengunjung.</p>
+          </section>
+
+          <section class="magazine-story task3-endorsement-section">
+            <h3><i class="fa-solid fa-star"></i> 6. Open endorsement dan peluang kolaborasi</h3>
+            <p>ShowLink membuka ruang bagi brand dan mitra yang ingin menjangkau pengguna melalui materi promosi yang relevan. Calon mitra dapat menyiapkan nama brand, deskripsi produk, sasaran audiens, format konten, periode kampanye, serta tautan tujuan. Semua detail perlu ditinjau sebelum tayang agar informasi tetap akurat dan pengalaman pengunjung terjaga.</p>
+            <p>Slot di bawah ini menampilkan materi endorsement yang diaktifkan admin. Setiap kartu dapat mengarah ke halaman sponsor yang telah ditentukan. Ketersediaan slot tidak berarti ada kerja sama yang dijamin, dan pengunjung tidak perlu mengeklik kartu sponsor untuk melanjutkan task.</p>
+            <div class="sl-endorsement-grid" data-shortlink-endorsements aria-label="Gambar endorsement sponsor"></div>
+            <div class="magazine-tip"><i class="fa-solid fa-envelope-open-text"></i><div><strong>Ingin mengajukan kerja sama?</strong><p>Siapkan profil brand, tujuan kampanye, materi gambar yang memiliki hak pakai, dan tautan resmi. Hubungi pengelola melalui kanal kontak resmi ShowLink untuk pembahasan lebih lanjut.</p></div></div>
+          </section>
+
+          <section class="task3-step-section" aria-labelledby="step3-heading">
+            <div class="task3-step-heading"><span class="task3-step-number">3</span><div><h3 id="step3-heading">Langkah 3 — Selesaikan Task 3</h3><p>Setelah langkah sebelumnya selesai, tombol ini akan terbuka.</p></div></div>
+            <button class="btn task-action-button hide" data-step="3" type="button" disabled><i class="fa-solid fa-circle-check"></i> Lanjutkan langkah 3</button>
+            <p class="status task-button-status" id="status-step-3" aria-live="polite"></p>
+          </section>
+
+          <div class="ad task-ad-slot" data-shortlink-ad-slot="10"><strong><i class="fa-solid fa-rectangle-ad"></i> Area Iklan Sponsor</strong><p>Slot iklan sponsor keempat, terpisah dari alur penyelesaian.</p></div>
+
+          <section class="task3-final-section">
+            <h3><i class="fa-solid fa-flag-checkered"></i> Siap menuju halaman Final?</h3>
+            <p>Setelah tiga langkah selesai, tombol Final akan tersedia di bawah ini.</p>
+            <button class="btn alt task-action-button hide" id="redirect-final" type="button"><i class="fa-solid fa-arrow-right"></i> Redirect ke Final</button>
+            <p class="status task-button-status" id="status-final" aria-live="polite"></p>
+          </section>
+
+          <footer class="magazine-footer"><i class="fa-solid fa-circle-check"></i> Ringkasan: kerja sama yang relevan, informasi yang jujur, dan materi sponsor yang transparan membantu kreator membangun hubungan jangka panjang.</footer>
+        </article>
+
+        <aside class="magazine-sidebar">
+          <div class="magazine-side-card"><span class="magazine-side-label">RINGKASAN</span><h3>Checklist endorsement</h3><p><i class="fa-solid fa-check"></i> Sponsor relevan dengan audiens</p><p><i class="fa-solid fa-check"></i> Klaim promosi dapat diverifikasi</p><p><i class="fa-solid fa-check"></i> Hak pakai gambar sudah jelas</p><p><i class="fa-solid fa-check"></i> Tautan tujuan diperiksa</p><p><i class="fa-solid fa-check"></i> Konten sponsor diberi label</p></div>
+          <div class="ad task-ad-slot" data-shortlink-ad-slot="6"><strong><i class="fa-solid fa-rectangle-ad"></i> Iklan Sponsor</strong><p>Area sponsor tambahan.</p></div>
+          <div class="magazine-side-card"><span class="magazine-side-label">PENGINGAT</span><h3><i class="fa-solid fa-shield-halved"></i> Aman dan transparan</h3><p>Jangan bagikan kata sandi atau kode OTP. Periksa domain dan hindari tawaran yang menjanjikan hasil pasti.</p></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot sl-task-footer"><div class="sl-footer-brand"><i class="fa-solid fa-link"></i> Copyright ShowLink Best CPM Indonesia</div><nav aria-label="Tautan footer"><a href="/">Home</a><a href="/about.html#terms-policy">Terms &amp; Policy</a><a href="/about.html">About</a></nav></footer>
+</body>
+</html>
