@@ -2537,3 +2537,20 @@ GRANT EXECUTE ON FUNCTION public.admin_set_withdrawal_mode_open(text,boolean) TO
 REVOKE ALL ON FUNCTION public.is_current_user_admin() FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.is_current_user_admin() TO authenticated;
 
+
+
+-- Public-safe payment gateway flags. Never expose admin-only settings or internal configuration.
+CREATE OR REPLACE FUNCTION public.get_public_gateway_settings()
+RETURNS jsonb
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public, extensions
+AS $$
+  SELECT jsonb_build_object(
+    'cashi_enabled', COALESCE((SELECT cashi_enabled FROM public.payment_gateway_settings WHERE id = true), false),
+    'bayargg_enabled', COALESCE((SELECT bayargg_enabled FROM public.payment_gateway_settings WHERE id = true), false)
+  );
+$$;
+REVOKE ALL ON FUNCTION public.get_public_gateway_settings() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.get_public_gateway_settings() TO anon, authenticated;
