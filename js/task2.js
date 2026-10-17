@@ -50,11 +50,10 @@
       scrollTo(sponsor || down);
     });
     sponsor?.addEventListener('click', () => {
-      const slot = $('[data-shortlink-ad-slot]');
-      const link = slot?.querySelector('a[href]');
-      if (link && /^https?:$/.test(new URL(link.href).protocol)) window.open(link.href, '_blank', 'noopener,noreferrer');
-      else scrollTo(slot);
-      if (status) status.textContent = 'Sponsor opsional. Klik iklan tidak diperlukan untuk menyelesaikan task.';
+      // This is a navigation step, not an ad-click target. Never open or trigger sponsor links here.
+      const slot = $('[data-shortlink-ad-slot="5"]');
+      scrollTo(slot);
+      if (status) status.textContent = 'Area sponsor ditampilkan terpisah. Tidak perlu mengeklik iklan untuk melanjutkan.';
     });
     down?.addEventListener('click', () => {
       down.classList.add('hide'); scrollTo($('#bottom-step'));
