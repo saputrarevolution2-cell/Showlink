@@ -2,27 +2,31 @@
 (function () {
   'use strict';
   const $ = (selector) => document.querySelector(selector);
-  function countdown(status, duration, label) {
+  function countdownButton(button, duration, label) {
     return new Promise((resolve) => {
-      if (!status) { window.setTimeout(resolve, duration); return; }
-      status.innerHTML = '';
-      const wrap = document.createElement('div'); wrap.className = 'sl-countdown';
-      const spinner = document.createElement('span'); spinner.className = 'sl-spinner'; spinner.setAttribute('aria-hidden', 'true');
-      const text = document.createElement('span'); text.className = 'sl-countdown-text';
-      const track = document.createElement('span'); track.className = 'sl-progress';
-      const fill = document.createElement('span'); track.appendChild(fill); wrap.append(spinner, text, track); status.appendChild(wrap);
+      if (!button) { window.setTimeout(resolve, duration); return; }
+      const original = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = '<span class="sl-button-loading"><span class="sl-spinner" aria-hidden="true"></span><span class="sl-button-loading-text"></span></span>';
+      const text = button.querySelector('.sl-button-loading-text');
       const start = Date.now();
       function tick() {
-        const elapsed = Date.now() - start; const remaining = Math.max(0, Math.ceil((duration - elapsed) / 1000));
-        text.textContent = `${label} ${remaining} detik`; fill.style.width = `${Math.min(100, (elapsed / duration) * 100)}%`;
-        if (elapsed >= duration) { text.textContent = `${label} selesai`; fill.style.width = '100%'; resolve(); return; }
+        const elapsed = Date.now() - start;
+        const remaining = Math.max(0, Math.ceil((duration - elapsed) / 1000));
+        if (text) text.textContent = `${label} ${remaining} dtk`;
+        if (elapsed >= duration) {
+          button.innerHTML = original;
+          button.disabled = false;
+          button.setAttribute('data-step-ready', 'true');
+          resolve();
+          return;
+        }
         requestAnimationFrame(tick);
       }
       tick();
     });
   }
   function scrollToElement(element) { if (element) element.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-  function setBusy(button, busy) { if (button) button.disabled = busy; }
   function init() {
     if (!window.SLF) return;
     const flow = window.SLF, status = $('#status'), statusSave = $('#save-status'), status2 = $('#status2');
@@ -35,24 +39,37 @@
     const adBackdrop = $('#sl-first-click-ad-backdrop');
     const firstClickAd = adBackdrop?.querySelector('[data-shortlink-ad-slot="7"]');
     const firstClickAdClose = $('#sl-first-click-ad-close');
-    let firstClickAdHandled = false;
-    const closeFirstClickAd = () => { if (adBackdrop) adBackdrop.hidden = true; };
-    firstClickAdClose?.addEventListener('click', closeFirstClickAd);
-    adBackdrop?.addEventListener('click', (event) => { if (event.target === adBackdrop) closeFirstClickAd(); });
-    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && adBackdrop && !adBackdrop.hidden) closeFirstClickAd(); });
-    document.addEventListener('pointerdown', (event) => {
-      if (firstClickAdHandled || !firstClickAd || window.scrollY > 100 || event.clientY > window.innerHeight) return;
-      if (event.target.closest('a,button,input,textarea,select,[role="button"]')) return;
-      const pendingCode = firstClickAd.dataset.slPendingCode;
-      if (!pendingCode || typeof window.SL_MOUNT_ADMIN_AD !== 'function') return;
-      firstClickAdHandled = true;
-      window.SL_MOUNT_ADMIN_AD(firstClickAd, pendingCode);
-      delete firstClickAd.dataset.slPendingCode;
-      if (!firstClickAd.hidden && firstClickAd.querySelector('.sl-admin-ad-slot')) {
-        adBackdrop.hidden = false;
-        firstClickAdClose?.focus({ preventScroll: true });
+    let adMounted = false, adTimer = 0;
+    const fallbackAdCode = `<script>atOptions = {'key':'9040f068da4e9c10ece09b284e9903d1','format':'iframe','height':50,'width':320,'params':{}};<\/script><script src="https://www.highrevenueformat.com/9040f068da4e9c10ece09b284e9903d1/invoke.js"><\/script>`;
+    const scheduleFloatingAd = (delay = 11000) => {
+      window.clearTimeout(adTimer);
+      adTimer = window.setTimeout(showFloatingAd, delay);
+    };
+    const showFloatingAd = () => {
+      if (!adBackdrop || !firstClickAd) return;
+      if (!adMounted) {
+        const configuredCode = firstClickAd.dataset.slPendingCode || '';
+        const codeToMount = configuredCode.includes('9040f068da4e9c10ece09b284e9903d1') ? configuredCode : fallbackAdCode;
+        if (typeof window.SL_MOUNT_ADMIN_AD === 'function') {
+          window.SL_MOUNT_ADMIN_AD(firstClickAd, codeToMount);
+        }
+        delete firstClickAd.dataset.slPendingCode;
+        adMounted = firstClickAd.dataset.slAdMounted === 'true' || firstClickAd.classList.contains('sl-atoptions-banner-loaded');
       }
-    }, { once: false, passive: true });
+      if (adMounted) adBackdrop.hidden = false;
+      else scheduleFloatingAd(11000);
+    };
+    const hideFloatingAd = () => {
+      if (adBackdrop) adBackdrop.hidden = true;
+      scheduleFloatingAd(11000);
+    };
+    firstClickAdClose?.addEventListener('click', hideFloatingAd);
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && adBackdrop && !adBackdrop.hidden) hideFloatingAd();
+    });
+    // First appearance is after 11 seconds. The same loaded banner is reused after hiding;
+    // it is not re-requested every cycle, avoiding artificial repeated ad impressions.
+    scheduleFloatingAd(11000);
     const firstDownload = $('#top'), sponsorButton = $('#save'), scrollDownButton = $('#down');
     const summaryDownload = $('#now'), scrollUpButton = $('#up'), continueButton = $('#next');
     const successMessage = $('#success'), notice = $('#task-completion-area'), noticeClose = $('#task-notice-close');
@@ -61,17 +78,19 @@
       .catch((error) => { if (status) status.textContent = error.message || 'Data shortlink belum bisa dimuat.'; });
 
     firstDownload?.addEventListener('click', async () => {
-      if (started || firstDownload.disabled) return; started = true; setBusy(firstDownload, true); firstDownload.classList.add('hide');
-      await countdown(status, 10000, 'Menyiapkan langkah pertama');
-      sponsorButton?.classList.remove('hide'); scrollDownButton?.classList.remove('hide'); setBusy(firstDownload, false);
-      if (status) status.textContent = 'Langkah pertama selesai. Kamu bisa melanjutkan ke bawah atau membuka sponsor secara opsional.';
+      if (started || firstDownload.disabled) return; started = true;
+      await countdownButton(firstDownload, 10000, 'Loading');
+      firstDownload.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Selesai'; firstDownload.disabled = true;
+      sponsorButton?.classList.remove('hide'); scrollDownButton?.classList.remove('hide');
+      if (status) status.textContent = 'Langkah pertama selesai. Lanjutkan ke bawah atau buka tautan sponsor secara opsional.';
       scrollToElement(sponsorButton || scrollDownButton);
     });
-    // Download Save is a local step timer; ad links remain separately labelled and optional.
+    // Loading stays inside the button that the visitor pressed.
     sponsorButton?.addEventListener('click', async () => {
-      if (sponsorStarted || sponsorButton.disabled) return; sponsorStarted = true; setBusy(sponsorButton, true); sponsorButton.classList.add('hide');
-      await countdown(statusSave, 10000, 'Menyiapkan langkah Download Save');
-      setBusy(sponsorButton, false); scrollDownButton?.classList.remove('hide');
+      if (sponsorStarted || sponsorButton.disabled) return; sponsorStarted = true;
+      await countdownButton(sponsorButton, 10000, 'Loading');
+      sponsorButton.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Selesai'; sponsorButton.disabled = true;
+      scrollDownButton?.classList.remove('hide');
       if (statusSave) statusSave.textContent = 'Langkah Download Save selesai.';
       scrollToElement(scrollDownButton);
     });
@@ -80,9 +99,10 @@
       window.setTimeout(() => { summaryDownload?.classList.remove('hide'); scrollToElement(summaryDownload); }, 500);
     });
     summaryDownload?.addEventListener('click', async () => {
-      if (summaryStarted || summaryDownload.disabled) return; summaryStarted = true; setBusy(summaryDownload, true); summaryDownload.classList.add('hide');
-      await countdown(status2, 10000, 'Memproses langkah download');
-      scrollUpButton?.classList.remove('hide'); setBusy(summaryDownload, false);
+      if (summaryStarted || summaryDownload.disabled) return; summaryStarted = true;
+      await countdownButton(summaryDownload, 10000, 'Loading');
+      summaryDownload.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Selesai'; summaryDownload.disabled = true;
+      scrollUpButton?.classList.remove('hide');
       if (status2) status2.textContent = 'Selesai. Tekan Next Up untuk kembali ke atas dan menyelesaikan Task 1.';
       scrollToElement(scrollUpButton);
     });
@@ -99,8 +119,9 @@
     });
     continueButton?.addEventListener('click', async () => {
       if (!completing || navigating || continueButton.disabled) return; navigating = true;
-      continueButton.classList.add('hide'); if (successMessage) successMessage.classList.add('hide'); setBusy(continueButton, true);
-      await countdown(status, 5000, 'Menyiapkan pilihan berikutnya');
+      if (successMessage) successMessage.classList.add('hide');
+      await countdownButton(continueButton, 5000, 'Loading');
+      continueButton.classList.add('hide');
       const choices = document.createElement('div'); choices.className = 'sl-next-choices';
       const task2 = document.createElement('a'); task2.className = 'btn task1-btn task1-btn-blue'; task2.href = '/task2.html' + (directSlug ? '?slug=' + encodeURIComponent(directSlug) : ''); task2.innerHTML = '<i class="fa-solid fa-arrow-right"></i> Lanjut ke Task 2';
       const paid = document.createElement('a'); paid.className = 'btn task1-btn task1-btn-green'; paid.href = directAccessLink?.href || '/shortlink-payment.html'; paid.innerHTML = '<i class="fa-solid fa-bolt"></i> Akses Langsung (Berbayar)';
