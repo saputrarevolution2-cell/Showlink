@@ -67,43 +67,10 @@ function parseAndMount(target,code){
  if(hasHeadContent){for(const node of [...doc.head.childNodes])appendSafeNode(document.head,node,true);}
  for(const node of nodes)appendSafeNode(target,node,false);
 }
-function mountAtOptionsBannerCode(target,code){
- // Adsterra atOptions/invoke.js units share the global `atOptions` variable.
- // Running several snippets in the page context can make every invoke.js read
- // the last unit's options. Give each banner its own document/global context.
- const doc=new DOMParser().parseFromString(String(code),'text/html');
- const scripts=[...doc.querySelectorAll('script')];
- const pairs=[];
- for(let i=0;i<scripts.length-1;i++){
-   const inline=scripts[i];const invoke=scripts[i+1];
-   if(!inline.src&&/\batOptions\s*=/.test(inline.textContent||'')&&/invoke\.js(?:[?#]|$)/i.test(invoke.getAttribute('src')||'')){
-     pairs.push({html:inline.outerHTML+'\n'+invoke.outerHTML,source:(inline.textContent||'')+'\n'+(invoke.getAttribute('src')||'')});i++;
-   }
- }
- if(!pairs.length)return false;
- const wrap=document.createElement('div');wrap.className='sl-admin-ad-slot sl-atoptions-banner-list';
- wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:100%;';
- for(const pair of pairs){
-   const widthMatch=pair.source.match(/\bwidth\s*['"]?\s*:\s*(\d+)/i);
-   const heightMatch=pair.source.match(/\bheight\s*['"]?\s*:\s*(\d+)/i);
-   const width=Math.max(1,Math.min(970,Number(widthMatch?.[1]||320)));
-   const height=Math.max(1,Math.min(600,Number(heightMatch?.[1]||100)));
-   const frame=document.createElement('iframe');
-   frame.title='Iklan Adsterra';frame.loading='lazy';frame.referrerPolicy='strict-origin-when-cross-origin';
-   frame.style.cssText=`display:block;width:min(${width}px,100%);max-width:100%;height:${height}px;border:0;overflow:hidden;flex:0 0 auto;`;
-   frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;min-height:0;overflow:hidden}body{display:flex;justify-content:center;align-items:flex-start}body>iframe{max-width:100%!important}img{max-width:100%!important;height:auto}</style></head><body>'+pair.html+'</body></html>';
-   wrap.appendChild(frame);
- }
- target.prepend(wrap);
- target.dataset.slAdMounted='true';
- target.classList.add('sl-atoptions-banner-loaded');
- return true;
-}
 function mountAdCode(target,code){
  if(!target||!code||target.dataset.slAdMounted==='true')return;
  target.classList.add('sl-ad-active');
  target.querySelectorAll(':scope > strong, :scope > p').forEach(el=>{el.hidden=true;});
- if(/\batOptions\s*=/.test(String(code))&&/invoke\.js/i.test(String(code))&&mountAtOptionsBannerCode(target,code))return;
  if(isGlobalCode(code)){
    target.dataset.slAdMounted='true';target.hidden=true;
    const doc=new DOMParser().parseFromString(String(code),'text/html');
@@ -121,7 +88,7 @@ function ensurePageSlot(page,n,legacyTargets=[]){
  if(target&&!target.dataset.shortlinkAdPage){target.dataset.shortlinkAdPage=page;target.dataset.shortlinkAdSlot=String(n);return target;}
  target=document.createElement('div');target.className='ad task-ad-slot sl-generated-ad-slot';target.dataset.shortlinkAdPage=page;target.dataset.shortlinkAdSlot=String(n);target.innerHTML='<strong><i class="fa-solid fa-rectangle-ad"></i> Area iklan '+page.toUpperCase()+' '+n+'</strong><p>Iklan sponsor opsional; tidak perlu diklik untuk melanjutkan.</p>';
  const magazine=document.querySelector('.magazine');const sections=magazine?[...magazine.querySelectorAll('article,section.magazine-story,section.task3-step-section')]:[];
- if(magazine&&sections.length){const anchor=sections[Math.min(n-1,sections.length-1)];anchor.insertAdjacentElement('afterend',target);}else{const footer=document.querySelector('footer');if(footer)footer.insertAdjacentElement('beforebegin',target);else (document.querySelector('main')||document.body).appendChild(target);}return target;
+ if(magazine&&sections.length){const anchor=sections[page==='task2'?(n-1)%sections.length:Math.min(n-1,sections.length-1)];anchor.insertAdjacentElement('afterend',target);}else{const footer=document.querySelector('footer');if(footer)footer.insertAdjacentElement('beforebegin',target);else (document.querySelector('main')||document.body).appendChild(target);}return target;
 }
 async function run(){
  try{
@@ -147,15 +114,10 @@ async function run(){
    document.body.dataset.adIntensityPercent=String(percent);
    document.body.dataset.adIntensitySlotCap=String(maxPageSlot);
    const slots=Array.isArray(data.adsterra_slots)?data.adsterra_slots:[];
-   // Task 1 slots 21–23 are a Popunder rotation pool. Load only one distinct
-   // configured Popunder script per page visit; never force three popups at once.
-   const task1PopunderPool=page==='task1'&&maxPageSlot>=21?slots.filter(slot=>slot&&slot.page==='task1'&&[21,22,23].includes(Number(slot.slot))&&slot.code&&slot.enabled!==false&&isGlobalCode(slot.code)):[];
-   const chosenTask1Popunder=task1PopunderPool.length?task1PopunderPool[Math.floor(Math.random()*task1PopunderPool.length)]:null;
    const legacyTargets=[...document.querySelectorAll('[data-shortlink-ad-slot]:not([data-shortlink-ad-page])')];
    const hasPageSpecificSlots=slots.some(slot=>slot&&slot.page===page&&slot.code&&slot.enabled!==false);
    for(const slot of slots){
      const n=Number(slot.slot);if(!Number.isInteger(n)||!slot.code||slot.enabled===false)continue;
-     if(page==='task1'&&[21,22,23].includes(n)&&slot!==chosenTask1Popunder)continue;
      if(slot.page){if(slot.page!==page||n<1||n>maxPageSlot)continue;mountAdCode(ensurePageSlot(page,n,legacyTargets),slot.code);}
      else {
        // Legacy configuration is a fallback only. Do not combine legacy and page-specific
