@@ -671,3 +671,22 @@ html[data-theme="dark"] .app-card,html[data-theme="dark"] .app-stat,html[data-th
 .dashboard-announcement-copy a{display:inline-flex;gap:6px;align-items:center;margin-top:9px;color:var(--primary);font-size:.82rem;font-weight:700;text-decoration:none}
 .dashboard-announcement-copy a:hover{text-decoration:underline}
 .announcement-empty{margin:0;padding:14px;border:1px dashed var(--sl-border);border-radius:12px;color:var(--sl-muted);font-size:.88rem}
+
+
+/* Dashboard polish: clear separation between cards and a more readable trend chart */
+.dashboard-clean{display:flex;flex-direction:column;gap:22px}
+.dashboard-clean>.clean-summary{margin:0 0 2px}
+.dashboard-clean>.clean-chart-card,.dashboard-clean>.clean-daily-card,.dashboard-clean>.announcement-card{margin:0;min-width:0}
+.dashboard-clean .clean-chart-card{padding:24px;min-height:390px}
+.dashboard-clean .line-chart{min-height:300px;margin-top:18px;overflow:visible}
+.dashboard-clean .line-chart svg{width:100%;height:auto;min-height:285px;overflow:visible}
+.dashboard-clean .chart-axis-label{font-size:13px}
+.dashboard-clean .chart-line-path{stroke-width:4}
+.dashboard-clean .chart-point{stroke-width:4}
+.dashboard-clean .chart-detail{margin-top:14px;padding:14px 16px;font-size:1rem}
+.dashboard-clean .clean-daily-card{margin-top:2px}
+.dashboard-clean .links-table-wrap{width:100%;max-width:100%;overflow-x:auto;border-radius:12px}
+.dashboard-clean .daily-statistics-table{min-width:900px}
+.dashboard-clean .daily-statistics-table th,.dashboard-clean .daily-statistics-table td{padding:14px 16px;font-size:.82rem}
+.dashboard-clean .announcement-card{margin-bottom:2px}
+@media(max-width:700px){.dashboard-clean{gap:17px}.dashboard-clean .clean-chart-card{min-height:0;padding:17px}.dashboard-clean .line-chart{min-height:245px}.dashboard-clean .line-chart svg{min-height:235px}.dashboard-clean .chart-axis-label{font-size:12px}.dashboard-clean .chart-detail{font-size:.88rem}.dashboard-clean .daily-statistics-table{min-width:860px}}
