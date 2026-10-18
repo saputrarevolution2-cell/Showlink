@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -13,7 +13,6 @@
   <script src="/js/supabase-config.js"></script>
   <script src="/js/shortlink-flow.js" defer></script>
   <script src="/js/task3.js" defer></script>
-  <script src="/js/theme.js"></script>
   <script src="/js/shortlink-admin-config.js" defer></script>
 </head>
 <body data-shortlink-page="task3" data-task="3">
@@ -22,7 +21,6 @@
     <nav class="task-auth-actions" aria-label="Akun">
       <a class="task-auth-login" href="/login.html">Login</a>
       <a class="task-auth-register" href="/register.html">Register</a>
-      <button class="task-theme-toggle" type="button" data-task-theme-toggle aria-label="Ganti tema" title="Ganti tema"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
     </nav>
   </header><div class="sl-promo-ticker" role="status"><span><i class="fa-solid fa-chart-line"></i> Ingin penghasilan dan pendapatan lebih besar? Daftar dan login di <a href="https://showlink.my.id">ShowLink.my.id</a> untuk mulai mengembangkan peluang monetisasi kamu.</span></div>
 
@@ -35,15 +33,21 @@
     </div>
   </aside>
 
+  <aside id="task3-floating-ad" class="task3-floating-ad" aria-label="Iklan mengambang" aria-live="polite">
+    <button id="task3-floating-ad-close" class="task3-floating-ad-close" type="button" aria-label="Tutup iklan mengambang"><i class="fa-solid fa-xmark"></i></button>
+    <div class="task3-floating-ad-heading"><i class="fa-solid fa-rectangle-ad"></i><div><strong>Iklan Sponsor</strong><span>Didukung oleh mitra iklan</span></div></div>
+    <div id="task3-floating-ad-content" class="task3-floating-ad-content"><span class="task3-ad-placeholder">Iklan sedang dimuat…</span></div>
+  </aside>
+
   <main class="wrap task3-wrap">
     <section class="card task3-intro-card">
       <div class="brand"><i class="fa-solid fa-handshake-angle"></i> SHOWLINK · FREE ACCESS</div>
       <h1 id="title">Task 3 — Endorsement & Monetisasi</h1>
-      <p>Selesaikan tiga langkah berurutan untuk membuka halaman Final. Setiap indikator loading muncul tepat di bawah tombol yang sedang diproses. Iklan dan sponsor bersifat opsional—tidak perlu diklik untuk menyelesaikan task.</p>
+      <p>Selesaikan tiga langkah berurutan untuk membuka halaman Final. Setiap langkah menampilkan status dan hitung mundur 10 detik. Kamu tidak perlu mengeklik iklan di dalam halaman sponsor.</p>
       <div class="bar"><span style="width:75%"></span></div>
       <button class="btn task-action-button" id="top" type="button"><i class="fa-solid fa-play"></i> Mulai Task 3</button>
       <p class="status task-button-status" id="status-top" aria-live="polite"></p>
-      <div class="ad task-ad-slot" data-shortlink-ad-slot="7"><strong><i class="fa-solid fa-rectangle-ad"></i> Area Iklan Sponsor</strong><p>Iklan ditampilkan terpisah. Klik iklan tidak diperlukan untuk melanjutkan.</p></div>
+      <div class="ad task-ad-slot" data-shortlink-ad-slot="7"><strong><i class="fa-solid fa-rectangle-ad"></i> Area Iklan Sponsor</strong><p>Iklan ditampilkan terpisah dari tombol langkah. Jangan mengeklik iklan secara tidak sengaja.</p></div>
     </section>
 
     <section class="magazine task3-magazine" aria-labelledby="magazine-title">
@@ -75,7 +79,7 @@
 
           <section class="task3-step-section" aria-labelledby="step1-heading">
             <div class="task3-step-heading"><span class="task3-step-number">1</span><div><h3 id="step1-heading">Langkah 1 — Tinjau peluang sponsor</h3><p>Buka langkah ini untuk melanjutkan proses secara berurutan.</p></div></div>
-            <button class="btn task-action-button hide" data-step="1" type="button"><i class="fa-solid fa-magnifying-glass-chart"></i> Lanjutkan langkah 1</button>
+            <button class="btn task-action-button hide" data-step="1" type="button"><i class="fa-solid fa-arrow-up-right-from-square"></i> Lanjutkan langkah 1</button>
             <p class="status task-button-status" id="status-step-1" aria-live="polite"></p>
           </section>
 
@@ -91,7 +95,7 @@
 
           <section class="task3-step-section" aria-labelledby="step2-heading">
             <div class="task3-step-heading"><span class="task3-step-number">2</span><div><h3 id="step2-heading">Langkah 2 — Periksa detail kampanye</h3><p>Pastikan informasi dan tujuan tautan jelas sebelum melanjutkan.</p></div></div>
-            <button class="btn task-action-button hide" data-step="2" type="button" disabled><i class="fa-solid fa-list-check"></i> Lanjutkan langkah 2</button>
+            <div class="task3-network-ad" id="task3-network-ad-2" aria-label="Area iklan langkah 2"><i class="fa-solid fa-rectangle-ad"></i><span>Iklan langkah 2 dimuat saat tombol ditekan</span></div><button class="btn task-action-button hide" data-step="2" type="button" disabled><i class="fa-solid fa-list-check"></i> Lanjutkan langkah 2</button>
             <p class="status task-button-status" id="status-step-2" aria-live="polite"></p>
           </section>
 
@@ -122,7 +126,7 @@
 
           <section class="task3-step-section" aria-labelledby="step3-heading">
             <div class="task3-step-heading"><span class="task3-step-number">3</span><div><h3 id="step3-heading">Langkah 3 — Selesaikan Task 3</h3><p>Setelah langkah sebelumnya selesai, tombol ini akan terbuka.</p></div></div>
-            <button class="btn task-action-button hide" data-step="3" type="button" disabled><i class="fa-solid fa-circle-check"></i> Lanjutkan langkah 3</button>
+            <div class="task3-network-ad" id="task3-network-ad-3" aria-label="Area iklan langkah 3"><i class="fa-solid fa-rectangle-ad"></i><span>Iklan langkah 3 dimuat saat tombol ditekan</span></div><button class="btn task-action-button hide" data-step="3" type="button" disabled><i class="fa-solid fa-circle-check"></i> Lanjutkan langkah 3</button>
             <p class="status task-button-status" id="status-step-3" aria-live="polite"></p>
           </section>
 
