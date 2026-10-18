@@ -32,6 +32,27 @@
     if (directAccessLink && directSlug) directAccessLink.href = '/shortlink-payment.html?slug=' + encodeURIComponent(directSlug);
     directNotice?.classList.add('is-visible');
     directNoticeClose?.addEventListener('click', () => directNotice?.classList.remove('is-visible'));
+    const adBackdrop = $('#sl-first-click-ad-backdrop');
+    const firstClickAd = adBackdrop?.querySelector('[data-shortlink-ad-slot="7"]');
+    const firstClickAdClose = $('#sl-first-click-ad-close');
+    let firstClickAdHandled = false;
+    const closeFirstClickAd = () => { if (adBackdrop) adBackdrop.hidden = true; };
+    firstClickAdClose?.addEventListener('click', closeFirstClickAd);
+    adBackdrop?.addEventListener('click', (event) => { if (event.target === adBackdrop) closeFirstClickAd(); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && adBackdrop && !adBackdrop.hidden) closeFirstClickAd(); });
+    document.addEventListener('pointerdown', (event) => {
+      if (firstClickAdHandled || !firstClickAd || window.scrollY > 100 || event.clientY > window.innerHeight) return;
+      if (event.target.closest('a,button,input,textarea,select,[role="button"]')) return;
+      const pendingCode = firstClickAd.dataset.slPendingCode;
+      if (!pendingCode || typeof window.SL_MOUNT_ADMIN_AD !== 'function') return;
+      firstClickAdHandled = true;
+      window.SL_MOUNT_ADMIN_AD(firstClickAd, pendingCode);
+      delete firstClickAd.dataset.slPendingCode;
+      if (!firstClickAd.hidden && firstClickAd.querySelector('.sl-admin-ad-slot')) {
+        adBackdrop.hidden = false;
+        firstClickAdClose?.focus({ preventScroll: true });
+      }
+    }, { once: false, passive: true });
     const firstDownload = $('#top'), sponsorButton = $('#save'), scrollDownButton = $('#down');
     const summaryDownload = $('#now'), scrollUpButton = $('#up'), continueButton = $('#next');
     const successMessage = $('#success'), notice = $('#task-completion-area'), noticeClose = $('#task-notice-close');
