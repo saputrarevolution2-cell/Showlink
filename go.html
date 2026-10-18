@@ -1,1 +1,91 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Pilih Akses — ShowLink</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/shortlink-flow.css"><link rel="stylesheet" href="/css/go.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/supabase-config.js"></script><script src="/js/shortlink-flow.js" defer></script><script src="/js/go.js" defer></script></head><body><main class="wrap"><section class="card"><div class="brand">SHOWLINK SHORTLINK</div><h1 id="title">Pilih cara melanjutkan</h1><p>Pilih akses gratis melalui tahapan atau akses langsung.</p><div class="notice" id="price">Memuat harga…</div><button class="btn alt" id="free">Lanjut dengan Free (AdsLink)</button><button class="btn" id="paid">Lanjut Langsung Akses Tanpa Ribet</button><p class="status" id="status"></p></section><footer class="foot">ShowLink</footer></main></body></html>
+<!doctype html>
+<html lang="id" data-theme="light" data-showlink-page-language="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#6d5dfc">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Pilih Akses — ShowLink</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/navbar.css?v=20261017-nav37">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/shortlink-flow.css">
+  <link rel="stylesheet" href="/css/go.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/supabase-config.js"></script>
+  <script src="/js/supabase-client.js"></script>
+  <script src="/js/navbar.js?v=20261019-endorse1" defer></script>
+  <script src="/js/footer.js" defer></script>
+  <script src="/js/language.js?v=20261009-nav35" defer></script>
+  <script src="/js/shortlink-flow.js" defer></script>
+  <script src="/js/go.js" defer></script>
+  <script src="/js/shortlink-admin-config.js?v=20261019-endorse1" defer></script>
+</head>
+<body class="app-page go-app" data-page-title-id="Pilih Akses — ShowLink" data-page-title-en="Choose Access — ShowLink" data-shortlink-page="go">
+  <div data-showlink-navbar></div>
+  <main class="go-main">
+    <div class="go-container">
+      <section class="go-hero">
+        <div class="go-brand"><span class="go-brand-icon"><i class="fa-solid fa-link" aria-hidden="true"></i></span><span>SHOWLINK</span></div>
+        <div class="go-heading-copy">
+          <span class="go-eyebrow">SHORTLINK ACCESS</span>
+          <h1 id="title">Judul Shortlink</h1>
+          <p>Pilih cara melanjutkan ke link tujuan:</p>
+        </div>
+      </section>
+
+      <section class="go-endorsements" aria-label="Slot endorse ShowLink">
+        <div class="go-section-heading"><span class="go-heading-icon"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></span><div><h2>Slot endorse 1</h2><p>Promosi pilihan di ShowLink</p></div></div>
+        <div class="sl-endorsement-grid go-endorsement-slot" data-shortlink-endorsements="top" aria-label="Slot endorse 1"></div>
+        <div class="go-section-heading go-section-heading-second"><span class="go-heading-icon"><i class="fa-solid fa-rectangle-ad" aria-hidden="true"></i></span><div><h2>Slot endorse 2</h2><p>Tempatkan promosi kamu di sini</p></div></div>
+        <div class="sl-endorsement-grid go-endorsement-slot" data-shortlink-endorsements="bottom" aria-label="Slot endorse 2"></div>
+        <a class="go-endorse-button" href="/endorse.html"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Buat endorse di sini <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+      </section>
+
+      <section class="go-access-card" aria-labelledby="access-heading">
+        <div class="go-access-heading"><span class="go-heading-icon"><i class="fa-solid fa-route" aria-hidden="true"></i></span><div><h2 id="access-heading">Pilih cara akses</h2><p>Pilih opsi yang paling sesuai untuk kamu.</p></div></div>
+        <div class="go-access-options">
+          <article class="go-option go-option-paid">
+            <div class="go-option-top"><span class="go-option-icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span><span class="go-option-badge">Tanpa iklan</span></div>
+            <h3>Berbayar — Tanpa Iklan</h3>
+            <p class="go-option-price">Nominal akses: <strong id="price">Memuat harga…</strong></p>
+            <p>Scan QRIS sekali, langsung ke tujuan tanpa iklan dan tanpa menunggu.</p>
+            <button class="go-button go-button-paid" id="paid" type="button">Bayar &amp; lanjut ke tujuan <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+          </article>
+          <article class="go-option go-option-free">
+            <div class="go-option-top"><span class="go-option-icon"><i class="fa-solid fa-gift" aria-hidden="true"></i></span><span class="go-option-badge">Gratis</span></div>
+            <h3>Lanjut Gratis Klik 2x — Dengan Iklan</h3>
+            <p>Menuju link tujuan dengan iklan seperti biasa. Selesaikan tahapan gratis yang tersedia untuk melanjutkan.</p>
+            <button class="go-button go-button-free" id="free" type="button">Lanjut gratis <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+          </article>
+        </div>
+        <p class="go-status" id="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="go-earn-banner" aria-labelledby="earn-title">
+        <div class="go-earn-icon"><i class="fa-solid fa-coins" aria-hidden="true"></i></div>
+        <div class="go-earn-copy">
+          <span class="go-eyebrow">MONETISASI LINK</span>
+          <h2 id="earn-title">PUNYA LINK JUGA? HASILKAN UANG DARINYA!</h2>
+          <p>ShowLink mengubah setiap link yang kamu bagikan jadi penghasilan. Pendek, aman, dan dibayar.</p>
+        </div>
+        <div class="go-earn-features">
+          <article><span><i class="fa-solid fa-link" aria-hidden="true"></i></span><div><h3>Shortlink</h3><p>Pengunjung bayar untuk lewat, atau gratis lewat iklan — kamu tetap dibayar.</p></div></article>
+          <article><span><i class="fa-solid fa-credit-card" aria-hidden="true"></i></span><div><h3>Payment Link</h3><p>Jual akses konten/link premiummu, bayaran QRIS langsung masuk saldo.</p></div></article>
+          <article><span><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></span><div><h3>Iklan &amp; Referral</h3><p>Pasang iklan sendiri dan ajak teman untuk bonus tambahan.</p></div></article>
+        </div>
+        <a class="go-register-link" href="/register.html">Daftar Gratis Sekarang <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+      </section>
+    </div>
+  </main>
+  <div data-showlink-footer></div>
+  <div class="go-empty-toast" id="go-empty-toast" role="status" aria-live="polite" hidden>
+    <button class="go-toast-close" id="go-toast-close" type="button" aria-label="Tutup notifikasi"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+    <span class="go-toast-icon"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></span>
+    <div><strong>Slot endorse sedang kosong</strong><p>Ingin promosikan produk, layanan, grup, atau media sosialmu? Pasang endorse di ShowLink.</p><a href="/endorse.html">Buat endorse di sini <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+  </div>
+</body>
+</html>
