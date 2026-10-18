@@ -91,7 +91,7 @@ function mountAtOptionsBannerCode(target,code){
    const frame=document.createElement('iframe');
    frame.title='Iklan Adsterra';frame.loading='lazy';frame.referrerPolicy='strict-origin-when-cross-origin';
    frame.style.cssText=`display:block;width:min(${width}px,100%);max-width:100%;height:${height}px;border:0;overflow:hidden;flex:0 0 auto;`;
-   frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;min-height:0;overflow:hidden}body{display:flex;justify-content:center;align-items:flex-start}</style></head><body>'+pair.html+'</body></html>';
+   frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;min-height:0;overflow:hidden}body{display:flex;justify-content:center;align-items:flex-start}body>iframe{max-width:100%!important}img{max-width:100%!important;height:auto}</style></head><body>'+pair.html+'</body></html>';
    wrap.appendChild(frame);
  }
  target.prepend(wrap);
@@ -147,10 +147,15 @@ async function run(){
    document.body.dataset.adIntensityPercent=String(percent);
    document.body.dataset.adIntensitySlotCap=String(maxPageSlot);
    const slots=Array.isArray(data.adsterra_slots)?data.adsterra_slots:[];
+   // Task 1 slots 21–23 are a Popunder rotation pool. Load only one distinct
+   // configured Popunder script per page visit; never force three popups at once.
+   const task1PopunderPool=page==='task1'&&maxPageSlot>=21?slots.filter(slot=>slot&&slot.page==='task1'&&[21,22,23].includes(Number(slot.slot))&&slot.code&&slot.enabled!==false&&isGlobalCode(slot.code)):[];
+   const chosenTask1Popunder=task1PopunderPool.length?task1PopunderPool[Math.floor(Math.random()*task1PopunderPool.length)]:null;
    const legacyTargets=[...document.querySelectorAll('[data-shortlink-ad-slot]:not([data-shortlink-ad-page])')];
    const hasPageSpecificSlots=slots.some(slot=>slot&&slot.page===page&&slot.code&&slot.enabled!==false);
    for(const slot of slots){
      const n=Number(slot.slot);if(!Number.isInteger(n)||!slot.code||slot.enabled===false)continue;
+     if(page==='task1'&&[21,22,23].includes(n)&&slot!==chosenTask1Popunder)continue;
      if(slot.page){if(slot.page!==page||n<1||n>maxPageSlot)continue;mountAdCode(ensurePageSlot(page,n,legacyTargets),slot.code);}
      else {
        // Legacy configuration is a fallback only. Do not combine legacy and page-specific

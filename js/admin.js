@@ -17,10 +17,15 @@
       for(let n=8;n<=28;n++){
         if(grid.querySelector(`[data-page-ad="${page}"][data-page-slot="${n}"]`))continue;
         const label=document.createElement('label');
-        label.textContent=`Adsterra ${page.toUpperCase()} Slot ${n}`;
+        let slotLabel=`Adsterra ${page.toUpperCase()} Slot ${n}`;
+        let slotHint=`Tempel kode/unit Adsterra ${page.toUpperCase()} slot ${n}...`;
+        if(page==='task1'&&n>=8&&n<=20){slotLabel=`Task 1 — Banner setelah artikel ${n-7}`;slotHint=`Tempel satu kode banner/native Adsterra untuk artikel ${n-7}...`;}
+        if(page==='task1'&&n>=21&&n<=23){slotLabel=`Task 1 — Popunder rotasi ${n-20}`;slotHint='Tempel satu kode Popunder Adsterra resmi. Hanya satu dari slot 21–23 dipilih per kunjungan.';}
+        if(page==='task1'&&n===24){slotLabel='Task 1 — Social Bar';slotHint='Tempel kode Social Bar Adsterra resmi.';}
+        label.textContent=slotLabel;
         const area=document.createElement('textarea');
         area.id=`page-ad-${page}-${n}`;area.dataset.pageAd=page;area.dataset.pageSlot=String(n);
-        area.rows=3;area.placeholder=`Tempel kode/unit Adsterra ${page.toUpperCase()} slot ${n}...`;
+        area.rows=3;area.placeholder=slotHint;
         label.appendChild(area);grid.appendChild(label);
       }
     }
