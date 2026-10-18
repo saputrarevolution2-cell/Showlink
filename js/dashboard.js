@@ -85,7 +85,7 @@
     renderLineChart('ads-link-chart','ads-link-detail',ads,'views');
     renderLineChart('payment-link-chart','payment-link-detail',payments,'money');
     const body=document.getElementById('dashboard-daily-stats-body');if(!body)return;
-    body.innerHTML=days.slice().reverse().map(d=>{const pay=payments.find(x=>x.key===d.key)?.value||0;return `<tr><td>${d.key}</td><td>—</td><td>—</td><td>—</td><td>${money(0)}</td><td>${money(pay)}</td></tr>`;}).join('');
+    body.innerHTML=days.slice().reverse().map(d=>{const pay=payments.find(x=>x.key===d.key)?.value||0;return `<tr><td>${d.key}</td><td>0</td><td>${money(0)}</td><td>${money(pay)}</td><td>0</td><td>0</td><td>0</td><td>${money(0)}</td></tr>`;}).join('');
   }
   function renderChart(orders){
     const box=$("#seven-day-chart"); if(!box)return;
@@ -120,19 +120,31 @@
   }
   document.addEventListener("click",e=>{const b=e.target.closest("[data-popup]");if(b)showPopup(b.dataset.popup);});
   document.addEventListener("keydown",e=>{const b=e.target.closest('[data-popup][role="button"]');if(b&&(e.key==="Enter"||e.key===" ")){e.preventDefault();showPopup(b.dataset.popup);}});
+  async function loadDashboardAnnouncements(sb, uid){
+    const list=document.getElementById('dashboard-announcements-list');
+    if(!list)return;
+    try{
+      const {data,error}=await sb.from('notifications').select('title,message,link_url,created_at').eq('user_id',uid).eq('type','announcement').order('created_at',{ascending:false}).limit(5);
+      if(error)throw error;
+      const items=data||[];
+      if(!items.length){list.innerHTML='<p class="announcement-empty">Belum ada pengumuman dari admin.</p>';return;}
+      list.innerHTML=items.map(item=>`<article class="dashboard-announcement-item"><div class="dashboard-announcement-icon"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></div><div class="dashboard-announcement-copy"><h3>${esc(item.title||'Pengumuman ShowLink')}</h3><p>${esc(item.message||'')}</p><small>${item.created_at?esc(dateTime(item.created_at)):'—'}</small>${item.link_url?`<a href="${esc(item.link_url)}">Lihat selengkapnya <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>`:''}</div></article>`).join('');
+    }catch(err){console.warn('Dashboard announcements unavailable',err);list.innerHTML='<p class="announcement-empty">Pengumuman belum dapat dimuat. Silakan coba lagi nanti.</p>';}
+  }
   async function load(){
     const sb=await window.ShowLinkSupabase.load();
     const {data:{session}}=await sb.auth.getSession();
     if(!session)return location.replace("/login.html?redirect="+encodeURIComponent(location.pathname));
     const uid=session.user.id;
+    loadDashboardAnnouncements(sb,uid);
     try{
       const {data:p}=await sb.from("profiles").select("username,display_name,is_admin").eq("id",uid).maybeSingle();
       const name=p?.username||p?.display_name||session.user.user_metadata?.username||session.user.email?.split("@")[0]||"User";
       $$('[data-user-name]').forEach(e=>e.textContent=name);
       const greetingHour=Number(new Intl.DateTimeFormat('en-US',{hour:'2-digit',hourCycle:'h23',timeZone:'Asia/Jakarta'}).format(new Date()));
       const greetingId=greetingHour>=4&&greetingHour<11?'Selamat pagi':greetingHour>=11&&greetingHour<15?'Selamat siang':greetingHour>=15&&greetingHour<18?'Selamat sore':'Selamat malam';const greeting=currentLang()==='en'?(greetingHour>=4&&greetingHour<11?'Good morning':greetingHour>=11&&greetingHour<15?'Good afternoon':greetingHour>=15&&greetingHour<18?'Good evening':'Good evening'):greetingId;
-      const heading=document.querySelector('.dashboard-hero h1');if(heading)heading.innerHTML=`${esc(greeting)}, <span data-user-name>${esc(name)}</span>! <span aria-hidden="true">👋</span>`;
-      const announcement=document.getElementById('admin-announcement-card');if(announcement&&p?.is_admin)announcement.hidden=false;
+      const greetingBox=document.getElementById('dashboard-greeting');if(greetingBox)greetingBox.innerHTML=`${esc(greeting)}, <span data-user-name>${esc(name)}</span>! <span aria-hidden="true">👋</span>`;
+
     }catch{}
     const [walletQ,linksQ,ordersQ,pasteLinksQ,shortlinkFinalQ]=await Promise.all([
       sb.from("wallets").select("available_balance,pending_balance,lifetime_earned").eq("user_id",uid).maybeSingle(),
@@ -164,6 +176,6 @@
     const incomeByLink={}; for(const o of paid)incomeByLink[o.payment_link_id]=(incomeByLink[o.payment_link_id]||0)+Number(o.seller_amount||0);
     state.links=links.map(x=>({...x,income:incomeByLink[x.id]||0}));state.page=1;renderLinks();renderPasteLinks();renderChart(orders);renderDailyStats(orders);
   }
-  document.addEventListener('submit',async e=>{if(e.target?.id!=='dashboard-announcement-form')return;e.preventDefault();const form=e.target,button=form.querySelector('button[type="submit"]'),feedback=document.getElementById('dashboard-announcement-feedback');const title=$('#dashboard-announcement-title').value.trim(),message=$('#dashboard-announcement-message').value.trim(),link=$('#dashboard-announcement-link').value.trim()||'/dashboard.html';if(!title||!message)return;if(!confirm(`Kirim pengumuman “${title}” ke seluruh anggota?`))return;button.disabled=true;if(feedback)feedback.textContent='Mengirim pengumuman…';try{const sb=await window.ShowLinkSupabase.load();const {data:{session}}=await sb.auth.getSession();if(!session)throw new Error('Sesi login berakhir. Silakan login kembali.');const {data,error}=await sb.rpc('admin_announce_all',{p_title:title,p_message:message,p_link_url:link});if(error)throw error;form.reset();$('#dashboard-announcement-link').value='/dashboard.html';if(feedback)feedback.textContent=`Pengumuman berhasil dikirim ke ${Number(data?.recipients||0)} akun.`;}catch(err){if(feedback)feedback.textContent=err.message||'Gagal mengirim pengumuman. Pastikan akun admin dan RPC tersedia.';}finally{button.disabled=false;}});
+
   document.addEventListener("DOMContentLoaded",()=>{translate();load().catch(e=>{console.error("ShowLink dashboard load failed:",e);const b=$("#dashboard-links-body");if(b)b.innerHTML=`<tr><td colspan="8" class="empty-row error-row"><i class="fa-solid fa-triangle-exclamation"></i>${t("error")}</td></tr>`;showToast(t("error"),`<p>${esc(e?.message||String(e))}</p>`);});window.addEventListener("showlink:language-change",()=>{translate();renderLinks();renderPasteLinks();});});
 })();
