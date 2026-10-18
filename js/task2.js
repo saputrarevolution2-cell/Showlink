@@ -1,8 +1,8 @@
-/* ShowLink Task 2 — page-specific flow. Shared data/navigation stays in shortlink-flow.js. */
+/* ShowLink Task 2 — same transparent editorial flow as Task 1. */
 (function () {
   'use strict';
   const $ = (selector) => document.querySelector(selector);
-  const setBusy = (button, busy) => { if (button) button.disabled = Boolean(busy); };
+  function setBusy(button, busy) { if (button) button.disabled = Boolean(busy); }
   function countdown(status, duration, label) {
     return new Promise((resolve) => {
       if (!status) { window.setTimeout(resolve, duration); return; }
@@ -27,66 +27,93 @@
   function init() {
     if (!window.SLF) return;
     const flow = window.SLF;
-    const status = $('#status'), status2 = $('#status2');
+    const status = $('#status'), statusSave = $('#save-status'), status2 = $('#status2');
     const slug = new URLSearchParams(location.search).get('slug') || sessionStorage.getItem('sl_slug') || '';
-    const directLink = $('#sl-direct-access-link');
-    const directNotice = $('#sl-direct-floating-notice');
-    const directNoticeClose = $('#sl-direct-notice-close');
-    const noticeClose = $('#task-notice-close');
+    const directLink = $('#sl-direct-access-link'), directNotice = $('#sl-direct-floating-notice');
+    const directClose = $('#sl-direct-notice-close'), noticeClose = $('#task-notice-close');
     if (directLink && slug) directLink.href = `/shortlink-payment.html?slug=${encodeURIComponent(slug)}`;
     directNotice?.classList.add('is-visible');
-    directNoticeClose?.addEventListener('click', () => directNotice?.classList.remove('is-visible'));
-    const first = $('#top'), sponsor = $('#save'), down = $('#down'), summary = $('#now'), up = $('#up'), next = $('#next');
+    directClose?.addEventListener('click', () => directNotice?.classList.remove('is-visible'));
+
+    const first = $('#top'), save = $('#save'), down = $('#down'), summary = $('#now'), up = $('#up'), next = $('#next');
     const success = $('#success'), completionArea = $('#task-completion-area');
-    let started = false, summaryStarted = false, completed = false, navigating = false;
+    const overlay = $('#task2-ad-overlay'), overlayClose = $('#task2-ad-overlay-close'), overlaySlot = $('[data-shortlink-ad-page="task2"][data-shortlink-ad-slot="7"]');
+    let started = false, saveStarted = false, summaryStarted = false, completed = false, navigating = false;
+    let overlayTimer = null;
+
     flow.get().then((data) => { const title = $('#title'); if (title) title.textContent = `${data.title || 'Shortlink'} — Task 2`; })
       .catch((error) => { if (status) status.textContent = error.message || 'Data shortlink belum bisa dimuat.'; });
 
+    // Slot 7 is reserved for an admin-managed display/native creative in the dismissible overlay.
+    // Popunder scripts belong in a separate admin slot and are never copied into the modal.
+    overlayTimer = window.setTimeout(() => {
+      const hasDisplayAd = overlaySlot && (overlaySlot.querySelector('.sl-admin-ad-slot > *, .sl-admin-image-ad, iframe, img, ins, a') || overlaySlot.dataset.slAdMounted === 'true' && !overlaySlot.classList.contains('sl-global-ad-loaded'));
+      if (hasDisplayAd && overlay) {
+        overlay.classList.add('is-visible'); overlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden'; overlayClose?.focus({ preventScroll: true });
+      }
+    }, 11000);
+    function closeOverlay() {
+      overlay?.classList.remove('is-visible'); overlay?.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+    overlayClose?.addEventListener('click', closeOverlay);
+    overlay?.addEventListener('click', (event) => { if (event.target === overlay) closeOverlay(); });
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && overlay?.classList.contains('is-visible')) closeOverlay(); });
+
     first?.addEventListener('click', async () => {
-      if (started || first.disabled) return; started = true; setBusy(first, true);
-      await countdown(status, 10000, 'Menyiapkan Task 2');
-      first.classList.add('hide'); sponsor?.classList.remove('hide'); down?.classList.remove('hide'); setBusy(first, false);
-      if (status) status.textContent = 'Langkah pertama selesai. Sponsor opsional; klik iklan tidak diperlukan.';
-      scrollTo(sponsor || down);
+      if (started || first.disabled) return;
+      started = true; setBusy(first, true); first.classList.add('hide');
+      await countdown(status, 10000, 'Menyiapkan langkah pertama');
+      save?.classList.remove('hide'); down?.classList.remove('hide'); setBusy(first, false);
+      if (status) status.textContent = 'Langkah pertama selesai. Tautan sponsor bersifat opsional.';
+      scrollTo(save || down);
     });
-    sponsor?.addEventListener('click', () => {
-      const slot = $('[data-shortlink-ad-slot]');
-      const link = slot?.querySelector('a[href]');
-      if (link && /^https?:$/.test(new URL(link.href).protocol)) window.open(link.href, '_blank', 'noopener,noreferrer');
-      else scrollTo(slot);
-      if (status) status.textContent = 'Sponsor opsional. Klik iklan tidak diperlukan untuk menyelesaikan task.';
+    save?.addEventListener('click', async () => {
+      if (saveStarted || save.disabled) return;
+      saveStarted = true; setBusy(save, true); save.classList.add('hide');
+      await countdown(statusSave || status, 10000, 'Menyiapkan langkah Download Save');
+      setBusy(save, false); down?.classList.remove('hide');
+      if (statusSave) statusSave.textContent = 'Langkah Download Save selesai.';
+      scrollTo(down);
     });
     down?.addEventListener('click', () => {
-      down.classList.add('hide'); scrollTo($('#bottom-step'));
+      down.classList.add('hide'); scrollTo($('#bottom-step') || $('.magazine-story:last-of-type'));
       window.setTimeout(() => { summary?.classList.remove('hide'); scrollTo(summary); }, 450);
     });
     summary?.addEventListener('click', async () => {
-      if (summaryStarted || summary.disabled) return; summaryStarted = true; setBusy(summary, true);
-      await countdown(status2, 7000, 'Memproses langkah berikutnya');
-      summary.classList.add('hide'); up?.classList.remove('hide'); setBusy(summary, false);
-      if (status2) status2.textContent = 'Selesai. Tekan Next Up untuk menyelesaikan Task 2.';
+      if (summaryStarted || summary.disabled) return;
+      summaryStarted = true; setBusy(summary, true); summary.classList.add('hide');
+      await countdown(status2, 10000, 'Memproses langkah download');
+      up?.classList.remove('hide'); setBusy(summary, false);
+      if (status2) status2.textContent = 'Selesai. Tekan Next Up untuk kembali ke atas dan menyelesaikan Task 2.';
       scrollTo(up);
     });
     up?.addEventListener('click', () => {
       if (completed) return; completed = true;
-      up.classList.add('hide'); sponsor?.classList.add('hide'); down?.classList.add('hide'); summary?.classList.add('hide'); first?.classList.add('hide');
+      up.classList.add('hide'); save?.classList.add('hide'); down?.classList.add('hide'); summary?.classList.add('hide'); first?.classList.add('hide');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       window.setTimeout(() => {
         try { sessionStorage.setItem(`sl_task2_complete_${flow.slug()}`, 'true'); } catch (_) {}
-        if (success) { success.textContent = '✓ Success — Task 2 Done'; success.classList.remove('hide'); }
-        if (next) { next.textContent = 'Lanjut ke Task 3'; next.classList.remove('hide'); next.disabled = false; }
+        if (success) { success.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Gass Kuyy Lanjut Cok! Task 2 selesai.'; success.classList.remove('hide'); }
+        if (next) { next.textContent = 'Gass Kuyy Lanjut Cok'; next.classList.remove('hide'); next.disabled = false; }
         completionArea?.classList.add('is-visible'); if (status) status.textContent = '';
         next?.focus({ preventScroll: true });
-      }, 400);
+      }, 450);
     });
     next?.addEventListener('click', async () => {
-      if (!completed || navigating || next.disabled) return; navigating = true; setBusy(next, true);
-      await countdown(status, 5000, 'Membuka Task 3'); flow.go('task3.html');
+      if (!completed || navigating || next.disabled) return;
+      navigating = true; next.classList.add('hide'); if (success) success.classList.add('hide'); setBusy(next, true);
+      await countdown(status, 5000, 'Menyiapkan pilihan berikutnya');
+      const choices = document.createElement('div'); choices.className = 'sl-next-choices';
+      const task3 = document.createElement('a'); task3.className = 'btn task2-btn task2-btn-blue';
+      task3.href = '/task3.html' + (slug ? '?slug=' + encodeURIComponent(slug) : ''); task3.innerHTML = '<i class="fa-solid fa-arrow-right"></i> Lanjut ke Task 3';
+      const paid = document.createElement('a'); paid.className = 'btn task2-btn task2-btn-green';
+      paid.href = directLink?.href || '/shortlink-payment.html'; paid.innerHTML = '<i class="fa-solid fa-bolt"></i> Akses Langsung (Berbayar)';
+      choices.append(task3, paid); completionArea?.appendChild(choices); completionArea?.classList.add('is-visible'); navigating = false; setBusy(next, false);
     });
-    noticeClose?.addEventListener('click', () => {
-      completionArea?.classList.remove('is-visible');
-      if (completed && next) { next.classList.remove('hide'); next.style.position='static'; next.style.width='100%'; next.style.marginTop='12px'; const card=document.querySelector('.card'); if(card&&!card.contains(next))card.appendChild(next); }
-    });
+    noticeClose?.addEventListener('click', () => completionArea?.classList.remove('is-visible'));
+    window.addEventListener('pagehide', () => { if (overlayTimer) window.clearTimeout(overlayTimer); document.body.style.overflow = ''; }, { once: true });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 })();
