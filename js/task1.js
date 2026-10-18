@@ -81,8 +81,8 @@
       continueButton.classList.add('hide'); if (successMessage) successMessage.classList.add('hide'); setBusy(continueButton, true);
       await countdown(status, 5000, 'Menyiapkan pilihan berikutnya');
       const choices = document.createElement('div'); choices.className = 'sl-next-choices';
-      const task2 = document.createElement('a'); task2.className = 'btn'; task2.href = '/task2.html' + (directSlug ? '?slug=' + encodeURIComponent(directSlug) : ''); task2.innerHTML = '<i class="fa-solid fa-arrow-right"></i> Lanjut ke Task 2';
-      const paid = document.createElement('a'); paid.className = 'btn alt'; paid.href = directAccessLink?.href || '/shortlink-payment.html'; paid.innerHTML = '<i class="fa-solid fa-bolt"></i> Akses Langsung (Berbayar)';
+      const task2 = document.createElement('a'); task2.className = 'btn task1-btn task1-btn-blue'; task2.href = '/task2.html' + (directSlug ? '?slug=' + encodeURIComponent(directSlug) : ''); task2.innerHTML = '<i class="fa-solid fa-arrow-right"></i> Lanjut ke Task 2';
+      const paid = document.createElement('a'); paid.className = 'btn task1-btn task1-btn-green'; paid.href = directAccessLink?.href || '/shortlink-payment.html'; paid.innerHTML = '<i class="fa-solid fa-bolt"></i> Akses Langsung (Berbayar)';
       choices.append(task2, paid); notice?.appendChild(choices); notice?.classList.add('is-visible'); navigating = false;
     });
     noticeClose?.addEventListener('click', () => notice?.classList.remove('is-visible'));
