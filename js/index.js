@@ -8,7 +8,7 @@
       workflowKicker:'ALUR PEMBAYARAN', workflowTitle:'Dari link sampai saldo, semuanya terlihat jelas.', workflowText:'Gunakan visual platform di bawah untuk menunjukkan pengalaman Payment Link, checkout, balance, dan payout.', capPayment:'Buat dan bagikan link pembayaran.', capCheckout:'Pengalaman pembayaran yang sederhana.', capBalance:'Pantau saldo dan settlement.', capGlobal:'Tujuan penarikan lokal dan internasional.',
       paymentKicker:'PAYMENT & WITHDRAW', paymentTitle:'Banyak pilihan metode, satu pengalaman premium.', paymentText:'Logo bank dan e-wallet di bawah adalah showcase metode. Metode yang benar-benar dapat diproses tetap mengikuti gateway/provider yang aktif.', bankTitle:'Bank', bankSub:'Bank transfer & local banking', walletTitle:'E-wallet & Global', walletSub:'Digital wallet, QR & international methods',
       withdrawKicker:'WITHDRAW', withdrawTitle:'Saldo masuk, penarikan tetap sederhana.', withdrawText:'Tampilkan tujuan penarikan bank atau e-wallet lokal maupun internasional. Provider payout yang aktif menentukan metode yang benar-benar dapat diproses.', localBank:'Bank Lokal', localWallet:'E-wallet Lokal', globalBank:'International', withdrawNote:'Dukungan payout bergantung pada provider/gateway yang dikonfigurasi di platform.',
-      ctaTitle:'Mulai menerima pembayaran dengan Payment Link.', ctaText:'Buat akun dan bangun pengalaman checkout yang terlihat profesional dari link pertama kamu.', cta:'Buat Payment Link', disclaimer:'Metode pembayaran dan payout pada website adalah showcase; ketersediaan transaksi mengikuti gateway/provider yang aktif.'
+      topMemberKicker:'KOMUNITAS SHOWLINK', topMemberTitle:'Top Member ShowLink', topMemberText:'Sorotan member dan pencapaian komunitas. Peringkat contoh ini adalah tampilan demo, bukan data ranking langsung.', withdrawShowKicker:'WITHDRAW SHOWCASE', withdrawShowTitle:'Contoh tampilan penarikan berhasil', withdrawShowText:'Mockup ilustrasi untuk promosi. Bukan bukti transaksi atau konfirmasi pembayaran nyata.', carouselHint:'Geser ke samping atau gunakan tombol panah', ctaTitle:'Mulai menerima pembayaran dengan Payment Link.', ctaText:'Buat akun dan bangun pengalaman checkout yang terlihat profesional dari link pertama kamu.', cta:'Buat Payment Link', disclaimer:'Metode pembayaran dan payout pada website adalah showcase; ketersediaan transaksi mengikuti gateway/provider yang aktif.'
     },
     en: {
       heroBadge:'SHOWLINK · PAYMENT PLATFORM', heroTitle:'One link to', heroAccent:'accept payments.', heroText:'Create a Payment Link, share it anywhere, accept payments through active gateways, then manage your balance and withdrawals from one platform.', start:'Get Started', seePlatform:'View Platform', point1:'Payment Link ready to share', point2:'Verified checkout', point3:'Mobile friendly', qrBadge:'PAYMENT · PLATFORM · WITHDRAW',
@@ -16,7 +16,7 @@
       workflowKicker:'PAYMENT FLOW', workflowTitle:'From link to balance, everything stays clear.', workflowText:'Use the platform visuals below to showcase Payment Link, checkout, balance, and payout experiences.', capPayment:'Create and share a payment link.', capCheckout:'A simple payment experience.', capBalance:'Monitor balance and settlement.', capGlobal:'Local and international withdrawal destinations.',
       paymentKicker:'PAYMENT & WITHDRAW', paymentTitle:'More methods, one premium experience.', paymentText:'The bank and e-wallet logos below are a showcase. Actual transaction availability depends on the active gateway/provider.', bankTitle:'Banks', bankSub:'Bank transfer & local banking', walletTitle:'E-wallet & Global', walletSub:'Digital wallet, QR & international methods',
       withdrawKicker:'WITHDRAW', withdrawTitle:'Money in, withdrawals kept simple.', withdrawText:'Support bank or e-wallet withdrawal destinations locally and internationally. The active payout provider determines what can actually be processed.', localBank:'Local Bank', localWallet:'Local E-wallet', globalBank:'International', withdrawNote:'Payout support depends on the provider/gateway configured on the platform.',
-      ctaTitle:'Start accepting payments with Payment Link.', ctaText:'Create an account and build a professional checkout experience from your very first link.', cta:'Create Payment Link', disclaimer:'Payment and payout methods shown on this website are showcase content; actual availability follows the active gateway/provider.'
+      topMemberKicker:'SHOWLINK COMMUNITY', topMemberTitle:'ShowLink Top Members', topMemberText:'Member highlights and community achievements. These sample rankings are a demo, not live ranking data.', withdrawShowKicker:'WITHDRAW SHOWCASE', withdrawShowTitle:'Successful withdrawal design examples', withdrawShowText:'Illustrative promotional mockups, not real transaction receipts or payment confirmations.', carouselHint:'Swipe sideways or use the arrow buttons', ctaTitle:'Start accepting payments with Payment Link.', ctaText:'Create an account and build a professional checkout experience from your very first link.', cta:'Create Payment Link', disclaimer:'Payment and payout methods shown on this website are showcase content; actual availability follows the active gateway/provider.'
     }
   };
 
@@ -34,7 +34,41 @@
     });
   }
 
-  document.addEventListener('DOMContentLoaded', translate);
+  function initWithdrawCarousel() {
+    const root = document.getElementById('withdraw-showcase-carousel');
+    if (!root || root.dataset.ready) return;
+    root.dataset.ready = '1';
+    const viewport = root.querySelector('.withdraw-carousel-viewport');
+    const slides = [...root.querySelectorAll('.withdraw-slide')];
+    const dots = [...document.querySelectorAll('.withdraw-carousel-dots button')];
+    let current = 0, timer;
+    const go = (index) => {
+      current = (index + slides.length) % slides.length;
+      slides[current].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      dots.forEach((dot, i) => dot.classList.toggle('is-active', i === current));
+    };
+    root.querySelector('.prev')?.addEventListener('click', () => { go(current - 1); restart(); });
+    root.querySelector('.next')?.addEventListener('click', () => { go(current + 1); restart(); });
+    dots.forEach((dot, i) => dot.addEventListener('click', () => { go(i); restart(); }));
+    const restart = () => { clearInterval(timer); timer = setInterval(() => go(current + 1), 4500); };
+    let scrollTick;
+    viewport.addEventListener('scroll', () => {
+      clearTimeout(scrollTick);
+      scrollTick = setTimeout(() => {
+        const center = viewport.scrollLeft + viewport.clientWidth / 2;
+        let best = 0, distance = Infinity;
+        slides.forEach((slide, i) => { const c = slide.offsetLeft + slide.offsetWidth / 2; const d = Math.abs(c - center); if (d < distance) { distance = d; best = i; } });
+        current = best; dots.forEach((dot, i) => dot.classList.toggle('is-active', i === current));
+      }, 100);
+    }, { passive: true });
+    root.addEventListener('mouseenter', () => clearInterval(timer));
+    root.addEventListener('mouseleave', restart);
+    root.addEventListener('focusin', () => clearInterval(timer));
+    root.addEventListener('focusout', restart);
+    restart();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => { translate(); initWithdrawCarousel(); });
   window.addEventListener('showlink:language-change', translate);
   window.addEventListener('storage', e => {
     if (e.key === 'showlink-language') translate();
