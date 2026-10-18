@@ -47,13 +47,27 @@
   }
   function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
+  let selectedAccount=null;
+  function saveAccount(user,email){
+    const username=user?.user_metadata?.username||user?.user_metadata?.display_name||email.split("@")[0];
+    let list=[];try{list=JSON.parse(localStorage.getItem("showlink_login_accounts")||"[]")}catch{}
+    list=[{username,email},...list.filter(x=>String(x.email||"").toLowerCase()!==email.toLowerCase())].slice(0,5);
+    try{localStorage.setItem("showlink_login_accounts",JSON.stringify(list));localStorage.setItem("showlink_last_email",email)}catch{}
+  }
+  function renderRecentAccounts(){
+    const wrap=$("[data-recent-accounts]"),listEl=$("[data-recent-account-list]");if(!wrap||!listEl)return;
+    let list=[];try{list=JSON.parse(localStorage.getItem("showlink_login_accounts")||"[]")}catch{}
+    if(!Array.isArray(list)||!list.length)return;
+    wrap.hidden=false;listEl.innerHTML="";
+    list.forEach(account=>{if(!account?.email)return;const b=document.createElement("button");b.type="button";b.className="auth-account-chip";b.innerHTML='<span class="account-avatar"></span><span class="account-name"><span class="account-label"></span><small class="account-email"></small></span><i class="fa-solid fa-chevron-right"></i>';b.querySelector('.account-avatar').textContent=(account.username||account.email).slice(0,1).toUpperCase();b.querySelector('.account-label').textContent=account.username||account.email.split('@')[0];b.querySelector('.account-email').textContent=account.email;b.addEventListener('click',()=>{selectedAccount=account;const emailInput=$("#login-email"),field=$("[data-login-email-field]"),pass=$("#login-password");if(emailInput)emailInput.value=account.email;if(field)field.hidden=true;listEl.querySelectorAll('.auth-account-chip').forEach(x=>x.classList.remove('is-selected'));b.classList.add('is-selected');if(pass)pass.focus();let switcher=$("[data-switch-account]");if(!switcher){switcher=document.createElement('button');switcher.type='button';switcher.className='auth-link auth-switch-account';switcher.dataset.switchAccount='';switcher.textContent='Gunakan email lain';wrap.after(switcher);switcher.addEventListener('click',()=>{selectedAccount=null;if(field)field.hidden=false;if(emailInput)emailInput.value='';switcher.remove();listEl.querySelectorAll('.auth-account-chip').forEach(x=>x.classList.remove('is-selected'));pass?.focus()})}});listEl.appendChild(b)});
+  }
   async function login(form){
     const email=$('[name="email"]',form)?.value.trim(),password=$('[name="password"]',form)?.value||"";
     if(!email)return showAlert(message("requiredField","Email wajib diisi."));
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return showAlert(message("invalidEmail","Format email tidak valid."));
     if(!password)return showAlert(message("requiredField","Password wajib diisi."));
     const sb=await getClient();if(!sb)return;const btn=$(".auth-submit",form);if(btn)btn.disabled=true;
-    try{const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;persistUser(data.user);redirectDashboard()}
+    try{const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;persistUser(data.user);saveAccount(data.user,email);redirectDashboard()}
     catch(e){showAlert(e.message||message("loginFailed","Email atau password salah."))}finally{if(btn)btn.disabled=false}
   }
 
@@ -88,7 +102,7 @@
   }
 
   function setup(){
-    setupPasswordToggles();setupStrength();
+    setupPasswordToggles();setupStrength();renderRecentAccounts();
     document.querySelectorAll("[data-auth-form]").forEach(form=>form.addEventListener("submit",e=>{e.preventDefault();hideAlert();form.dataset.authForm==="register"?register(form):login(form)}));
     document.querySelectorAll('[data-i18n="forgotPassword"]').forEach(a=>a.addEventListener("click",e=>{e.preventDefault();location.href="/reset-password.html"}));
     document.querySelectorAll("[data-google-auth]").forEach(b=>b.addEventListener("click",googleAuth));
