@@ -1,4 +1,4 @@
--- ShowLink: page-specific Adsterra and endorsement slots (7 + 2 per page).
+-- ShowLink: page-specific Adsterra and endorsement slots (28 + 2 per page).
 -- Run after SHORTLINK-ADS-ENDORSEMENTS-MIGRATION.sql in Supabase SQL Editor.
 -- Self-healing schema guard: some projects may have skipped the earlier endorsement migration.
 ALTER TABLE public.showlink_admin_settings
@@ -22,11 +22,11 @@ BEGIN
  IF NOT public.is_current_user_admin() THEN RAISE EXCEPTION 'ADMIN_REQUIRED'; END IF;
  IF p_cpm IS NULL OR p_cpm < 0 OR p_cpm > 1000000 THEN RAISE EXCEPTION 'CPM_INVALID'; END IF;
  IF jsonb_typeof(coalesce(p_adsterra_slots,'[]'::jsonb)) <> 'array' THEN RAISE EXCEPTION 'ADSTERRA_SLOTS_MUST_BE_ARRAY'; END IF;
- IF jsonb_array_length(coalesce(p_adsterra_slots,'[]'::jsonb)) > 28 THEN RAISE EXCEPTION 'MAX_28_PAGE_ADSTERRA_SLOTS'; END IF;
+ IF jsonb_array_length(coalesce(p_adsterra_slots,'[]'::jsonb)) > 112 THEN RAISE EXCEPTION 'MAX_112_PAGE_ADSTERRA_SLOTS'; END IF;
  IF EXISTS (
    SELECT 1 FROM jsonb_array_elements(coalesce(p_adsterra_slots,'[]'::jsonb)) x(value)
    WHERE coalesce(x.value->>'page','') NOT IN ('task1','task2','task3','final')
-      OR coalesce(x.value->>'slot','') !~ '^[1-7]$'
+      OR coalesce(x.value->>'slot','') !~ '^([1-9]|1[0-9]|2[0-8])$'
       OR coalesce(x.value->>'enabled','true') NOT IN ('true','false')
  ) THEN RAISE EXCEPTION 'INVALID_PAGE_ADSTERRA_SLOT'; END IF;
  IF jsonb_typeof(coalesce(p_endorsement_slots,'[]'::jsonb)) <> 'array' THEN RAISE EXCEPTION 'ENDORSEMENT_SLOTS_MUST_BE_ARRAY'; END IF;
@@ -73,7 +73,7 @@ RETURNS jsonb LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public,extens
   'adsterra_slots',(SELECT coalesce(jsonb_agg(x.value ORDER BY coalesce(x.value->>'page','legacy'),(x.value->>'slot')::integer),'[]'::jsonb)
     FROM jsonb_array_elements(coalesce(s.adsterra_slots,'[]'::jsonb)) x(value)
     WHERE coalesce((x.value->>'enabled')::boolean,false)=true
-      AND ((x.value->>'page') IN ('task1','task2','task3','final') AND coalesce(x.value->>'slot','') ~ '^[1-7]$'
+      AND ((x.value->>'page') IN ('task1','task2','task3','final') AND coalesce(x.value->>'slot','') ~ '^([1-9]|1[0-9]|2[0-8])$'
         OR (x.value->>'page') IS NULL AND coalesce(x.value->>'slot','') ~ '^(10|[1-9])$')),
   'endorsement_slots',(SELECT coalesce(jsonb_agg(x.value ORDER BY coalesce(x.value->>'page','legacy'),(x.value->>'slot')::integer),'[]'::jsonb)
     FROM jsonb_array_elements(coalesce(s.endorsement_slots,'[]'::jsonb)) x(value)
