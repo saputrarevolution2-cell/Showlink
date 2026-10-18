@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow"><title>Final — ShowLink</title>
@@ -7,27 +7,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/shortlink-flow.css"><link rel="stylesheet" href="/css/shortlink-final.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/supabase-config.js"></script>
-  <script src="/js/shortlink-flow.js" defer></script><script src="/js/shortlink-final.js" defer></script><script src="/js/theme.js"></script><script src="/js/shortlink-admin-config.js" defer></script>
+  <script src="/js/shortlink-flow.js" defer></script><script src="/js/shortlink-final.js" defer></script><script src="/js/shortlink-admin-config.js" defer></script>
 </head>
 <body data-shortlink-final="true" data-shortlink-page="final">
-  <header class="task-auth-nav" aria-label="Navigasi akun ShowLink"><a class="task-auth-brand" href="/" aria-label="ShowLink beranda"><i class="fa-solid fa-link"></i><span>SHOWLINK</span></a><nav class="task-auth-actions" aria-label="Akun"><a class="task-auth-login" href="/login.html">Login</a><a class="task-auth-register" href="/register.html">Register</a><button class="task-theme-toggle" type="button" data-task-theme-toggle aria-label="Ganti tema" title="Ganti tema"><i class="fa-solid fa-moon" aria-hidden="true"></i></button></nav></header>
+  <header class="task-auth-nav" aria-label="Navigasi akun ShowLink"><a class="task-auth-brand" href="/" aria-label="ShowLink beranda"><i class="fa-solid fa-link"></i><span>SHOWLINK</span></a><nav class="task-auth-actions" aria-label="Akun"><a class="task-auth-login" href="/login.html">Login</a><a class="task-auth-register" href="/register.html">Register</a></nav></header>
   <div class="sl-promo-ticker" role="status"><span><i class="fa-solid fa-bullhorn"></i> Ingin Endorse Usaha dan Pekerjaanmu berkembang lebih cepat? Gabung di ShowLink — promosikan usahamu di mana saja dan kapan saja, dengan paket sesuai kebutuhan.</span></div>
   <aside id="sl-direct-floating-notice" class="sl-direct-floating-notice is-visible" aria-label="Akses langsung"><button class="sl-direct-notice-close" id="sl-direct-notice-close" type="button" aria-label="Tutup notifikasi akses langsung"><i class="fa-solid fa-xmark"></i></button><div class="sl-notice-direct"><strong><i class="fa-solid fa-bolt"></i> Mau langsung akses?</strong><p>Lewati tahapan gratis dan pilih akses langsung melalui pembayaran.</p><a href="/shortlink-payment.html" id="sl-direct-access-link" class="sl-direct-access-button">Lanjut Akses Langsung <i class="fa-solid fa-arrow-right"></i></a></div></aside>
   <main class="wrap final-wrap">
     <section class="card final-card">
       <div class="brand"><i class="fa-solid fa-flag-checkered"></i> SHOWLINK · FINAL</div>
       <h1 id="title">Memeriksa tahapan shortlink</h1>
-      <p class="final-lead">Selesaikan Task 1, Task 2, dan Task 3 di browser ini untuk membuka tujuan asli. Iklan dan endorsement adalah sponsor opsional; tidak perlu diklik.</p>
+      <p class="final-lead">Halaman ini akan memeriksa ulang penyelesaian Task 1, Task 2, dan Task 3. Tombol tujuan asli hanya muncul jika semua tahapan terdeteksi selesai.</p>
       <div class="sl-endorsement-grid final-endorsement-top" data-shortlink-endorsements="top" aria-label="Endorsement sponsor bagian atas"></div>
       <div class="final-ad-grid" aria-label="Iklan Adsterra Final">
         <div class="ad task-ad-slot" data-shortlink-ad-page="final" data-shortlink-ad-slot="1"><strong><i class="fa-solid fa-rectangle-ad"></i> Area iklan Final 1</strong></div>
         <div class="ad task-ad-slot" data-shortlink-ad-page="final" data-shortlink-ad-slot="2"><strong><i class="fa-solid fa-rectangle-ad"></i> Area iklan Final 2</strong></div>
       </div>
       <div class="final-gate" id="final-gate">
-        <div class="final-gate-heading"><i class="fa-solid fa-shield-halved"></i><div><h2>Verifikasi akses</h2><p>Tunggu pemeriksaan awal, lalu konfirmasi untuk menampilkan tombol Download.</p></div></div>
-        <div id="final-initial-loading" class="status final-status" aria-live="polite"><span class="sl-countdown"><span class="sl-spinner" aria-hidden="true"></span><span class="sl-countdown-text">Menyiapkan pemeriksaan 5 detik</span><span class="sl-progress"><span id="final-initial-progress"></span></span></span></div>
-        <label id="final-human-check-wrap" class="final-human-check" hidden><input id="final-human-check" type="checkbox"><span><strong><i class="fa-solid fa-circle-check"></i> Saya bukan robot</strong><small>Konfirmasi ini hanya langkah antarmuka, bukan CAPTCHA keamanan.</small></span></label>
-        <button class="btn final-download-button" id="final-download-check" type="button" disabled hidden><i class="fa-solid fa-download"></i> Download</button>
+        <div class="final-gate-heading"><i class="fa-solid fa-shield-halved"></i><div><h2>Verifikasi akses</h2><p>Tunggu pemeriksaan otomatis. Kami akan mengecek ulang apakah semua halaman task sudah dilewati.</p></div></div>
+        <div id="final-initial-loading" class="status final-status" aria-live="polite"><span class="sl-countdown"><span class="sl-spinner" aria-hidden="true"></span><span class="sl-countdown-text">Menyiapkan pemeriksaan awal</span><span class="sl-progress"><span id="final-initial-progress"></span></span></span></div>
         <div id="final-verify-status" class="status final-status" aria-live="polite"></div>
         <div id="final-result" class="final-result" hidden></div>
         <a id="final-start-over" class="btn final-restart-button" href="/task1.html" hidden><i class="fa-solid fa-rotate-left"></i> Mulai dari awal — Task 1</a>
