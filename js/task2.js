@@ -5,23 +5,36 @@
   function countdownButton(button, duration, label) {
     return new Promise((resolve) => {
       if (!button) { window.setTimeout(resolve, duration); return; }
-      const original = button.innerHTML;
+      if (button.dataset.loading === 'true') return;
+      button.dataset.loading = 'true';
       button.disabled = true;
-      button.innerHTML = '<span class="sl-button-loading"><span class="sl-spinner" aria-hidden="true"></span><span class="sl-button-loading-text"></span></span>';
+      button.setAttribute('aria-busy', 'true');
+      button.innerHTML = '<span class="sl-button-loading"><span class="sl-button-loading-row"><span class="sl-spinner" aria-hidden="true"></span><span class="sl-button-loading-text"></span></span><span class="sl-button-progress" aria-hidden="true"><span></span></span></span>';
       const text = button.querySelector('.sl-button-loading-text');
+      const fill = button.querySelector('.sl-button-progress > span');
       const start = Date.now();
+      let timer = null;
       function tick() {
         const elapsed = Date.now() - start;
-        if (text) text.textContent = `${label} ${Math.max(0, Math.ceil((duration - elapsed) / 1000))} dtk`;
-        if (elapsed >= duration) { button.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Selesai'; button.disabled = true; button.classList.add('is-done'); resolve(); return; }
-        window.requestAnimationFrame(tick);
+        const remaining = Math.max(0, Math.ceil((duration - elapsed) / 1000));
+        if (text) text.textContent = `${label} ${remaining} detik`;
+        if (fill) fill.style.width = `${Math.min(100, (elapsed / duration) * 100)}%`;
+        if (elapsed >= duration) {
+          if (timer !== null) window.clearInterval(timer);
+          button.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Selesai';
+          button.classList.add('is-done');
+          button.setAttribute('aria-busy', 'false');
+          delete button.dataset.loading;
+          resolve();
+        }
       }
       tick();
+      timer = window.setInterval(tick, 100);
     });
   }
   function scrollTo(element) { if (element) element.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
   function init() {
-    if (!window.SLF) return;
+    if (!window.SLF) { const status = document.querySelector('#status'); if (status) status.textContent = 'Fitur tahapan belum siap dimuat. Muat ulang halaman beberapa saat lagi.'; return; }
     const flow = window.SLF;
     const status = $('#status'), statusSave = $('#save-status'), status2 = $('#status2');
     const slug = new URLSearchParams(location.search).get('slug') || sessionStorage.getItem('sl_slug') || '';
@@ -80,7 +93,6 @@
       await countdownButton(first, 10000, 'Loading');
       save?.classList.remove('hide'); down?.classList.remove('hide');
       if (status) status.textContent = 'Langkah pertama selesai. Tautan sponsor bersifat opsional.';
-      scrollTo(save || down);
     });
     save?.addEventListener('click', async () => {
       if (saveStarted || save.disabled) return;
@@ -88,7 +100,6 @@
       await countdownButton(save, 10000, 'Loading');
       down?.classList.remove('hide');
       if (statusSave) statusSave.textContent = 'Langkah Download Save selesai.';
-      scrollTo(down);
     });
     down?.addEventListener('click', () => {
       down.classList.add('hide'); scrollTo($('#bottom-step') || $('.magazine-story:last-of-type'));
