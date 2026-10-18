@@ -40,23 +40,35 @@
     flow.get().then((data) => { const title = $('#title'); if (title) title.textContent = `${data.title || 'Shortlink'} — Task 2`; })
       .catch((error) => { if (status) status.textContent = error.message || 'Data shortlink belum bisa dimuat.'; });
 
-    // Slot 7 is reserved for an admin-managed display/native creative in the dismissible overlay.
-    // Popunder scripts belong in a separate admin slot and are never copied into the modal.
-    function scheduleOverlay(delay = 11000) {
+    // A clearly labeled, dismissible 300x250 sponsor unit. The requested Adsterra
+    // code is injected only when the notice is visible and reloaded on the next cycle.
+    function mountRequestedAd() {
+      if (!overlaySlot) return;
+      overlaySlot.replaceChildren();
+      const options = document.createElement('script');
+      options.textContent = "atOptions = { 'key' : '995976d1f84651e529f61b1fec35968c', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };";
+      const loader = document.createElement('script');
+      loader.src = 'https://www.highrevenueformat.com/995976d1f84651e529f61b1fec35968c/invoke.js';
+      loader.async = true;
+      loader.onerror = () => { if (overlaySlot && !overlaySlot.querySelector('iframe')) overlaySlot.innerHTML = '<span class="task2-ad-fallback"><i class="fa-solid fa-rectangle-ad"></i> Iklan sponsor belum tersedia.</span>'; };
+      overlaySlot.append(options, loader);
+    }
+    function scheduleOverlay(delay = 6000) {
       window.clearTimeout(overlayTimer);
       overlayTimer = window.setTimeout(() => {
-        const hasDisplayAd = overlaySlot && (overlaySlot.querySelector('.sl-admin-ad-slot > *, .sl-admin-image-ad, iframe, img, ins, a') || overlaySlot.dataset.slAdMounted === 'true' && !overlaySlot.classList.contains('sl-global-ad-loaded'));
-        if (hasDisplayAd && overlay) {
+        if (overlay) {
           overlay.classList.add('is-visible'); overlay.setAttribute('aria-hidden', 'false');
-          document.body.style.overflow = 'hidden'; overlayClose?.focus({ preventScroll: true });
-        } else scheduleOverlay(11000);
+          document.body.style.overflow = 'hidden';
+          mountRequestedAd();
+          overlayClose?.focus({ preventScroll: true });
+        }
       }, delay);
     }
-    scheduleOverlay(11000);
+    scheduleOverlay(6000);
     function closeOverlay() {
       overlay?.classList.remove('is-visible'); overlay?.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
-      scheduleOverlay(11000);
+      scheduleOverlay(6000);
     }
     overlayClose?.addEventListener('click', closeOverlay);
     overlay?.addEventListener('click', (event) => { if (event.target === overlay) closeOverlay(); });
