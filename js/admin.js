@@ -7,9 +7,29 @@
   const msg=(s,ok=false)=>{const e=$("#admin-message");e.textContent=s||"";e.className=`app-message ${ok?"success":"error"}`;e.hidden=!s;};
   async function rpc(name,args={}){const {data,error}=await sb.rpc(name,args);if(error)throw error;return data;}
   async function userAction(action,user_id){const {data,error}=await sb.functions.invoke("admin-user-action",{body:{action,user_id}});if(error){let detail=error.message||"Edge Function gagal";try{const response=error.context;if(response&&typeof response.json==="function"){const body=await response.json();if(body?.error)detail=body.error;}}catch{}throw new Error(detail);}if(data?.error)throw new Error(data.error);return data;}
+
+  function ensureExtendedAdSlots(){
+    for(const page of ['task1','task2','task3','final']){
+      const existing=document.querySelector(`[data-page-ad="${page}"][data-page-slot="1"]`);
+      const section=existing?.closest('.admin-page-ads-section');
+      const grid=section?.querySelector('.admin-adsterra-grid');
+      if(!grid)continue;
+      for(let n=8;n<=28;n++){
+        if(grid.querySelector(`[data-page-ad="${page}"][data-page-slot="${n}"]`))continue;
+        const label=document.createElement('label');
+        label.textContent=`Adsterra ${page.toUpperCase()} Slot ${n}`;
+        const area=document.createElement('textarea');
+        area.id=`page-ad-${page}-${n}`;area.dataset.pageAd=page;area.dataset.pageSlot=String(n);
+        area.rows=3;area.placeholder=`Tempel kode/unit Adsterra ${page.toUpperCase()} slot ${n}...`;
+        label.appendChild(area);grid.appendChild(label);
+      }
+    }
+  }
+
   async function boot(){
     try{sb=await window.ShowLinkSupabase.load();const {data:{session}}=await sb.auth.getSession();if(!session){location.replace('/login.html?next=/admin.html');return;}
       const admin=await rpc('is_current_user_admin');if(!admin){document.body.innerHTML='<main style="max-width:620px;margin:15vh auto;padding:30px;text-align:center;font-family:Inter,sans-serif"><h1>Akses Ditolak</h1><p>Akun ini bukan administrator.</p><a href="/dashboard.html">Kembali ke Dashboard</a></main>';return;}
+      ensureExtendedAdSlots();
       await Promise.all([loadStats(),loadGateway(),loadControls(),loadControlCenterSettings(),loadTab('users'),loadSupport(),loadWithdrawSummary()]);
     }catch(e){msg(e.message||'Gagal memuat Admin Panel');}
   }

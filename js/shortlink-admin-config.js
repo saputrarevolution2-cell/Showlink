@@ -1,7 +1,8 @@
 /* Public renderer for admin-managed Adsterra codes and endorsements.
    Global/script-only units (e.g. Popunder or Social Bar) are injected into the
-   document head; container-based units (banner/native) are rendered in their
-   page slot. Only codes saved by the platform administrator are executed. */
+   document head once per unique script; container-based units (banner/native)
+   are rendered in their page slots. Intensity controls eligible slot counts,
+   never forced repeated firing of a global ad script. Only admin-saved codes run. */
 (()=>{'use strict';
 const GLOBAL_SRC_ATTR='data-sl-adsterra-src';
 const GLOBAL_CODE_ATTR='data-sl-adsterra-code';
@@ -103,15 +104,27 @@ async function run(){
    try{const cached=JSON.parse(sessionStorage.getItem('sl_data')||'{}');if(['low','medium','high'].includes(cached.ad_intensity))intensity=cached.ad_intensity;}catch(_){}
    if(/^[A-Za-z0-9_-]{3,40}$/.test(slug)){try{const {data:level,error:levelError}=await sb.rpc('get_shortlink_ad_intensity',{p_slug:slug});if(!levelError&&['low','medium','high'].includes(String(level)))intensity=String(level);}catch(_){}}
    const percent=({low:50,medium:75,high:100})[intensity]||75;
-   const maxPageSlot=Math.ceil(7*percent/100),maxLegacySlot=Math.ceil(10*percent/100);
+   // Per-page configured placement caps requested by the platform owner.
+   // Low=7, Medium=14, High=28 independently on Task 1, Task 2, Task 3 and Final.
+   // These are separate admin-configured placements, not forced repeat executions
+   // of one Popunder/Social Bar script.
+   const maxPageSlot=({low:7,medium:14,high:28})[intensity]||14;
+   const maxLegacySlot=Math.ceil(10*percent/100);
    document.body.dataset.adIntensity=intensity;
    document.body.dataset.adIntensityPercent=String(percent);
+   document.body.dataset.adIntensitySlotCap=String(maxPageSlot);
    const slots=Array.isArray(data.adsterra_slots)?data.adsterra_slots:[];
    const legacyTargets=[...document.querySelectorAll('[data-shortlink-ad-slot]:not([data-shortlink-ad-page])')];
+   const hasPageSpecificSlots=slots.some(slot=>slot&&slot.page===page&&slot.code&&slot.enabled!==false);
    for(const slot of slots){
      const n=Number(slot.slot);if(!Number.isInteger(n)||!slot.code||slot.enabled===false)continue;
      if(slot.page){if(slot.page!==page||n<1||n>maxPageSlot)continue;mountAdCode(ensurePageSlot(page,n,legacyTargets),slot.code);}
-     else {if(n<1||n>maxLegacySlot)continue;const target=document.querySelector(`[data-shortlink-ad-slot="${n}"]:not([data-shortlink-ad-page])`);if(target)mountAdCode(target,slot.code);}
+     else {
+       // Legacy configuration is a fallback only. Do not combine legacy and page-specific
+       // slot sets on the same page, which would exceed the selected intensity budget.
+       if(hasPageSpecificSlots||n<1||n>maxPageSlot)continue;
+       const target=document.querySelector(`[data-shortlink-ad-slot="${n}"]:not([data-shortlink-ad-page])`);if(target)mountAdCode(target,slot.code);
+     }
    }
    const placeholders=[...document.querySelectorAll('[data-shortlink-ad-slot]')];
    if(data.image_ad_enabled&&validHttp(data.image_ad_url)&&validHttp(data.image_ad_target_url)&&placeholders.length){const wrap=document.createElement('div');wrap.className='sl-admin-image-ad';const a=document.createElement('a');a.href=data.image_ad_target_url;a.target='_blank';a.rel='noopener noreferrer sponsored';const img=document.createElement('img');img.src=data.image_ad_url;img.alt='Iklan sponsor';img.loading='lazy';img.style.cssText='display:block;width:100%;height:auto;max-height:320px;object-fit:contain;border-radius:12px';a.appendChild(img);wrap.appendChild(a);placeholders[0].prepend(wrap);}
