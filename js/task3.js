@@ -3,7 +3,6 @@
   'use strict';
   const $ = (selector) => document.querySelector(selector);
   const setBusy = (button, busy) => { if (button) button.disabled = Boolean(busy); };
-  const STEP1_URL = 'https://www.profitableratecpmnetwork.com/pkmkxfrmiy?key=5b5750804fb6a29007e75d321e567d75';
   const NETWORK_AD_SCRIPT = 'https://pl31626285.profitableratecpmnetwork.com/1e/25/0c/1e250cc0da41c572970286fab29d5009.js';
 
   function countdown(status, duration, label) {
@@ -67,7 +66,8 @@
     const close = $('#task3-floating-ad-close');
     if (!panel || !content) return;
     close?.addEventListener('click', () => panel.classList.remove('is-visible'));
-    window.setTimeout(() => panel.classList.add('is-visible'), 4500);
+    // Show once after five seconds; do not repeatedly interrupt visitors.
+    window.setTimeout(() => panel.classList.add('is-visible'), 5000);
     // Load the supplied 300x250 Adsterra unit inside the floating panel.
     const options = document.createElement('script');
     options.text = "atOptions = {'key':'995976d1f84651e529f61b1fec35968c','format':'iframe','height':250,'width':300,'params':{}};";
@@ -89,6 +89,9 @@
     directNotice?.classList.add('is-visible');
     directNoticeClose?.addEventListener('click', () => directNotice?.classList.remove('is-visible'));
     initFloatingAd();
+    // Ad units are independent page placements, not prerequisites for task progress.
+    loadNetworkAd(2);
+    loadNetworkAd(3);
 
     const startButton = $('#top');
     const startStatus = $('#status-top');
@@ -129,21 +132,8 @@
       button?.addEventListener('click', async () => {
         if (!started || number !== completedSteps + 1 || button.disabled) return;
         setBusy(button, true);
-        if (number === 1) {
-          // Open the advertiser destination from a direct user gesture.
-          const opened = window.open(STEP1_URL, '_blank');
-          if (!opened) {
-            if (status) {
-              status.classList.remove('is-loading', 'is-complete');
-              status.textContent = 'Browser memblokir tab iklan. Izinkan pop-up lalu tekan tombol ini lagi.';
-            }
-            setBusy(button, false);
-            return;
-          }
-        } else {
-          loadNetworkAd(number);
-        }
-        await countdown(status, 10000, number === 1 ? 'Menunggu langkah 1' : `Memproses iklan langkah ${number}`);
+        // The countdown is a task timer, not a check that an ad was clicked or viewed.
+        await countdown(status, 10000, `Memproses langkah ${number}`);
         button.innerHTML = `<i class="fa-solid fa-circle-check"></i> Langkah ${number} selesai`;
         button.classList.add('is-done');
         button.setAttribute('aria-label', `Langkah ${number} selesai`);
