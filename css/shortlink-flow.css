@@ -34,3 +34,11 @@ html[data-theme="dark"] .sl-task-footer{border-color:#2b3850;color:#aebbd0}
 .sl-generated-ad-slot.sl-ad-active,.ad.sl-ad-active{min-height:0;padding:8px 0;border-color:transparent;background:transparent}
 .sl-ad-active>.sl-admin-ad-slot{margin:0}
 .sl-ad-active>strong[hidden],.sl-ad-active>p[hidden]{display:none!important}
+
+/* Empty endorsement slot: invitation to book a promotion */
+.sl-endorsement-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:150px;padding:18px;border:1px dashed #c7c4ef;border-radius:16px;background:linear-gradient(145deg,#faf9ff,#f3f6ff);color:#4d4b68;text-align:center;grid-column:1/-1}
+.sl-endorsement-empty-icon{display:grid;place-items:center;width:35px;height:35px;border-radius:11px;background:#e8e5ff;color:#6554e8;font-size:15px}
+.sl-endorsement-empty strong{font-size:14px;font-weight:900}
+.sl-endorsement-empty p{max-width:570px;margin:0;color:#77758c;font-size:12px;line-height:1.65}
+.sl-endorsement-cta{display:inline-flex;align-items:center;justify-content:center;gap:9px;margin-top:7px;padding:10px 14px;border:0;border-radius:12px;background:linear-gradient(135deg,#6757ee,#8b5cf6);color:#fff!important;text-decoration:none;font-size:12px;font-weight:900;box-shadow:0 8px 20px rgba(103,87,238,.2)}
+.sl-endorsement-cta:hover{transform:translateY(-1px);box-shadow:0 12px 24px rgba(103,87,238,.26)}
