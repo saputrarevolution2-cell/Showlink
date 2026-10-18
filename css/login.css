@@ -2529,3 +2529,20 @@ html[data-theme="dark"] .auth-page .auth-input:focus{background:#111d32!importan
 html[data-theme="dark"] .auth-page .auth-field label{color:#e8edfb}
 .auth-page .auth-submit{box-shadow:0 9px 24px rgba(109,93,252,.18)}
 @media(max-width:620px){.auth-page .auth-card{padding:24px 17px 22px!important}.auth-page .auth-form{gap:16px!important}.auth-page .auth-head p{max-width:34ch;margin-inline:auto!important}}
+
+/* Auth polish: show one floating notification only and make account switch action a proper secondary button. */
+.auth-page .auth-alert,
+.auth-page .auth-alert.is-visible { display: none !important; }
+.auth-page .auth-switch-account {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  width:100%; min-height:44px; margin:12px 0 18px; padding:11px 16px;
+  box-sizing:border-box; border:1px solid var(--line, #344158);
+  border-radius:12px; background:var(--surface-2, rgba(255,255,255,.05));
+  color:var(--primary, #8b6cff); font:inherit; font-size:13px; font-weight:700;
+  line-height:1.35; text-align:center; cursor:pointer;
+  appearance:none; -webkit-appearance:none; box-shadow:none;
+  transition:background .18s ease,border-color .18s ease,transform .18s ease;
+}
+.auth-page .auth-switch-account:hover { border-color:var(--primary, #8b6cff); background:rgba(129,116,255,.10); }
+.auth-page .auth-switch-account:active { transform:scale(.99); }
+.auth-page .auth-switch-account:focus-visible { outline:2px solid var(--primary, #8b6cff); outline-offset:3px; }
