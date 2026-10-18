@@ -72,3 +72,43 @@ html[data-theme="dark"] .task-ad-slot strong{color:#d5d2ff}
 html[data-theme="dark"] .task3-final-section{background:linear-gradient(135deg,#1c2340,#172b40);border-color:#35416b}
 html[data-theme="dark"] .task3-endorsement-section .sl-endorsement-card{background:#131d2f;border-color:#33415a;color:#e7ecf5}
 @media(max-width:760px){.task3-wrap{margin-top:16px;padding:0 10px}.task3-step-section{padding:15px;margin:20px 0}.task-ad-slot{margin:18px 0;padding:14px}.task3-final-section{padding:16px}}
+
+
+/* Task 3 polish: compact sponsor steps and floating 300x250 ad notification. */
+.task3-intro-card{position:relative;overflow:hidden;border:1px solid #e4e8f5;background:radial-gradient(circle at 100% 0%,#eeebff 0,transparent 38%),#fff}
+.task3-intro-card .brand{display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border-radius:999px;background:#f0efff;color:#5145cd;letter-spacing:.08em}
+.task3-intro-card h1{max-width:760px;line-height:1.12;letter-spacing:-.035em}
+.task3-intro-card .bar{margin:20px 0 14px;height:9px;background:#e9eaf6}
+.task3-intro-card .bar span{border-radius:99px;background:linear-gradient(90deg,#6457e8,#31b6a4)}
+.task3-step-section{position:relative;overflow:hidden;background:linear-gradient(145deg,#fff,#fbfcff)}
+.task3-step-heading h3{color:#222b45;line-height:1.3}
+.task3-step-section .task-action-button{box-shadow:0 8px 20px rgba(83,72,202,.16);transition:transform .18s ease,box-shadow .18s ease}
+.task3-step-section .task-action-button:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 11px 24px rgba(83,72,202,.23)}
+.task3-step-section .task-action-button.is-done{box-shadow:none}
+.task3-network-ad{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;min-height:48px;margin:12px 0;padding:11px 13px;border:1px dashed #cbd2e5;border-radius:12px;background:#f8f9ff;color:#737d94;font-size:12px;text-align:center}
+.task3-network-ad>i{color:#6558d9;font-size:17px}
+.task3-network-ad.is-ad-loading{background:linear-gradient(90deg,#f8f9ff,#eeedff,#f8f9ff);background-size:200% 100%;animation:task3AdPulse 1.2s ease-in-out infinite}
+.task3-ad-load-error{display:block;flex-basis:100%;color:#a34c35;font-size:12px}
+.task3-floating-ad{display:none;position:fixed;z-index:10020;right:14px;bottom:14px;width:min(332px,calc(100vw - 24px));max-height:min(72vh,390px);overflow:auto;padding:12px;border:1px solid #dfe4f2;border-radius:18px;background:#fff;box-shadow:0 18px 65px rgba(14,24,50,.28);color:#202a40}
+.task3-floating-ad.is-visible{display:block;animation:slNoticeIn .24s ease-out}
+.task3-floating-ad-close{position:absolute;z-index:2;right:8px;top:8px;display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:9px;background:#f0efff;color:#5145cd;cursor:pointer}
+.task3-floating-ad-heading{display:flex;align-items:center;gap:10px;margin:0 30px 10px 0}
+.task3-floating-ad-heading>i{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:#f0efff;color:#5145cd}
+.task3-floating-ad-heading strong,.task3-floating-ad-heading span{display:block}
+.task3-floating-ad-heading strong{font-size:13px;font-weight:900}
+.task3-floating-ad-heading span{margin-top:2px;color:#7a8497;font-size:11px}
+.task3-floating-ad-content{display:flex;align-items:center;justify-content:center;min-height:250px;overflow:hidden;border-radius:12px;background:#f7f8fc}
+.task3-ad-placeholder{font-size:12px;color:#7a8497}
+.task3-floating-ad-content iframe{max-width:100%;border:0}
+html[data-theme="dark"] .task3-intro-card{background:radial-gradient(circle at 100% 0%,#25254d 0,transparent 42%),#131d2f;border-color:#33415a}
+html[data-theme="dark"] .task3-intro-card .brand{background:#202846;color:#d5d2ff}
+html[data-theme="dark"] .task3-step-section{background:linear-gradient(145deg,#131d2f,#111a2b)}
+html[data-theme="dark"] .task3-step-heading h3{color:#f0f4fc}
+html[data-theme="dark"] .task3-network-ad{background:#17233a;border-color:#34415a;color:#b5c0d3}
+html[data-theme="dark"] .task3-network-ad.is-ad-loading{background:linear-gradient(90deg,#17233a,#252746,#17233a);background-size:200% 100%}
+html[data-theme="dark"] .task3-floating-ad{background:#131d2f;border-color:#33415a;color:#e7ecf5}
+html[data-theme="dark"] .task3-floating-ad-close,html[data-theme="dark"] .task3-floating-ad-heading>i{background:#202846;color:#d5d2ff}
+html[data-theme="dark"] .task3-floating-ad-heading span{color:#b5c0d3}
+html[data-theme="dark"] .task3-floating-ad-content{background:#17233a}
+@keyframes task3AdPulse{0%,100%{background-position:100% 0}50%{background-position:0 0}}
+@media(max-width:520px){.task3-floating-ad{right:10px;bottom:10px;width:calc(100vw - 20px);padding:10px}.task3-floating-ad-content{min-height:250px}.task3-intro-card{padding:20px}.task3-step-heading{gap:10px}.task3-step-number{flex-basis:34px;height:34px;border-radius:10px}}
