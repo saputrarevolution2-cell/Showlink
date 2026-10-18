@@ -31,6 +31,10 @@
   async function loadControlCenterSettings(){
     const s=await rpc('admin_get_control_center_settings');
     $('#admin-cpm').value=s.cpm??1;
+    const tierSettings=(s.shortlink_flow&&s.shortlink_flow.ad_tiers)||{};
+    $('#ad-tier-low-rate').value=Number(tierSettings.low?.rate??0);
+    $('#ad-tier-medium-rate').value=Number(tierSettings.medium?.rate??0);
+    $('#ad-tier-high-rate').value=Number(tierSettings.high?.rate??0);
     $('#image-ad-enabled').checked=!!s.image_ad_enabled;
     $('#image-ad-url').value=s.image_ad_url||'';
     $('#image-ad-target').value=s.image_ad_target_url||'';
@@ -57,7 +61,7 @@
       p_image_ad_enabled:$('#image-ad-enabled').checked,p_image_ad_url:imageUrl,p_image_ad_target_url:target,
       p_shortlink_redirect_enabled:$('#shortlink-redirect-enabled').checked,
       p_shortlink_redirect_label:$('#shortlink-redirect-label').value.trim()||'Lanjutkan',
-      p_shortlink_redirect_url:$('#shortlink-redirect-url').value.trim(),p_shortlink_flow:{task1:true,task2:true,task3:true},p_endorsement_slots:endorsements
+      p_shortlink_redirect_url:$('#shortlink-redirect-url').value.trim(),p_shortlink_flow:{task1:true,task2:true,task3:true,ad_tiers:{low:{percent:50,rate:Number($('#ad-tier-low-rate').value||0)},medium:{percent:75,rate:Number($('#ad-tier-medium-rate').value||0)},high:{percent:100,rate:Number($('#ad-tier-high-rate').value||0)}}},p_endorsement_slots:endorsements
     });
   }
   $('#control-center-form').addEventListener('submit',async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await saveControlCenterSettings();msg('CPM dan pengaturan iklan berhasil disimpan.',true);}catch(x){msg(x.message||'Gagal menyimpan CPM/iklan');}finally{b.disabled=false;}});

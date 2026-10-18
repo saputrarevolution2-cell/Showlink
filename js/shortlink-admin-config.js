@@ -68,6 +68,8 @@ function parseAndMount(target,code){
 }
 function mountAdCode(target,code){
  if(!target||!code||target.dataset.slAdMounted==='true')return;
+ target.classList.add('sl-ad-active');
+ target.querySelectorAll(':scope > strong, :scope > p').forEach(el=>{el.hidden=true;});
  if(isGlobalCode(code)){
    target.dataset.slAdMounted='true';target.hidden=true;
    const doc=new DOMParser().parseFromString(String(code),'text/html');
@@ -79,8 +81,10 @@ function mountAdCode(target,code){
  const wrap=document.createElement('div');wrap.className='sl-admin-ad-slot';
  parseAndMount(wrap,code);target.prepend(wrap);
 }
-function ensurePageSlot(page,n){
+function ensurePageSlot(page,n,legacyTargets=[]){
  let target=document.querySelector(`[data-shortlink-ad-page="${page}"][data-shortlink-ad-slot="${n}"]`);if(target)return target;
+ target=legacyTargets[n-1]||null;
+ if(target&&!target.dataset.shortlinkAdPage){target.dataset.shortlinkAdPage=page;target.dataset.shortlinkAdSlot=String(n);return target;}
  target=document.createElement('div');target.className='ad task-ad-slot sl-generated-ad-slot';target.dataset.shortlinkAdPage=page;target.dataset.shortlinkAdSlot=String(n);target.innerHTML='<strong><i class="fa-solid fa-rectangle-ad"></i> Area iklan '+page.toUpperCase()+' '+n+'</strong><p>Iklan sponsor opsional; tidak perlu diklik untuk melanjutkan.</p>';
  const magazine=document.querySelector('.magazine');const sections=magazine?[...magazine.querySelectorAll('article,section.magazine-story,section.task3-step-section')]:[];
  if(magazine&&sections.length){const anchor=sections[Math.min(n-1,sections.length-1)];anchor.insertAdjacentElement('afterend',target);}else{const footer=document.querySelector('footer');if(footer)footer.insertAdjacentElement('beforebegin',target);else (document.querySelector('main')||document.body).appendChild(target);}return target;
@@ -91,11 +95,23 @@ async function run(){
    const sb=window.supabase.createClient(c.url,c.anonKey);
    const {data,error}=await sb.rpc('get_public_shortlink_control_settings');if(error||!data){console.warn('ShowLink: pengaturan iklan gagal dimuat',error?.message||'Tidak ada data');return;}
    const page=String(document.body.dataset.shortlinkPage||(document.body.dataset.shortlinkFinal==='true'?'final':''));
+   const flowSettings=data.shortlink_flow||{};
+   const tiers=flowSettings.ad_tiers||{};
+   let intensity='medium';
+   const params=new URLSearchParams(location.search);
+   const slug=(params.get('slug')||params.get('code')||params.get('id')||'').trim();
+   try{const cached=JSON.parse(sessionStorage.getItem('sl_data')||'{}');if(['low','medium','high'].includes(cached.ad_intensity))intensity=cached.ad_intensity;}catch(_){}
+   if(/^[A-Za-z0-9_-]{3,40}$/.test(slug)){try{const {data:level,error:levelError}=await sb.rpc('get_shortlink_ad_intensity',{p_slug:slug});if(!levelError&&['low','medium','high'].includes(String(level)))intensity=String(level);}catch(_){}}
+   const percent=({low:50,medium:75,high:100})[intensity]||75;
+   const maxPageSlot=Math.ceil(7*percent/100),maxLegacySlot=Math.ceil(10*percent/100);
+   document.body.dataset.adIntensity=intensity;
+   document.body.dataset.adIntensityPercent=String(percent);
    const slots=Array.isArray(data.adsterra_slots)?data.adsterra_slots:[];
+   const legacyTargets=[...document.querySelectorAll('[data-shortlink-ad-slot]:not([data-shortlink-ad-page])')];
    for(const slot of slots){
      const n=Number(slot.slot);if(!Number.isInteger(n)||!slot.code||slot.enabled===false)continue;
-     if(slot.page){if(slot.page!==page||n<1||n>7)continue;mountAdCode(ensurePageSlot(page,n),slot.code);}
-     else {if(n<1||n>10)continue;const target=document.querySelector(`[data-shortlink-ad-slot="${n}"]:not([data-shortlink-ad-page])`);if(target)mountAdCode(target,slot.code);}
+     if(slot.page){if(slot.page!==page||n<1||n>maxPageSlot)continue;mountAdCode(ensurePageSlot(page,n,legacyTargets),slot.code);}
+     else {if(n<1||n>maxLegacySlot)continue;const target=document.querySelector(`[data-shortlink-ad-slot="${n}"]:not([data-shortlink-ad-page])`);if(target)mountAdCode(target,slot.code);}
    }
    const placeholders=[...document.querySelectorAll('[data-shortlink-ad-slot]')];
    if(data.image_ad_enabled&&validHttp(data.image_ad_url)&&validHttp(data.image_ad_target_url)&&placeholders.length){const wrap=document.createElement('div');wrap.className='sl-admin-image-ad';const a=document.createElement('a');a.href=data.image_ad_target_url;a.target='_blank';a.rel='noopener noreferrer sponsored';const img=document.createElement('img');img.src=data.image_ad_url;img.alt='Iklan sponsor';img.loading='lazy';img.style.cssText='display:block;width:100%;height:auto;max-height:320px;object-fit:contain;border-radius:12px';a.appendChild(img);wrap.appendChild(a);placeholders[0].prepend(wrap);}
