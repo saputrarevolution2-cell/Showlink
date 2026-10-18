@@ -1,13 +1,16 @@
-/* ShowLink Task 3 — independent loading indicators beneath each action. */
+/* ShowLink Task 3 — ordered steps, independent countdowns and ad placements. */
 (function () {
   'use strict';
   const $ = (selector) => document.querySelector(selector);
   const setBusy = (button, busy) => { if (button) button.disabled = Boolean(busy); };
+  const STEP1_URL = 'https://www.profitableratecpmnetwork.com/pkmkxfrmiy?key=5b5750804fb6a29007e75d321e567d75';
+  const NETWORK_AD_SCRIPT = 'https://pl31626285.profitableratecpmnetwork.com/1e/25/0c/1e250cc0da41c572970286fab29d5009.js';
 
   function countdown(status, duration, label) {
     return new Promise((resolve) => {
       if (!status) { window.setTimeout(resolve, duration); return; }
       status.replaceChildren();
+      status.classList.remove('is-complete');
       status.classList.add('is-loading');
       const wrap = document.createElement('div'); wrap.className = 'sl-countdown';
       const spinner = document.createElement('span'); spinner.className = 'sl-spinner'; spinner.setAttribute('aria-hidden', 'true');
@@ -38,6 +41,43 @@
     if (element) element.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  function loadNetworkAd(step) {
+    const mount = $(`#task3-network-ad-${step}`);
+    if (!mount || mount.dataset.loaded === 'true') return;
+    mount.dataset.loaded = 'true';
+    mount.classList.add('is-ad-loading');
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = NETWORK_AD_SCRIPT;
+    script.dataset.task3Step = String(step);
+    script.onload = () => mount.classList.remove('is-ad-loading');
+    script.onerror = () => {
+      mount.classList.remove('is-ad-loading');
+      const note = document.createElement('span');
+      note.className = 'task3-ad-load-error';
+      note.textContent = 'Iklan tidak berhasil dimuat. Langkah tetap dapat dilanjutkan.';
+      mount.appendChild(note);
+    };
+    mount.appendChild(script);
+  }
+
+  function initFloatingAd() {
+    const panel = $('#task3-floating-ad');
+    const content = $('#task3-floating-ad-content');
+    const close = $('#task3-floating-ad-close');
+    if (!panel || !content) return;
+    close?.addEventListener('click', () => panel.classList.remove('is-visible'));
+    window.setTimeout(() => panel.classList.add('is-visible'), 4500);
+    // Load the supplied 300x250 Adsterra unit inside the floating panel.
+    const options = document.createElement('script');
+    options.text = "atOptions = {'key':'995976d1f84651e529f61b1fec35968c','format':'iframe','height':250,'width':300,'params':{}};";
+    content.appendChild(options);
+    const adScript = document.createElement('script');
+    adScript.async = true;
+    adScript.src = 'https://www.highrevenueformat.com/995976d1f84651e529f61b1fec35968c/invoke.js';
+    content.appendChild(adScript);
+  }
+
   function init() {
     if (!window.SLF) return;
     const flow = window.SLF;
@@ -48,6 +88,7 @@
     if (directLink && slug) directLink.href = `/shortlink-payment.html?slug=${encodeURIComponent(slug)}`;
     directNotice?.classList.add('is-visible');
     directNoticeClose?.addEventListener('click', () => directNotice?.classList.remove('is-visible'));
+    initFloatingAd();
 
     const startButton = $('#top');
     const startStatus = $('#status-top');
@@ -73,7 +114,7 @@
       if (started || startButton.disabled) return;
       started = true;
       setBusy(startButton, true);
-      await countdown(startStatus, 10000, 'Menyiapkan Task 3');
+      await countdown(startStatus, 3000, 'Menyiapkan Task 3');
       startButton.classList.add('hide');
       setBusy(startButton, false);
       const first = steps[0];
@@ -88,10 +129,25 @@
       button?.addEventListener('click', async () => {
         if (!started || number !== completedSteps + 1 || button.disabled) return;
         setBusy(button, true);
-        await countdown(status, 5000, `Menyelesaikan langkah ${number}`);
+        if (number === 1) {
+          // Open the advertiser destination from a direct user gesture.
+          const opened = window.open(STEP1_URL, '_blank');
+          if (!opened) {
+            if (status) {
+              status.classList.remove('is-loading', 'is-complete');
+              status.textContent = 'Browser memblokir tab iklan. Izinkan pop-up lalu tekan tombol ini lagi.';
+            }
+            setBusy(button, false);
+            return;
+          }
+        } else {
+          loadNetworkAd(number);
+        }
+        await countdown(status, 10000, number === 1 ? 'Menunggu langkah 1' : `Memproses iklan langkah ${number}`);
         button.innerHTML = `<i class="fa-solid fa-circle-check"></i> Langkah ${number} selesai`;
         button.classList.add('is-done');
         button.setAttribute('aria-label', `Langkah ${number} selesai`);
+        setBusy(button, false);
         completedSteps = number;
         const next = steps[number];
         if (next?.button) {
@@ -112,7 +168,7 @@
       if (redirecting || completedSteps !== steps.length || redirectButton.disabled) return;
       redirecting = true;
       setBusy(redirectButton, true);
-      await countdown(redirectStatus, 2500, 'Membuka halaman Final');
+      await countdown(redirectStatus, 7000, 'Membuka halaman Final');
       flow.go('shortlink-final.html');
     });
   }
