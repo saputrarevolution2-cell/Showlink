@@ -310,3 +310,10 @@ html[data-theme="dark"] .admin-page .admin-page-ads-section textarea{background:
 html[data-theme="dark"] .admin-page .admin-adsterra-grid textarea::placeholder,
 html[data-theme="dark"] .admin-page .admin-page-ads-section input::placeholder,
 html[data-theme="dark"] .admin-page .admin-page-ads-section textarea::placeholder{color:#9aa9bf}
+
+/* Admin-configurable Shortlink ad intensity rates, including dark mode. */
+.admin-ad-tier-settings{display:grid;gap:10px;padding:15px;margin:14px 0;border:1px solid var(--sl-border);border-radius:14px;background:var(--sl-surface);color:var(--sl-text)}
+.admin-ad-tier-settings>strong{font-weight:850}.admin-ad-tier-settings .admin-muted{margin:0;line-height:1.55}.admin-ad-tier-settings .admin-adsterra-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+.admin-ad-tier-settings input{width:100%;min-height:42px;padding:10px 12px;border:1px solid var(--sl-border);border-radius:10px;background:var(--sl-surface);color:var(--sl-text);font:inherit}
+html[data-theme="dark"] .admin-ad-tier-settings{background:var(--sl-surface-soft);border-color:var(--sl-border);color:var(--sl-text)}
+html[data-theme="dark"] .admin-ad-tier-settings input{background:#0b1220;color:#f1f5f9;border-color:#394963;color-scheme:dark}
