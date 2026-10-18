@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!area.children.length) {
         const placeholder = document.createElement('div');
         placeholder.className = 'final-endorsement-placeholder';
-        placeholder.innerHTML = '<i class="fa-solid fa-bullhorn" aria-hidden="true"></i><span>Slot Endorsement Sponsor</span><small>Tempat promosi sponsor akan tampil di sini.</small>';
+        placeholder.innerHTML = '<i class="fa-solid fa-bullhorn" aria-hidden="true"></i><span>Slot endorse sedang kosong</span><small>Mau endorse grup, akun sosial media, produk, layanan, atau promosi lainnya?</small><a class="sl-endorsement-cta" href="/endorse.html"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Endorse Sekarang</a>'; 
         area.appendChild(placeholder);
       }
     });
