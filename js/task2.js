@@ -2,22 +2,18 @@
 (function () {
   'use strict';
   const $ = (selector) => document.querySelector(selector);
-  function setBusy(button, busy) { if (button) button.disabled = Boolean(busy); }
-  function countdown(status, duration, label) {
+  function countdownButton(button, duration, label) {
     return new Promise((resolve) => {
-      if (!status) { window.setTimeout(resolve, duration); return; }
-      status.replaceChildren();
-      const wrap = document.createElement('div'); wrap.className = 'sl-countdown';
-      const spinner = document.createElement('span'); spinner.className = 'sl-spinner'; spinner.setAttribute('aria-hidden', 'true');
-      const text = document.createElement('span'); text.className = 'sl-countdown-text';
-      const track = document.createElement('span'); track.className = 'sl-progress';
-      const fill = document.createElement('span'); track.appendChild(fill); wrap.append(spinner, text, track); status.appendChild(wrap);
+      if (!button) { window.setTimeout(resolve, duration); return; }
+      const original = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = '<span class="sl-button-loading"><span class="sl-spinner" aria-hidden="true"></span><span class="sl-button-loading-text"></span></span>';
+      const text = button.querySelector('.sl-button-loading-text');
       const start = Date.now();
       function tick() {
         const elapsed = Date.now() - start;
-        text.textContent = `${label} ${Math.max(0, Math.ceil((duration - elapsed) / 1000))} detik`;
-        fill.style.width = `${Math.min(100, elapsed / duration * 100)}%`;
-        if (elapsed >= duration) { text.textContent = `${label} selesai`; fill.style.width = '100%'; resolve(); return; }
+        if (text) text.textContent = `${label} ${Math.max(0, Math.ceil((duration - elapsed) / 1000))} dtk`;
+        if (elapsed >= duration) { button.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Selesai'; button.disabled = true; button.classList.add('is-done'); resolve(); return; }
         window.requestAnimationFrame(tick);
       }
       tick();
@@ -46,16 +42,21 @@
 
     // Slot 7 is reserved for an admin-managed display/native creative in the dismissible overlay.
     // Popunder scripts belong in a separate admin slot and are never copied into the modal.
-    overlayTimer = window.setTimeout(() => {
-      const hasDisplayAd = overlaySlot && (overlaySlot.querySelector('.sl-admin-ad-slot > *, .sl-admin-image-ad, iframe, img, ins, a') || overlaySlot.dataset.slAdMounted === 'true' && !overlaySlot.classList.contains('sl-global-ad-loaded'));
-      if (hasDisplayAd && overlay) {
-        overlay.classList.add('is-visible'); overlay.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden'; overlayClose?.focus({ preventScroll: true });
-      }
-    }, 11000);
+    function scheduleOverlay(delay = 11000) {
+      window.clearTimeout(overlayTimer);
+      overlayTimer = window.setTimeout(() => {
+        const hasDisplayAd = overlaySlot && (overlaySlot.querySelector('.sl-admin-ad-slot > *, .sl-admin-image-ad, iframe, img, ins, a') || overlaySlot.dataset.slAdMounted === 'true' && !overlaySlot.classList.contains('sl-global-ad-loaded'));
+        if (hasDisplayAd && overlay) {
+          overlay.classList.add('is-visible'); overlay.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden'; overlayClose?.focus({ preventScroll: true });
+        } else scheduleOverlay(11000);
+      }, delay);
+    }
+    scheduleOverlay(11000);
     function closeOverlay() {
       overlay?.classList.remove('is-visible'); overlay?.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      scheduleOverlay(11000);
     }
     overlayClose?.addEventListener('click', closeOverlay);
     overlay?.addEventListener('click', (event) => { if (event.target === overlay) closeOverlay(); });
@@ -63,17 +64,17 @@
 
     first?.addEventListener('click', async () => {
       if (started || first.disabled) return;
-      started = true; setBusy(first, true); first.classList.add('hide');
-      await countdown(status, 10000, 'Menyiapkan langkah pertama');
-      save?.classList.remove('hide'); down?.classList.remove('hide'); setBusy(first, false);
+      started = true;
+      await countdownButton(first, 10000, 'Loading');
+      save?.classList.remove('hide'); down?.classList.remove('hide');
       if (status) status.textContent = 'Langkah pertama selesai. Tautan sponsor bersifat opsional.';
       scrollTo(save || down);
     });
     save?.addEventListener('click', async () => {
       if (saveStarted || save.disabled) return;
-      saveStarted = true; setBusy(save, true); save.classList.add('hide');
-      await countdown(statusSave || status, 10000, 'Menyiapkan langkah Download Save');
-      setBusy(save, false); down?.classList.remove('hide');
+      saveStarted = true;
+      await countdownButton(save, 10000, 'Loading');
+      down?.classList.remove('hide');
       if (statusSave) statusSave.textContent = 'Langkah Download Save selesai.';
       scrollTo(down);
     });
@@ -83,9 +84,9 @@
     });
     summary?.addEventListener('click', async () => {
       if (summaryStarted || summary.disabled) return;
-      summaryStarted = true; setBusy(summary, true); summary.classList.add('hide');
-      await countdown(status2, 10000, 'Memproses langkah download');
-      up?.classList.remove('hide'); setBusy(summary, false);
+      summaryStarted = true;
+      await countdownButton(summary, 10000, 'Loading');
+      up?.classList.remove('hide');
       if (status2) status2.textContent = 'Selesai. Tekan Next Up untuk kembali ke atas dan menyelesaikan Task 2.';
       scrollTo(up);
     });
@@ -103,14 +104,14 @@
     });
     next?.addEventListener('click', async () => {
       if (!completed || navigating || next.disabled) return;
-      navigating = true; next.classList.add('hide'); if (success) success.classList.add('hide'); setBusy(next, true);
-      await countdown(status, 5000, 'Menyiapkan pilihan berikutnya');
+      navigating = true; if (success) success.classList.add('hide');
+      await countdownButton(next, 5000, 'Loading');
       const choices = document.createElement('div'); choices.className = 'sl-next-choices';
       const task3 = document.createElement('a'); task3.className = 'btn task2-btn task2-btn-blue';
       task3.href = '/task3.html' + (slug ? '?slug=' + encodeURIComponent(slug) : ''); task3.innerHTML = '<i class="fa-solid fa-arrow-right"></i> Lanjut ke Task 3';
       const paid = document.createElement('a'); paid.className = 'btn task2-btn task2-btn-green';
       paid.href = directLink?.href || '/shortlink-payment.html'; paid.innerHTML = '<i class="fa-solid fa-bolt"></i> Akses Langsung (Berbayar)';
-      choices.append(task3, paid); completionArea?.appendChild(choices); completionArea?.classList.add('is-visible'); navigating = false; setBusy(next, false);
+      choices.append(task3, paid); completionArea?.appendChild(choices); completionArea?.classList.add('is-visible'); navigating = false;
     });
     noticeClose?.addEventListener('click', () => completionArea?.classList.remove('is-visible'));
     window.addEventListener('pagehide', () => { if (overlayTimer) window.clearTimeout(overlayTimer); document.body.style.overflow = ''; }, { once: true });
