@@ -625,3 +625,49 @@ html[data-theme="dark"] .app-card,html[data-theme="dark"] .app-stat,html[data-th
 @media(max-width:900px){.earnings-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.announcement-card{padding:16px;border-radius:17px}.announcement-form{grid-template-columns:1fr}.announcement-form label:nth-child(2){grid-column:auto}.announcement-form button{width:100%;justify-content:center}.earnings-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.earnings-summary-grid .stat-card{padding:12px 10px;gap:9px}.earnings-summary-grid .stat-card strong{font-size:15px}.earnings-summary-grid .stat-card small{font-size:9px}.trend-heading{flex-direction:column}.trend-current{width:100%}.line-chart svg{min-height:150px}.chart-axis-label{font-size:9px}}
 @media(max-width:390px){.earnings-summary-grid{grid-template-columns:1fr}.announcement-form{gap:10px}}
+
+/* Clean dashboard layout: intentionally scoped to dashboard.html */
+.dashboard-clean{max-width:1120px;margin-inline:auto;gap:18px}
+.dashboard-page-heading{padding:8px 0 2px;margin-bottom:2px}
+.dashboard-page-heading h1{font-size:clamp(1.55rem,4vw,2rem);line-height:1.2;margin:0 0 7px;font-weight:800;letter-spacing:-.035em;color:var(--sl-text)}
+.dashboard-page-heading p{margin:0;color:var(--sl-muted);font-size:clamp(1rem,2.7vw,1.12rem);font-weight:600}
+.dashboard-clean .announcement-card,.dashboard-clean .analytics-card{margin:0}
+.dashboard-clean .announcement-card{padding:20px;border:1px solid var(--sl-border);border-radius:18px;background:var(--sl-surface);box-shadow:var(--sl-shadow)}
+.dashboard-clean .section-head{margin-bottom:14px}
+.dashboard-clean .section-head h2,.dashboard-clean .trend-heading h2{margin:0;font-size:1.1rem;letter-spacing:-.02em;color:var(--sl-text)}
+.dashboard-clean .section-head p,.dashboard-clean .trend-heading p{margin:5px 0 0;color:var(--sl-muted);font-size:.88rem}
+.dashboard-clean .clean-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0}
+.dashboard-clean .stat-card{min-width:0;padding:17px;border:1px solid var(--sl-border);border-radius:16px;background:var(--sl-surface);box-shadow:0 5px 18px rgba(15,23,42,.045);gap:12px}
+.dashboard-clean .stat-card>div:last-child{min-width:0}
+.dashboard-clean .stat-card span{font-size:.86rem;color:var(--sl-muted);font-weight:600}
+.dashboard-clean .stat-card strong{display:block;margin-top:6px;font-size:clamp(1.05rem,2.7vw,1.35rem);line-height:1.25;overflow-wrap:anywhere;color:var(--sl-text)}
+.dashboard-clean .stat-card small{display:block;margin-top:5px;color:var(--sl-muted);font-size:.78rem}
+.dashboard-clean .stat-icon{width:40px;height:40px;flex:0 0 40px;border-radius:12px}
+.dashboard-clean .clean-chart-card,.dashboard-clean .clean-daily-card{padding:20px;border:1px solid var(--sl-border);border-radius:18px;background:var(--sl-surface);box-shadow:var(--sl-shadow)}
+.dashboard-clean .trend-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.dashboard-clean .trend-current{min-width:115px;text-align:right}
+.dashboard-clean .trend-current small{display:block;color:var(--sl-muted);font-size:.76rem}
+.dashboard-clean .trend-current b{display:block;margin-top:4px;font-size:1rem;color:var(--sl-text)}
+.dashboard-clean .line-chart{width:100%;min-height:230px;overflow:hidden}
+.dashboard-clean .line-chart svg{display:block;width:100%;height:auto;min-height:210px}
+.dashboard-clean .chart-detail{min-height:42px;padding:11px 13px;border-radius:11px;background:var(--sl-gradient-soft);color:var(--sl-text);font-size:.9rem}
+.dashboard-clean .daily-statistics-table{min-width:760px}
+.dashboard-clean .daily-statistics-table th,.dashboard-clean .daily-statistics-table td{padding:12px 13px;white-space:nowrap}
+.dashboard-clean .announcement-form{gap:12px}
+.dashboard-clean .announcement-form label{display:grid;gap:7px;color:var(--sl-text);font-size:.88rem;font-weight:650}
+.dashboard-clean .announcement-form input,.dashboard-clean .announcement-form textarea{width:100%;box-sizing:border-box;border:1px solid var(--sl-border-strong);border-radius:11px;padding:12px 13px;background:var(--sl-surface-strong);color:var(--sl-text);font:inherit;outline-offset:2px}
+.dashboard-clean .announcement-form textarea{resize:vertical}
+@media(max-width:700px){.dashboard-clean{gap:14px;padding-inline:14px}.dashboard-clean .clean-summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.dashboard-clean .stat-card{padding:13px;gap:9px}.dashboard-clean .stat-icon{width:34px;height:34px;flex-basis:34px}.dashboard-clean .clean-chart-card,.dashboard-clean .clean-daily-card,.dashboard-clean .announcement-card{padding:15px;border-radius:15px}.dashboard-clean .trend-heading{gap:8px}.dashboard-clean .trend-current{min-width:90px}.dashboard-clean .trend-current small{font-size:.68rem}.dashboard-clean .line-chart{min-height:190px}.dashboard-clean .line-chart svg{min-height:185px}}
+@media(max-width:380px){.dashboard-clean .clean-summary{grid-template-columns:1fr}.dashboard-clean .stat-card{display:flex;align-items:center}}
+
+/* Dashboard announcement feed: displays announcements sent from the Admin panel */
+.dashboard-announcements-list{display:grid;gap:12px;margin-top:14px}
+.dashboard-announcement-item{display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid var(--sl-border);border-radius:14px;background:var(--sl-surface-strong)}
+.dashboard-announcement-icon{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border-radius:11px;background:color-mix(in srgb,var(--primary) 14%,transparent);color:var(--primary)}
+.dashboard-announcement-copy{min-width:0;flex:1}
+.dashboard-announcement-copy h3{margin:0 0 5px;color:var(--sl-text);font-size:.96rem;font-weight:750;overflow-wrap:anywhere}
+.dashboard-announcement-copy p{margin:0;color:var(--sl-text);font-size:.88rem;line-height:1.6;overflow-wrap:anywhere;white-space:pre-wrap}
+.dashboard-announcement-copy small{display:block;margin-top:8px;color:var(--sl-muted);font-size:.74rem}
+.dashboard-announcement-copy a{display:inline-flex;gap:6px;align-items:center;margin-top:9px;color:var(--primary);font-size:.82rem;font-weight:700;text-decoration:none}
+.dashboard-announcement-copy a:hover{text-decoration:underline}
+.announcement-empty{margin:0;padding:14px;border:1px dashed var(--sl-border);border-radius:12px;color:var(--sl-muted);font-size:.88rem}
