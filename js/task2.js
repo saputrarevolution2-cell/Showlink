@@ -33,7 +33,7 @@
 
     const first = $('#top'), save = $('#save'), down = $('#down'), summary = $('#now'), up = $('#up'), next = $('#next');
     const success = $('#success'), completionArea = $('#task-completion-area');
-    const overlay = $('#task2-ad-overlay'), overlayClose = $('#task2-ad-overlay-close'), overlaySlot = $('[data-shortlink-ad-page="task2"][data-shortlink-ad-slot="7"]');
+    const overlay = $('#task2-ad-overlay'), overlayClose = $('#task2-ad-overlay-close'), overlaySlot = $('#task2-ad-unit');
     let started = false, saveStarted = false, summaryStarted = false, completed = false, navigating = false;
     let overlayTimer = null;
 
