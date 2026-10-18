@@ -594,3 +594,34 @@ html[data-theme="dark"] .app-card,html[data-theme="dark"] .app-stat,html[data-th
 .donut-foot{font-size:.84rem;color:var(--muted,#64748b);line-height:1.4;min-height:1.2em}
 .donut-hint{font-size:.76rem;color:var(--donut-color,#64748b);font-weight:650}
 @media(max-width:480px){.pastelink-donut-grid{gap:10px}.pastelink-donut-card{padding:16px 8px;border-radius:16px}.donut-chart{width:clamp(94px,29vw,126px)}.donut-chart:before{inset:8px}.donut-label{font-size:.82rem}.donut-foot{font-size:.72rem}.donut-hint{font-size:.7rem}}
+
+
+/* Dashboard earnings overview + interactive seven-day trends */
+.announcement-card{margin:0 0 22px;padding:22px;border:1px solid var(--line);border-radius:20px;background:var(--surface);box-shadow:var(--shadow)}
+.announcement-card[hidden]{display:none!important}
+.announcement-card h2,.trend-heading h2{margin:7px 0 5px;font-size:clamp(18px,2vw,22px);letter-spacing:-.45px;color:var(--text)}
+.announcement-card p,.trend-heading p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}
+.announcement-form{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:18px}
+.announcement-form label{display:grid;gap:7px;color:var(--text);font-size:12px;font-weight:750}
+.announcement-form label:nth-child(2){grid-column:1/-1}
+.announcement-form input,.announcement-form textarea{width:100%;min-height:43px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);color:var(--text);outline:none;font:inherit;font-size:13px;resize:vertical}
+.announcement-form input:focus,.announcement-form textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 13%,transparent)}
+.announcement-form button{justify-self:start}.announcement-feedback{grid-column:1/-1;min-height:16px}
+.earnings-summary-grid{grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:25px}
+.earnings-summary-grid .stat-card{min-width:0;align-items:flex-start}
+.earnings-summary-grid .stat-card>div:last-child{min-width:0}
+.earnings-summary-grid .stat-card strong{overflow-wrap:anywhere}
+.earnings-summary-grid .stat-card small{font-size:10px;line-height:1.5}
+.trend-card{cursor:default!important}
+.trend-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.trend-current{flex:0 0 auto;min-width:150px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface2)}
+.trend-current small{display:block;color:var(--muted);font-size:10px;line-height:1.5}.trend-current b{display:block;margin-top:5px;font-size:18px;color:var(--text);font-variant-numeric:tabular-nums}
+.line-chart{width:100%;margin-top:14px;overflow:hidden}.line-chart svg{display:block;width:100%;height:auto;min-height:170px;overflow:visible}
+.chart-gridline{stroke:var(--line);stroke-width:1;stroke-dasharray:3 4}.chart-axis-label{fill:var(--muted);font-size:10px}
+.chart-line-path{fill:none;stroke:#6956ee;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.chart-point{fill:var(--surface);stroke:#6956ee;stroke-width:3;cursor:pointer;vector-effect:non-scaling-stroke;transition:r .15s ease,fill .15s ease}.chart-point:hover,.chart-point:focus{fill:#a855f7;r:7;outline:none}
+.chart-detail{margin-top:8px;padding:11px 13px;border-radius:12px;background:var(--surface2);color:var(--text);font-size:12px;font-weight:750;line-height:1.5}
+.daily-statistics-card{margin-bottom:20px}.daily-statistics-table{min-width:760px}.daily-statistics-table th,.daily-statistics-table td{font-size:10px}.daily-statistics-table th{white-space:normal}
+@media(max-width:900px){.earnings-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.announcement-card{padding:16px;border-radius:17px}.announcement-form{grid-template-columns:1fr}.announcement-form label:nth-child(2){grid-column:auto}.announcement-form button{width:100%;justify-content:center}.earnings-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.earnings-summary-grid .stat-card{padding:12px 10px;gap:9px}.earnings-summary-grid .stat-card strong{font-size:15px}.earnings-summary-grid .stat-card small{font-size:9px}.trend-heading{flex-direction:column}.trend-current{width:100%}.line-chart svg{min-height:150px}.chart-axis-label{font-size:9px}}
+@media(max-width:390px){.earnings-summary-grid{grid-template-columns:1fr}.announcement-form{gap:10px}}
