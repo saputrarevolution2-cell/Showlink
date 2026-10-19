@@ -44,7 +44,7 @@
   }
   const t=k=>{
     const isId=(document.documentElement.lang||"id").toLowerCase().startsWith("id");
-    const fallback={orders:isId?"Pesanan":"Orders",withdraw:isId?"Penarikan":"Withdraw",myPaymentLinks:isId?"Link Saya":"My Links",profile:isId?"Profil":"Profile",settings:isId?"Pengaturan":"Settings",about:isId?"Tentang":"About",notifications:isId?"Notifikasi":"Notifications",paymentLink:"Payment Link",dashboard:"Dashboard",signOut:isId?"Keluar":"Sign out",home:isId?"Beranda":"Home",support:isId?"Suport":"Support",endorse:"Endorse",login:isId?"Masuk":"Login",register:isId?"Daftar":"Register",allPublicLinks:isId?"Tautan Publik":"Public Links",pastelink:"PasteLink",shortlink:"Shortlink",sub4unlock:"Sub4Unlock",vip:"VIP",premium:"Premium",comingSoon:isId?"Segera hadir":"Coming soon",create:isId?"Buat":"Create"};
+    const fallback={"all-public-links":isId?"Tautan Publik":"All Public Links","my-links":isId?"Link Saya":"My Links","payment-link":"Payment Link",settings:isId?"Pengaturan":"Settings",orders:isId?"Pesanan":"Orders",withdraw:isId?"Penarikan":"Withdraw",myPaymentLinks:isId?"Link Saya":"My Links",profile:isId?"Profil":"Profile",settings:isId?"Pengaturan":"Settings",about:isId?"Tentang":"About",notifications:isId?"Notifikasi":"Notifications",paymentLink:"Payment Link",dashboard:"Dashboard",signOut:isId?"Keluar":"Sign out",home:isId?"Beranda":"Home",support:isId?"Suport":"Support",endorse:"Endorse",login:isId?"Masuk":"Login",register:isId?"Daftar":"Register",allPublicLinks:isId?"Tautan Publik":"Public Links",pastelink:"PasteLink",shortlink:"Shortlink",sub4unlock:"Sub4Unlock",vip:"VIP",premium:"Premium",comingSoon:isId?"Segera hadir":"Coming soon",create:isId?"Buat":"Create"};
     const translated=window.ShowLinkLanguage?.t?.(k);
     return translated&&translated!==k?translated:(fallback[k]||k);
   };
@@ -55,18 +55,25 @@
   function badge(label,cls){return `<span class="sl-new-badge ${cls}">${label}</span>`;}
   function disabledLink(ic,key,badgeText,badgeClass){return `<a class="sl-nav-link sl-nav-link-disabled" href="#" data-nav-link data-nav-key="${key}" aria-disabled="true" tabindex="-1"><span>${icon(ic.cls,ic.name)}</span><span class="sl-nav-link-label">${t(key)}</span>${badge(badgeText,badgeClass)}</a>`;}
   function authMarkup(){
+    // Keep the authenticated drawer in sync with every configurable admin menu key.
     return `${link(C.dashboard,{cls:"sl-icon-blue",name:"fa-gauge-high"},"dashboard")}
+      ${link("/all-public-links.html",{cls:"sl-icon-blue",name:"fa-globe"},"all-public-links")}
       <div class="sl-drawer-divider"></div>
       ${link(C.pastelink,{cls:"sl-icon-blue",name:"fa-file-lines"},"pastelink")}
       ${link(C.shortlink,{cls:"sl-icon-pink",name:"fa-link"},"shortlink")}
-      ${link(C.paymentLink,{cls:"sl-icon-red",name:"fa-credit-card"},"paymentLink")}
+      ${link(C.paymentLink,{cls:"sl-icon-red",name:"fa-credit-card"},"payment-link")}
       ${link("/sub4unlock.html",{cls:"sl-icon-muted",name:"fa-lock-open"},"sub4unlock")}
       <div class="sl-drawer-divider"></div>
+      ${link("/order.html",{cls:"sl-icon-blue",name:"fa-receipt"},"order")}
+      ${link("/notifikasi.html",{cls:"sl-icon-blue",name:"fa-bell"},"notifications")}
       ${link(C.withdraw,{cls:"sl-icon-green",name:"fa-money-bill-transfer"},"withdraw")}
+      ${link("/kelola-tautan.html",{cls:"sl-icon-purple",name:"fa-link"},"my-links")}
+      ${link("/pengaturan.html",{cls:"sl-icon-muted",name:"fa-gear"},"settings")}
       <div class="sl-drawer-divider"></div>
       ${link(C.profile,{cls:"sl-icon-purple",name:"fa-user"},"profile")}
       ${link("/premium.html",{cls:"sl-icon-premium",name:"fa-gem"},"premium")}
-      <div class="sl-drawer-divider"></div>
+      ${link("/premium.html",{cls:"sl-icon-premium",name:"fa-crown"},"vip")}
+      ${link("/endorse.html",{cls:"sl-icon-pink",name:"fa-bullhorn"},"endorse")}
       ${link(C.support,{cls:"sl-icon-green",name:"fa-headset"},"support")}
       ${link(C.about,{cls:"sl-icon-blue",name:"fa-circle-info"},"about")}
       <a class="sl-nav-link sl-nav-logout" href="/index.html" data-nav-link data-nav-key="logout" data-logout><span>${icon("sl-icon-red","fa-right-from-bracket")}</span><span class="sl-nav-link-label" data-i18n="signOut">${t("signOut")}</span></a>`;
@@ -98,17 +105,18 @@
     try{
       const sb=await window.ShowLinkSupabase?.load?.();if(!sb)return;
       const {data,error}=await sb.rpc("get_public_shortlink_control_settings");if(error||!data)return;
-      const map={"/dashboard.html":"dashboard","/all-public-links.html":"all-public-links","/pastelink.html":"pastelink","/shortlink.html":"shortlink","/payment-link.html":"payment-link","/order.html":"order","/notifikasi.html":"notifications","/withdraw.html":"withdraw","/profil.html":"profile","/kelola-tautan.html":"my-links","/pengaturan.html":"settings","/about.html":"about","/support.html":"support","/endorse.html":"endorse"};
+      const map={"/dashboard.html":"dashboard","/all-public-links.html":"all-public-links","/pastelink.html":"pastelink","/shortlink.html":"shortlink","/payment-link.html":"payment-link","/order.html":"order","/notifikasi.html":"notifications","/withdraw.html":"withdraw","/profil.html":"profile","/kelola-tautan.html":"my-links","/pengaturan.html":"settings","/about.html":"about","/support.html":"support","/endorse.html":"endorse","/sub4unlock.html":"sub4unlock","/premium.html":"premium"};
       const settings=data.navbar_visibility||{};
       // Normalize legacy/admin keys so one saved toggle controls every matching navbar entry.
-      const aliases={paymentLink:"payment-link",payment_link:"payment-link",myPaymentLinks:"my-links",myLinks:"my-links",orders:"order",profile:"profile",notifications:"notifications",sub4unlock:"sub4unlock"};
+      const aliases={paymentLink:"payment-link",payment_link:"payment-link",myPaymentLinks:"my-links",myLinks:"my-links",orders:"order",profile:"profile",notifications:"notifications",allPublicLinks:"all-public-links",all_public_links:"all-public-links",endorsements:"endorse"};
       const isHidden=key=>{const candidates=[key,aliases[key],...Object.keys(aliases).filter(k=>aliases[k]===key)];return candidates.some(k=>k&&settings[k]===false);};
+      const isBottomHidden=key=>settings[`bottom:${key}`]===false;
       const order=Array.isArray(settings.__order)?settings.__order:[];
       const drawer=document.querySelector("[data-navbar-menu]");if(drawer&&order.length){const nodes=[...drawer.children];nodes.sort((a,b)=>{const key=x=>x.querySelector("[data-nav-link]")?.dataset.navKey||"";const ai=order.indexOf(key(a)),bi=order.indexOf(key(b));return (ai<0?999:ai)-(bi<0?999:bi)}).forEach(n=>drawer.appendChild(n));}
       const bottomOrder=Array.isArray(settings.__bottom_order)?settings.__bottom_order:["dashboard","withdraw","create","premium","profile"];
       const createItems={pastelink:"pastelink",shortlink:"shortlink","payment-link":"payment-link",sub4unlock:"sub4unlock"};const createMenu=document.querySelector("[data-bottom-create-menu]");createMenu?.querySelectorAll("a").forEach(a=>{const key=Object.keys(createItems).find(k=>a.getAttribute("href")===(k==="payment-link"?"/payment-link.html":`/${k}.html`));if(key){a.hidden=isHidden(createItems[key]);a.style.display=a.hidden?"none":"";}});
       const bottom=document.querySelector("[data-showlink-bottom-nav]");if(bottom){
-        const createButton=bottom.querySelector("[data-bottom-create]");const createWrap=bottom.querySelector(".sl-bottom-create-wrap");if(createWrap){const allCreateHidden=["pastelink","shortlink","payment-link","sub4unlock"].every(k=>isHidden(k));createWrap.hidden=isHidden("create")||allCreateHidden;createWrap.style.display=createWrap.hidden?"none":"";}const nodes=[...bottom.children];nodes.sort((a,b)=>{const key=x=>x.dataset.bottomLink|| (x.querySelector("[data-bottom-create]")?"create":"");const ai=bottomOrder.indexOf(key(a)),bi=bottomOrder.indexOf(key(b));return (ai<0?999:ai)-(bi<0?999:bi)}).forEach(n=>bottom.appendChild(n));bottom.querySelectorAll("[data-bottom-link]").forEach(a=>{const k=a.dataset.bottomLink;a.hidden=isHidden(k);a.style.display=a.hidden?"none":"";});}
+        const createWrap=bottom.querySelector(".sl-bottom-create-wrap");if(createWrap){const allCreateHidden=["pastelink","shortlink","payment-link","sub4unlock"].every(k=>isHidden(k));createWrap.hidden=isBottomHidden("create")||allCreateHidden;createWrap.style.display=createWrap.hidden?"none":"";}const nodes=[...bottom.children];nodes.sort((a,b)=>{const key=x=>x.dataset.bottomLink|| (x.querySelector("[data-bottom-create]")?"create":"");const ai=bottomOrder.indexOf(key(a)),bi=bottomOrder.indexOf(key(b));return (ai<0?999:ai)-(bi<0?999:bi)}).forEach(n=>bottom.appendChild(n));bottom.querySelectorAll("[data-bottom-link]").forEach(a=>{const k=a.dataset.bottomLink;a.hidden=isBottomHidden(k);a.style.display=a.hidden?"none":"";});}
 
       document.querySelectorAll("[data-showlink-navbar] [data-nav-link]").forEach(a=>{
         const key=a.dataset.navKey||map[new URL(a.href,location.origin).pathname];if(!key)return;

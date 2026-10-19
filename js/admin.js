@@ -47,6 +47,9 @@
     const appearanceFields={bg:'navbar-color-bg',drawer:'navbar-color-drawer',text:'navbar-color-text',accent:'navbar-color-accent'};
     for(const [key,id] of Object.entries(appearanceFields)){const el=$('#'+id);if(el&&/^#[0-9a-f]{6}$/i.test(appearance[key]||''))el.value=appearance[key];}
     const order=Array.isArray(nav.__order)?nav.__order:[];document.querySelectorAll('[data-nav-config]').forEach((card,i)=>{let sel=card.querySelector('[data-nav-position]');if(!sel){sel=document.createElement('label');sel.className='admin-nav-position';sel.innerHTML='Posisi menu<select data-nav-position></select>';card.appendChild(sel);sel=sel.querySelector('select');}const key=card.dataset.navConfig;const pos=order.indexOf(key);sel.innerHTML=Array.from({length:document.querySelectorAll('[data-nav-config]').length},(_,n)=>`<option value="${n}">${n+1}</option>`).join('');sel.value=String(pos<0?i:pos);});
+    const bottomOrder=Array.isArray(nav.__bottom_order)?nav.__bottom_order:["dashboard","withdraw","create","premium","profile"];
+    document.querySelectorAll('[data-bottom-visible]').forEach(el=>{const key=el.dataset.bottomVisible;el.checked=nav[`bottom:${key}`]!==false;});
+    document.querySelectorAll('[data-bottom-position]').forEach(el=>{const pos=bottomOrder.indexOf(el.dataset.bottomPosition);el.value=String(pos<0?["dashboard","withdraw","create","premium","profile"].indexOf(el.dataset.bottomPosition):pos);});
     const items=nav.__items||{};
     document.querySelectorAll('[data-navbar-side-text]').forEach(el=>{const item=items[el.dataset.navbarSideText]||{};el.value=typeof item.text==='string'?item.text:'';});
     document.querySelectorAll('[data-navbar-side-text-color]').forEach(el=>{const item=items[el.dataset.navbarSideTextColor]||{};if(/^#[0-9a-f]{6}$/i.test(item.text_color||''))el.value=item.text_color;});
@@ -57,6 +60,8 @@
     out.__appearance={bg:$('#navbar-color-bg').value,drawer:$('#navbar-color-drawer').value,text:$('#navbar-color-text').value,accent:$('#navbar-color-accent').value};
     out.__order=[...document.querySelectorAll('[data-nav-config]')].sort((a,b)=>Number(a.querySelector('[data-nav-position]')?.value||0)-Number(b.querySelector('[data-nav-position]')?.value||0)).map(a=>a.dataset.navConfig);
     out.__items={};
+    document.querySelectorAll('[data-bottom-visible]').forEach(el=>{out[`bottom:${el.dataset.bottomVisible}`]=el.checked;});
+    out.__bottom_order=[...document.querySelectorAll('[data-bottom-position]')].sort((a,b)=>Number(a.value)-Number(b.value)).map(el=>el.dataset.bottomPosition);
     document.querySelectorAll('[data-navbar-side-text]').forEach(el=>{const key=el.dataset.navbarSideText;out.__items[key]={text:el.value.trim().slice(0,18),text_color:$(`[data-navbar-side-text-color="${key}"]`)?.value||'#ffffff',bg_color:$(`[data-navbar-side-bg="${key}"]`)?.value||'#2563eb'};});
     return out;
   }

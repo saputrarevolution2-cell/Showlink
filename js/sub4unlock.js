@@ -1,0 +1,1 @@
+document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.sub4-primary,.sub4-secondary').forEach(a=>a.addEventListener('click',()=>{a.setAttribute('aria-busy','true');}));});
