@@ -1,7 +1,7 @@
 /* ShowLink — shared imported navbar */
 (() => {
   "use strict";
-  const C={home:"/index.html",dashboard:"/dashboard.html",allPublicLinks:"/all-public-links.html",pastelink:"/pastelink.html",shortlink:"/shortlink.html",support:"/support.html",endorse:"/endorse.html",paymentLink:"/payment-link.html",orders:"/order.html",notifications:"/notifikasi.html",withdraw:"/withdraw.html",myLinks:"/kelola-tautan.html",profile:"/profil.html",settings:"/pengaturan.html",about:"/about.html",admin:"/admin.html",login:"/login.html",register:"/register.html"};
+  const C={home:"/index.html",dashboard:"/dashboard.html",allPublicLinks:"/all-public-links.html",pastelink:"/pastelink.html",shortlink:"/shortlink.html",sub4unlock:"#",vip:"#",premium:"#",support:"/support.html",endorse:"/endorse.html",paymentLink:"/payment-link.html",orders:"/order.html",notifications:"/notifikasi.html",withdraw:"/withdraw.html",myLinks:"/kelola-tautan.html",profile:"/profil.html",settings:"/pengaturan.html",about:"/about.html",admin:"/admin.html",login:"/login.html",register:"/register.html"};
   let authUser=null, loaded=false, supabaseBootstrap=null, templatePromise=null, renderVersion=0;
   // Authentication must come from the real Supabase session, never stale localStorage.
   const logged=()=>!!authUser;
@@ -44,14 +44,36 @@
   }
   const t=k=>{
     const isId=(document.documentElement.lang||"id").toLowerCase().startsWith("id");
-    const fallback={orders:isId?"Pesanan":"Orders",withdraw:isId?"Penarikan":"Withdraw",myPaymentLinks:isId?"Link Saya":"My Links",profile:isId?"Profil":"Profile",settings:isId?"Pengaturan":"Settings",about:isId?"Tentang":"About",notifications:isId?"Notifikasi":"Notifications",paymentLink:"Payment Link",dashboard:"Dashboard",signOut:isId?"Keluar":"Sign out",home:isId?"Beranda":"Home",support:isId?"Bantuan":"Support",endorse:isId?"Endorse":"Endorse",login:isId?"Masuk":"Login",register:isId?"Daftar":"Register",allPublicLinks:"All Link",pastelink:"PasteLink",shortlink:"Shortlink",comingSoon:isId?"Segera hadir":"Coming soon",create:isId?"Buat":"Create"};
-    return window.ShowLinkLanguage?.t?.(k)||fallback[k]||k;
+    const fallback={orders:isId?"Pesanan":"Orders",withdraw:isId?"Penarikan":"Withdraw",myPaymentLinks:isId?"Link Saya":"My Links",profile:isId?"Profil":"Profile",settings:isId?"Pengaturan":"Settings",about:isId?"Tentang":"About",notifications:isId?"Notifikasi":"Notifications",paymentLink:"Payment Link",dashboard:"Dashboard",signOut:isId?"Keluar":"Sign out",home:isId?"Beranda":"Home",support:isId?"Suport":"Support",endorse:"Endorse",login:isId?"Masuk":"Login",register:isId?"Daftar":"Register",allPublicLinks:isId?"Tautan Publik":"Public Links",pastelink:"PasteLink",shortlink:"Shortlink",sub4unlock:"Sub4Unlock",vip:"VIP",premium:"Premium",comingSoon:isId?"Segera hadir":"Coming soon",create:isId?"Buat":"Create"};
+    const translated=window.ShowLinkLanguage?.t?.(k);
+    return translated&&translated!==k?translated:(fallback[k]||k);
   };
   const icon=(cls,name)=>`<i class="fa-solid ${name}${cls?` ${cls}`:""}" aria-hidden="true"></i>`;
   const link=(href,ic,key,extra="")=>`<a class="sl-nav-link" href="${href}" data-nav-link ${extra}><span>${icon(ic.cls,ic.name)}</span><span class="sl-nav-link-label" data-i18n="${key}">${t(key)}</span></a>`;
   const soon=(href,ic,key)=>`${link(href,ic,key)}<span class="sl-new-badge sl-new-gray">${t("comingSoon")}</span>`;
   function withSoon(href,ic,key){return link(href,ic,key).replace("</a>",`<span class="sl-new-badge sl-new-gray sl-coming-soon-badge">${t("comingSoon")}</span></a>`);}
-  function authMarkup(){return `${link(C.dashboard,{cls:"sl-icon-blue",name:"fa-gauge-high"},"dashboard")}${withSoon(C.allPublicLinks,{cls:"sl-icon-cyan",name:"fa-globe"},"allPublicLinks")}<div class="sl-drawer-divider"></div>${link(C.pastelink,{cls:"sl-icon-purple",name:"fa-file-lines"},"pastelink").replace("</a>",`<span class="sl-new-badge sl-pastelink-new"><i class="fa-solid fa-sparkles" aria-hidden="true"></i> NEW</span></a>`)}${link(C.shortlink,{cls:"sl-icon-orange",name:"fa-link"},"shortlink")}${link(C.paymentLink,{cls:"sl-icon-yellow",name:"fa-credit-card"},"paymentLink").replace("</a>",`<span class="sl-new-badge sl-payment-trend"><i class="fa-solid fa-fire" aria-hidden="true"></i> TREND</span></a>`)}<div class="sl-drawer-divider"></div>${link(C.orders,{cls:"sl-icon-purple",name:"fa-receipt"},"orders",'data-order-link').replace('</a>','<span class="sl-new-badge sl-new-green" data-order-new>NEW</span></a>')}${link(C.notifications,{cls:"sl-icon-pink",name:"fa-bell"},"notifications",'data-menu-notifications-link').replace('</a>','<span class="sl-menu-notification-badge" data-menu-notification-badge hidden></span></a>')}${link(C.withdraw,{cls:"sl-icon-green",name:"fa-money-bill-transfer"},"withdraw")}<div class="sl-drawer-divider"></div>${link(C.profile,{cls:"sl-icon-purple",name:"fa-user"},"profile")}${link(C.myLinks,{cls:"sl-icon-blue",name:"fa-link"},"myPaymentLinks")}${link(C.settings,{cls:"sl-icon-yellow",name:"fa-gear"},"settings")}<div class="sl-drawer-divider"></div>${link(C.about,{cls:"sl-icon-blue",name:"fa-circle-info"},"about")}${link(C.support,{cls:"sl-icon-green",name:"fa-headset"},"support")}${link(C.endorse,{cls:"sl-icon-pink",name:"fa-bullhorn"},"endorse")}<a class="sl-nav-link sl-nav-logout" href="/index.html" data-logout>${icon("sl-icon-red","fa-right-from-bracket")}<span data-i18n="signOut">${t("signOut")}</span></a>`;}
+  function badge(label,cls){return `<span class="sl-new-badge ${cls}">${label}</span>`;}
+  function disabledLink(ic,key,badgeText,badgeClass){return `<a class="sl-nav-link sl-nav-link-disabled" href="#" data-nav-link data-nav-key="${key}" aria-disabled="true" tabindex="-1"><span>${icon(ic.cls,ic.name)}</span><span class="sl-nav-link-label">${t(key)}</span>${badge(badgeText,badgeClass)}</a>`;}
+  function authMarkup(){
+    return `${link(C.dashboard,{cls:"sl-icon-blue",name:"fa-gauge-high"},"dashboard")}
+      <div class="sl-drawer-divider"></div>
+      ${link(C.pastelink,{cls:"sl-icon-blue",name:"fa-file-lines"},"pastelink").replace("</a>",`${badge("NEW","sl-badge-pastelink").replace("</span>"," <i class=\"fa-solid fa-code\" aria-hidden=\"true\"></i></span>")}</a>`)}
+      ${link(C.shortlink,{cls:"sl-icon-pink",name:"fa-link"},"shortlink").replace("</a>",`${badge("TREND","sl-badge-shortlink").replace("</span>"," <i class=\"fa-solid fa-code\" aria-hidden=\"true\"></i></span>")}</a>`)}
+      ${link(C.paymentLink,{cls:"sl-icon-red",name:"fa-credit-card"},"paymentLink").replace("</a>",`${badge("NEW","sl-badge-payment").replace("</span>"," <i class=\"fa-solid fa-code\" aria-hidden=\"true\"></i></span>")}</a>`)}
+      ${disabledLink({cls:"sl-icon-muted",name:"fa-lock"},"sub4unlock",t("comingSoon"),"sl-badge-soon")}
+      <div class="sl-drawer-divider"></div>
+      ${link(C.endorse,{cls:"sl-icon-viral",name:"fa-bullhorn"},"endorse").replace("</a>",`${badge("VIRAL","sl-badge-viral").replace("</span>"," <i class=\"fa-solid fa-code\" aria-hidden=\"true\"></i></span>")}</a>`)}
+      ${link(C.notifications,{cls:"sl-icon-pink",name:"fa-bell"},"notifications",'data-menu-notifications-link').replace('</a>','<span class="sl-menu-notification-badge" data-menu-notification-badge hidden></span></a>')}
+      ${link(C.withdraw,{cls:"sl-icon-green",name:"fa-money-bill-transfer"},"withdraw")}
+      <div class="sl-drawer-divider"></div>
+      ${link(C.profile,{cls:"sl-icon-purple",name:"fa-user"},"profile")}
+      ${disabledLink({cls:"sl-icon-vip",name:"fa-crown"},"vip","BETA","sl-badge-beta")}
+      ${disabledLink({cls:"sl-icon-premium",name:"fa-gem"},"premium","BETA","sl-badge-beta")}
+      <div class="sl-drawer-divider"></div>
+      ${link(C.support,{cls:"sl-icon-green",name:"fa-headset"},"support")}
+      ${link(C.about,{cls:"sl-icon-blue",name:"fa-circle-info"},"about")}
+      <a class="sl-nav-link sl-nav-logout" href="/index.html" data-nav-link data-nav-key="logout" data-logout><span>${icon("sl-icon-red","fa-right-from-bracket")}</span><span class="sl-nav-link-label" data-i18n="signOut">${t("signOut")}</span></a>`;
+  }
   function guestMarkup(){return `${link(C.home,{cls:"sl-icon-blue",name:"fa-house"},"home")}${link(C.support,{cls:"sl-icon-green",name:"fa-headset"},"support")}${link(C.endorse,{cls:"sl-icon-pink",name:"fa-bullhorn"},"endorse")}<div class="sl-drawer-divider"></div>${link(C.login,{cls:"sl-icon-green",name:"fa-right-to-bracket"},"login")}${link(C.register,{cls:"sl-icon-yellow",name:"fa-user-plus"},"register")}`;}
   async function loadTemplate(){
     if(loaded)return true;
@@ -80,7 +102,27 @@
       const sb=await window.ShowLinkSupabase?.load?.();if(!sb)return;
       const {data,error}=await sb.rpc("get_public_shortlink_control_settings");if(error||!data)return;
       const map={"/dashboard.html":"dashboard","/all-public-links.html":"all-public-links","/pastelink.html":"pastelink","/shortlink.html":"shortlink","/payment-link.html":"payment-link","/order.html":"order","/notifikasi.html":"notifications","/withdraw.html":"withdraw","/profil.html":"profile","/kelola-tautan.html":"my-links","/pengaturan.html":"settings","/about.html":"about","/support.html":"support","/endorse.html":"endorse"};
-      document.querySelectorAll("[data-showlink-navbar] [data-nav-link]").forEach(a=>{const key=map[new URL(a.href,location.origin).pathname];if(key){const hide=!!(data.navbar_visibility&&data.navbar_visibility[key]===false);a.hidden=hide;a.style.display=hide?"none":"";}});
+      const settings=data.navbar_visibility||{};
+      document.querySelectorAll("[data-showlink-navbar] [data-nav-link]").forEach(a=>{
+        const key=a.dataset.navKey||map[new URL(a.href,location.origin).pathname];if(!key)return;
+        const hide=settings[key]===false;a.hidden=hide;a.style.display=hide?"none":"";
+        let badgeEl=a.querySelector(".sl-admin-nav-badge");
+        const item=settings.__items?.[key]||{},label=String(item.text||"").trim().slice(0,18);
+        if(label){
+          if(!badgeEl){badgeEl=document.createElement("span");badgeEl.className="sl-admin-nav-badge";badgeEl.setAttribute("aria-label",label);a.appendChild(badgeEl);}
+          badgeEl.textContent=label;
+          badgeEl.style.color=/^#[0-9a-f]{6}$/i.test(item.text_color||"")?item.text_color:"#ffffff";
+          badgeEl.style.backgroundColor=/^#[0-9a-f]{6}$/i.test(item.bg_color||"")?item.bg_color:"#2563eb";
+          badgeEl.hidden=false;
+          a.querySelectorAll(".sl-new-badge:not(.sl-admin-nav-badge)").forEach(existing=>existing.hidden=true);
+        }else{
+          if(badgeEl)badgeEl.remove();
+          a.querySelectorAll(".sl-new-badge").forEach(existing=>existing.hidden=false);
+        }
+      });
+      const appearance=settings.__appearance||{},root=document.documentElement;
+      const cssMap={bg:"--sl-admin-nav-bg",drawer:"--sl-admin-drawer-bg",text:"--sl-admin-nav-text",accent:"--sl-admin-nav-accent"};
+      for(const [key,variable] of Object.entries(cssMap)){const value=appearance[key];if(/^#[0-9a-f]{6}$/i.test(value||""))root.style.setProperty(variable,value);else root.style.removeProperty(variable);}
     }catch(e){console.debug("ShowLink navbar visibility settings unavailable",e);}
   }
   async function refreshAdminVisibility(){const els=document.querySelectorAll("[data-admin-nav]");if(!els.length||!logged())return;try{const sb=await window.ShowLinkSupabase?.load?.();if(!sb)return;const {data:{session}}=await sb.auth.getSession();if(!session)return;const {data,error}=await sb.rpc("is_current_user_admin");if(!error&&data===true)els.forEach(e=>e.hidden=false);}catch{}}
@@ -187,6 +229,6 @@
   }
   function logoutReady(){if(window.__showLinkLogoutReady)return;window.__showLinkLogoutReady=true;document.addEventListener("click",async e=>{const b=e.target instanceof Element?e.target.closest("[data-logout]"):null;if(!b)return;e.preventDefault();closeDrawer();try{const sb=await window.ShowLinkSupabase?.load?.();await sb?.auth.signOut();}catch{}localStorage.removeItem("showlink_user");window.dispatchEvent(new CustomEvent("showlink:auth-change",{detail:{user:null}}));location.replace(C.home);});}
   window.ShowLinkNavbar={render,refresh:()=>{render()},refreshNotifications:refreshNotificationBadge,setAuth:u=>{authUser=u||null;render()}};
-  window.addEventListener("showlink:auth-change",e=>{authUser=e.detail?.user||null;render();});document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();closeNotificationPanel(document.querySelector("[data-showlink-navbar]"));closeCreateMenu(document.querySelector("[data-showlink-navbar]"));}});logoutReady();
+  window.addEventListener("showlink:auth-change",e=>{authUser=e.detail?.user||null;render();});window.addEventListener("showlink:language-change",()=>render());document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeDrawer();closeNotificationPanel(document.querySelector("[data-showlink-navbar]"));closeCreateMenu(document.querySelector("[data-showlink-navbar]"));}});logoutReady();
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>{authUser=null;render()},{once:true});else{authUser=null;render();}
 })();

@@ -43,8 +43,21 @@
     $('#shortlink-redirect-url').value=s.shortlink_redirect_url||'';
     const nav=s.navbar_visibility||{};
     document.querySelectorAll('[data-navbar-key]').forEach(el=>{el.checked=nav[el.dataset.navbarKey]!==false;});
+    const appearance=nav.__appearance||{};
+    const appearanceFields={bg:'navbar-color-bg',drawer:'navbar-color-drawer',text:'navbar-color-text',accent:'navbar-color-accent'};
+    for(const [key,id] of Object.entries(appearanceFields)){const el=$('#'+id);if(el&&/^#[0-9a-f]{6}$/i.test(appearance[key]||''))el.value=appearance[key];}
+    const items=nav.__items||{};
+    document.querySelectorAll('[data-navbar-side-text]').forEach(el=>{const item=items[el.dataset.navbarSideText]||{};el.value=typeof item.text==='string'?item.text:'';});
+    document.querySelectorAll('[data-navbar-side-text-color]').forEach(el=>{const item=items[el.dataset.navbarSideTextColor]||{};if(/^#[0-9a-f]{6}$/i.test(item.text_color||''))el.value=item.text_color;});
+    document.querySelectorAll('[data-navbar-side-bg]').forEach(el=>{const item=items[el.dataset.navbarSideBg]||{};if(/^#[0-9a-f]{6}$/i.test(item.bg_color||''))el.value=item.bg_color;});
   }
-  function collectNavVisibility(){const out={};document.querySelectorAll('[data-navbar-key]').forEach(el=>out[el.dataset.navbarKey]=el.checked);return out;}
+  function collectNavVisibility(){
+    const out={};document.querySelectorAll('[data-navbar-key]').forEach(el=>out[el.dataset.navbarKey]=el.checked);
+    out.__appearance={bg:$('#navbar-color-bg').value,drawer:$('#navbar-color-drawer').value,text:$('#navbar-color-text').value,accent:$('#navbar-color-accent').value};
+    out.__items={};
+    document.querySelectorAll('[data-navbar-side-text]').forEach(el=>{const key=el.dataset.navbarSideText;out.__items[key]={text:el.value.trim().slice(0,18),text_color:$(`[data-navbar-side-text-color="${key}"]`)?.value||'#ffffff',bg_color:$(`[data-navbar-side-bg="${key}"]`)?.value||'#2563eb'};});
+    return out;
+  }
   async function saveControlCenterSettings(){
     const slots=[];
     document.querySelectorAll('[data-page-ad]').forEach(field=>{const code=field.value.trim();if(code)slots.push({page:field.dataset.pageAd,slot:Number(field.dataset.pageSlot),enabled:true,code});});
