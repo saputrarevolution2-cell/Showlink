@@ -13,7 +13,7 @@
 <link rel="icon" href="/assets/showlink-favicon.png">
 <link rel="stylesheet" href="/css/navbar.css?v=20261017-nav37"><link rel="stylesheet" href="/css/footer.css">
 <link rel="stylesheet" href="/css/login.css"><link rel="icon" type="image/svg+xml" href="/assets/showlink-favicon.svg"><link rel="icon" type="image/png" sizes="512x512" href="/assets/showlink-favicon.png"><link rel="apple-touch-icon" href="/assets/showlink-favicon.png"><script src="/js/theme.js"></script>
-<script src="/js/navbar.js?v=20261017-nav37" defer></script>
+<script src="/js/navbar.js?v=20261019-endorse1" defer></script>
 <script src="/js/footer.js" defer></script>
 <script src="/js/language.js?v=20261009-nav35" defer></script>
 </head>
@@ -21,24 +21,6 @@
 <div data-showlink-navbar></div>
 <main class="auth-main">
   <div class="sl-container auth-wrap">
-    <aside class="auth-intro">
-      <div class="auth-intro-top">
-        <a href="/" class="auth-brand"><span class="brand-mark"><i class="fa-solid fa-link"></i></span>ShowLink</a>
-        <div class="auth-kicker"><i class="fa-solid fa-shield-halved"></i> SHOWLINK ACCOUNT</div>
-        <h1 data-i18n="authWelcome">Selamat datang kembali</h1>
-        <p data-i18n="authWelcomeSub">Masuk untuk melanjutkan ke akun ShowLink.</p>
-        <div class="auth-points">
-          <div class="auth-point"><i class="fa-solid fa-link"></i><span data-i18n="authManage">Kelola Payment Link</span></div>
-          <div class="auth-point"><i class="fa-solid fa-chart-line"></i><span data-i18n="authAnalytics">Lihat performa dan aktivitas akun</span></div>
-          <div class="auth-point"><i class="fa-solid fa-lock"></i><span data-i18n="authSecure">Akses akun dengan aman</span></div>
-        </div>
-      </div>
-      <div class="auth-art" aria-hidden="true">
-        <div class="auth-art-card main"><div class="auth-art-icon"><i class="fa-solid fa-chart-line"></i></div><div class="auth-art-line long"></div><div class="auth-art-line"></div><div class="auth-art-line short"></div></div>
-        <div class="auth-art-card small"><div class="auth-art-icon"><i class="fa-solid fa-link"></i></div><div class="auth-art-line"></div><div class="auth-art-line short"></div></div>
-      </div>
-    </aside>
-
     <section class="auth-card" aria-labelledby="login-heading">
       <div class="auth-head">
         <div class="auth-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
@@ -49,7 +31,8 @@
       <div class="auth-alert" data-auth-alert role="alert"></div>
 
       <form class="auth-form" data-auth-form="login" novalidate>
-        <div class="auth-field">
+        <div class="auth-recent-accounts" data-recent-accounts hidden><label data-i18n="recentAccounts">Akun yang pernah digunakan</label><div data-recent-account-list></div></div>
+        <div class="auth-field" data-login-email-field>
           <label for="login-email" data-i18n="email">Email</label>
           <div class="auth-input-wrap">
             <i class="fa-regular fa-envelope"></i>
@@ -82,6 +65,12 @@
       </div>
       <p class="auth-terms" data-i18n="authTerms">Dengan melanjutkan, kamu menyetujui Ketentuan Layanan dan Kebijakan Privasi ShowLink.</p>
       <a class="auth-back" href="/"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="backHome">Kembali ke beranda</span></a>
+    </section>
+    <section class="auth-info-bottom" aria-label="Tentang ShowLink">
+      <div class="auth-info-brand"><span class="auth-info-logo"><i class="fa-solid fa-link"></i></span><div><strong>ShowLink</strong><small>SHOWLINK ACCOUNT</small></div></div>
+      <h2 data-i18n="authWelcome">Selamat datang kembali</h2>
+      <p data-i18n="authWelcomeSub">Masuk untuk melanjutkan ke akun ShowLink.</p>
+      <div class="auth-info-points"><span><i class="fa-solid fa-link"></i><b data-i18n="authManage">Kelola Payment Link</b></span><span><i class="fa-solid fa-chart-line"></i><b data-i18n="authAnalytics">Lihat performa dan aktivitas akun</b></span><span><i class="fa-solid fa-shield-halved"></i><b data-i18n="authSecure">Akses akun dengan aman</b></span></div>
     </section>
   </div>
 </main>
