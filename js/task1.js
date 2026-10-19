@@ -1,4 +1,4 @@
-/* ShowLink Task 1 — editorial flow with transparent sponsor links. */
+/* ShowLink Task 1 — clear, single-pass user flow. */
 (function () {
   'use strict';
   const $ = (selector) => document.querySelector(selector);
@@ -25,67 +25,78 @@
   function setBusy(button, busy) { if (button) button.disabled = busy; }
   function init() {
     if (!window.SLF) return;
-    const flow = window.SLF, status = $('#status'), statusSave = $('#save-status'), status2 = $('#status2');
-    const directSlug = new URLSearchParams(location.search).get('slug') || sessionStorage.getItem('sl_slug') || '';
-    const directAccessLink = document.getElementById('sl-direct-access-link');
+    const flow = window.SLF, status = $('#status'), status2 = $('#status2');
+    const directSlug = new URLSearchParams(location.search).get("slug") || sessionStorage.getItem("sl_slug") || "";
+    const directAccessLink = document.getElementById("sl-direct-access-link");
     const directNotice = $('#sl-direct-floating-notice'), directNoticeClose = $('#sl-direct-notice-close');
-    if (directAccessLink && directSlug) directAccessLink.href = '/shortlink-payment.html?slug=' + encodeURIComponent(directSlug);
+    if (directAccessLink && directSlug) directAccessLink.href = "/shortlink-payment.html?slug=" + encodeURIComponent(directSlug);
+    // Akses langsung adalah notifikasi mandiri: tampil sejak halaman dibuka,
+    // tidak menunggu Task 1 selesai dan tidak bergantung pada notifikasi sukses.
     directNotice?.classList.add('is-visible');
     directNoticeClose?.addEventListener('click', () => directNotice?.classList.remove('is-visible'));
     const firstDownload = $('#top'), sponsorButton = $('#save'), scrollDownButton = $('#down');
     const summaryDownload = $('#now'), scrollUpButton = $('#up'), continueButton = $('#next');
     const successMessage = $('#success'), notice = $('#task-completion-area'), noticeClose = $('#task-notice-close');
-    let started = false, sponsorStarted = false, summaryStarted = false, completing = false, navigating = false;
+    const sponsorSlot = $('[data-shortlink-ad-slot="1"]');
+    let started = false, summaryStarted = false, completing = false, navigating = false;
     flow.get().then((data) => { const title = $('#title'); if (title) title.textContent = `${data.title || 'Shortlink'} — Task 1`; })
       .catch((error) => { if (status) status.textContent = error.message || 'Data shortlink belum bisa dimuat.'; });
 
+    // 1) Download awal: 10 detik, lalu munculkan Download Save dan Next ke bawah.
     firstDownload?.addEventListener('click', async () => {
-      if (started || firstDownload.disabled) return; started = true; setBusy(firstDownload, true); firstDownload.classList.add('hide');
+      if (started || firstDownload.disabled) return; started = true; setBusy(firstDownload, true);
       await countdown(status, 10000, 'Menyiapkan langkah pertama');
-      sponsorButton?.classList.remove('hide'); scrollDownButton?.classList.remove('hide'); setBusy(firstDownload, false);
-      if (status) status.textContent = 'Langkah pertama selesai. Kamu bisa melanjutkan ke bawah atau membuka sponsor secara opsional.';
+      firstDownload.classList.add('hide'); sponsorButton?.classList.remove('hide'); scrollDownButton?.classList.remove('hide');
+      setBusy(firstDownload, false);
+      if (status) status.textContent = 'Langkah pertama selesai. Pilih Download Save atau lanjut ke bawah.';
       scrollToElement(sponsorButton || scrollDownButton);
     });
-    // Download Save is a local step timer; ad links remain separately labelled and optional.
-    sponsorButton?.addEventListener('click', async () => {
-      if (sponsorStarted || sponsorButton.disabled) return; sponsorStarted = true; setBusy(sponsorButton, true); sponsorButton.classList.add('hide');
-      await countdown(statusSave, 10000, 'Menyiapkan langkah Download Save');
-      setBusy(sponsorButton, false); scrollDownButton?.classList.remove('hide');
-      if (statusSave) statusSave.textContent = 'Langkah Download Save selesai.';
-      scrollToElement(scrollDownButton);
+    // Sponsor opsional: buka URL sponsor yang dikonfigurasi admin jika tersedia.
+    sponsorButton?.addEventListener('click', () => {
+      const anchor = sponsorSlot?.querySelector('a[href]');
+      if (anchor && /^https?:$/.test(new URL(anchor.href).protocol)) window.open(anchor.href, '_blank', 'noopener,noreferrer');
+      else scrollToElement(sponsorSlot);
+      if (status) status.textContent = 'Sponsor dibuka jika tautannya tersedia. Klik iklan tidak diwajibkan.';
     });
+    // 2) Scroll ke bawah menuju ringkasan, lalu tampilkan tombol Download.
     scrollDownButton?.addEventListener('click', () => {
       scrollDownButton.classList.add('hide'); scrollToElement($('.magazine-side-card') || $('#bottom-step'));
       window.setTimeout(() => { summaryDownload?.classList.remove('hide'); scrollToElement(summaryDownload); }, 500);
     });
+    // 3) Download ringkasan: 7 detik, lalu tampilkan Next Up.
     summaryDownload?.addEventListener('click', async () => {
-      if (summaryStarted || summaryDownload.disabled) return; summaryStarted = true; setBusy(summaryDownload, true); summaryDownload.classList.add('hide');
-      await countdown(status2, 10000, 'Memproses langkah download');
-      scrollUpButton?.classList.remove('hide'); setBusy(summaryDownload, false);
+      if (summaryStarted || summaryDownload.disabled) return; summaryStarted = true; setBusy(summaryDownload, true);
+      await countdown(status2, 7000, 'Memproses download');
+      summaryDownload.classList.add('hide'); scrollUpButton?.classList.remove('hide'); setBusy(summaryDownload, false);
       if (status2) status2.textContent = 'Selesai. Tekan Next Up untuk kembali ke atas dan menyelesaikan Task 1.';
       scrollToElement(scrollUpButton);
     });
+    // 4) Next Up: kembali ke atas dan munculkan notifikasi sukses beserta tombol lanjut.
     scrollUpButton?.addEventListener('click', () => {
       if (completing) return; completing = true;
-      scrollUpButton.classList.add('hide'); sponsorButton?.classList.add('hide'); scrollDownButton?.classList.add('hide'); summaryDownload?.classList.add('hide'); firstDownload?.classList.add('hide');
+      scrollUpButton.classList.add('hide'); sponsorButton?.classList.add('hide'); scrollDownButton?.classList.add('hide');
+      summaryDownload?.classList.add('hide'); firstDownload?.classList.add('hide');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       window.setTimeout(() => {
         try { sessionStorage.setItem(`sl_task1_complete_${flow.slug()}`, 'true'); } catch (_) {}
-        if (successMessage) { successMessage.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Gass Kuyy Lanjut Cok! Task 1 selesai.'; successMessage.classList.remove('hide'); }
-        if (continueButton) { continueButton.textContent = 'Gass Kuyy Lanjut Cok'; continueButton.classList.remove('hide'); continueButton.disabled = false; }
+        if (successMessage) { successMessage.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Success — Task 1 Done'; successMessage.classList.remove('hide'); }
+        if (continueButton) { continueButton.textContent = 'Lanjut ke Task 2'; continueButton.classList.remove('hide'); continueButton.disabled = false; }
         notice?.classList.add('is-visible'); if (status) status.textContent = ''; continueButton?.focus({ preventScroll: true });
       }, 450);
     });
+    // 5) Satu klik pada Lanjut ke Task 2 memulai loading 5 detik, lalu berpindah.
     continueButton?.addEventListener('click', async () => {
-      if (!completing || navigating || continueButton.disabled) return; navigating = true;
-      continueButton.classList.add('hide'); if (successMessage) successMessage.classList.add('hide'); setBusy(continueButton, true);
-      await countdown(status, 5000, 'Menyiapkan pilihan berikutnya');
-      const choices = document.createElement('div'); choices.className = 'sl-next-choices';
-      const task2 = document.createElement('a'); task2.className = 'btn task1-btn task1-btn-blue'; task2.href = '/task2.html' + (directSlug ? '?slug=' + encodeURIComponent(directSlug) : ''); task2.innerHTML = '<i class="fa-solid fa-arrow-right"></i> Lanjut ke Task 2';
-      const paid = document.createElement('a'); paid.className = 'btn task1-btn task1-btn-green'; paid.href = directAccessLink?.href || '/shortlink-payment.html'; paid.innerHTML = '<i class="fa-solid fa-bolt"></i> Akses Langsung (Berbayar)';
-      choices.append(task2, paid); notice?.appendChild(choices); notice?.classList.add('is-visible'); navigating = false;
+      if (!completing || navigating || continueButton.disabled) return; navigating = true; setBusy(continueButton, true);
+      await countdown(status, 5000, 'Membuka Task 2'); flow.go('task2.html');
     });
-    noticeClose?.addEventListener('click', () => notice?.classList.remove('is-visible'));
+    // Menutup notifikasi tidak mengunci alur: tombol lanjut tetap tersedia di kartu utama.
+    noticeClose?.addEventListener('click', () => {
+      notice?.classList.remove('is-visible');
+      if (completing && continueButton) {
+        continueButton.classList.remove('hide'); continueButton.style.position = 'static'; continueButton.style.width = '100%'; continueButton.style.marginTop = '12px';
+        const card = $('.card'); if (card && !card.contains(continueButton)) card.appendChild(continueButton);
+      }
+    });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 })();

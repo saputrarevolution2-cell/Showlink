@@ -7,29 +7,9 @@
   const msg=(s,ok=false)=>{const e=$("#admin-message");e.textContent=s||"";e.className=`app-message ${ok?"success":"error"}`;e.hidden=!s;};
   async function rpc(name,args={}){const {data,error}=await sb.rpc(name,args);if(error)throw error;return data;}
   async function userAction(action,user_id){const {data,error}=await sb.functions.invoke("admin-user-action",{body:{action,user_id}});if(error){let detail=error.message||"Edge Function gagal";try{const response=error.context;if(response&&typeof response.json==="function"){const body=await response.json();if(body?.error)detail=body.error;}}catch{}throw new Error(detail);}if(data?.error)throw new Error(data.error);return data;}
-
-  function ensureExtendedAdSlots(){
-    for(const page of ['task1','task2','task3','final']){
-      const existing=document.querySelector(`[data-page-ad="${page}"][data-page-slot="1"]`);
-      const section=existing?.closest('.admin-page-ads-section');
-      const grid=section?.querySelector('.admin-adsterra-grid');
-      if(!grid)continue;
-      for(let n=8;n<=28;n++){
-        if(grid.querySelector(`[data-page-ad="${page}"][data-page-slot="${n}"]`))continue;
-        const label=document.createElement('label');
-        label.textContent=`Adsterra ${page.toUpperCase()} Slot ${n}`;
-        const area=document.createElement('textarea');
-        area.id=`page-ad-${page}-${n}`;area.dataset.pageAd=page;area.dataset.pageSlot=String(n);
-        area.rows=3;area.placeholder=`Tempel kode/unit Adsterra ${page.toUpperCase()} slot ${n}...`;
-        label.appendChild(area);grid.appendChild(label);
-      }
-    }
-  }
-
   async function boot(){
     try{sb=await window.ShowLinkSupabase.load();const {data:{session}}=await sb.auth.getSession();if(!session){location.replace('/login.html?next=/admin.html');return;}
       const admin=await rpc('is_current_user_admin');if(!admin){document.body.innerHTML='<main style="max-width:620px;margin:15vh auto;padding:30px;text-align:center;font-family:Inter,sans-serif"><h1>Akses Ditolak</h1><p>Akun ini bukan administrator.</p><a href="/dashboard.html">Kembali ke Dashboard</a></main>';return;}
-      ensureExtendedAdSlots();
       await Promise.all([loadStats(),loadGateway(),loadControls(),loadControlCenterSettings(),loadTab('users'),loadSupport(),loadWithdrawSummary()]);
     }catch(e){msg(e.message||'Gagal memuat Admin Panel');}
   }
@@ -51,10 +31,6 @@
   async function loadControlCenterSettings(){
     const s=await rpc('admin_get_control_center_settings');
     $('#admin-cpm').value=s.cpm??1;
-    const tierSettings=(s.shortlink_flow&&s.shortlink_flow.ad_tiers)||{};
-    $('#ad-tier-low-rate').value=Number(tierSettings.low?.rate??0);
-    $('#ad-tier-medium-rate').value=Number(tierSettings.medium?.rate??0);
-    $('#ad-tier-high-rate').value=Number(tierSettings.high?.rate??0);
     $('#image-ad-enabled').checked=!!s.image_ad_enabled;
     $('#image-ad-url').value=s.image_ad_url||'';
     $('#image-ad-target').value=s.image_ad_target_url||'';
@@ -81,7 +57,7 @@
       p_image_ad_enabled:$('#image-ad-enabled').checked,p_image_ad_url:imageUrl,p_image_ad_target_url:target,
       p_shortlink_redirect_enabled:$('#shortlink-redirect-enabled').checked,
       p_shortlink_redirect_label:$('#shortlink-redirect-label').value.trim()||'Lanjutkan',
-      p_shortlink_redirect_url:$('#shortlink-redirect-url').value.trim(),p_shortlink_flow:{task1:true,task2:true,task3:true,ad_tiers:{low:{percent:50,rate:Number($('#ad-tier-low-rate').value||0)},medium:{percent:75,rate:Number($('#ad-tier-medium-rate').value||0)},high:{percent:100,rate:Number($('#ad-tier-high-rate').value||0)}}},p_endorsement_slots:endorsements
+      p_shortlink_redirect_url:$('#shortlink-redirect-url').value.trim(),p_shortlink_flow:{task1:true,task2:true,task3:true},p_endorsement_slots:endorsements
     });
   }
   $('#control-center-form').addEventListener('submit',async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await saveControlCenterSettings();msg('CPM dan pengaturan iklan berhasil disimpan.',true);}catch(x){msg(x.message||'Gagal menyimpan CPM/iklan');}finally{b.disabled=false;}});
@@ -95,7 +71,7 @@
   async function loadTab(tab){current=tab;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));$("#admin-table-caption").textContent=({users:'Kelola akun: ban, buka ban, atau hapus user.',pastelinks:'Edit isi/judul/kedaluwarsa atau hapus PasteLink.',shortlinks:'Edit URL, harga akses, atau hapus Shortlink.',links:'Edit metadata dan status atau hapus payment link.',orders:'Pantau semua order platform.',withdrawals:'Approve, proses, atau reject permintaan withdrawal.'})[tab];const spec=maps[tab];$("#admin-head").innerHTML='<tr>'+spec.heads.map(h=>`<th>${h}</th>`).join('')+'</tr>';$("#admin-body").innerHTML='<tr><td colspan="8">Memuat data…</td></tr>';const data=await rpc(spec.fn,{p_limit:500});cache[tab]=Array.isArray(data)?data:[];render(tab);}
   function actionBtn(label,attrs,klass=''){return `<button type="button" class="admin-table-action ${klass}" ${attrs}>${label}</button>`;}
   function render(tab){const rows=cache[tab]||[];if(!rows.length){$("#admin-body").innerHTML='<tr><td colspan="8" class="app-empty">Tidak ada data.</td></tr>';return;}let html='';
-    if(tab==='users')html=rows.map(r=>`<tr><td><small>${esc(String(r.id).slice(0,8))}…</small></td><td><strong>${esc(r.username)}</strong>${r.is_admin?'<small><br>Administrator</small>':''}</td><td>${esc(r.auth_email||'-')}</td><td>${esc(r.plan||'free')}</td><td>${r.is_admin?'YES':'-'}</td><td>${money(r.balance)}</td><td><span class="status-pill ${r.is_banned?'status-banned':'status-active'}">${r.is_banned?'BANNED':'Aktif'}</span></td><td><div class="admin-actions">${r.is_admin?'<span>Protected</span>':`${actionBtn(r.is_banned?'Buka ban':'Ban',`data-user-action="${r.is_banned?'unban_user':'ban_user'}" data-user-id="${esc(r.id)}"`,r.is_banned?'positive':'danger')}${actionBtn('Hapus',`data-user-action="delete_user" data-user-id="${esc(r.id)}"`,'danger')}`}</div></td></tr>`).join('');
+    if(tab==='users')html=rows.map(r=>`<tr><td><small>${esc(String(r.id).slice(0,8))}…</small></td><td><strong>${esc(r.username)}</strong>${r.is_admin?'<small><br>Administrator</small>':''}</td><td>${esc(r.auth_email||'-')}</td><td>${esc(r.plan||'free')}</td><td>${r.is_admin?'YES':'-'}</td><td>${money(r.balance)}</td><td><span class="status-pill ${r.is_banned?'status-banned':'status-active'}">${r.is_banned?'BANNED':'Aktif'}</span></td><td><div class="admin-actions">${r.is_admin?'<span>Protected</span>':`${actionBtn('Detail Profil',`data-profile-details="${esc(r.id)}"`)}${actionBtn(r.is_banned?'Buka ban':'Ban',`data-user-action="${r.is_banned?'unban_user':'ban_user'}" data-user-id="${esc(r.id)}"`,r.is_banned?'positive':'danger')}${actionBtn('Hapus',`data-user-action="delete_user" data-user-id="${esc(r.id)}"`,'danger')}`}</div></td></tr><tr class="admin-profile-detail-row" data-profile-detail-row="${esc(r.id)}" hidden><td colspan="8"><div class="admin-profile-detail-grid">${[['Nama sesuai Bank/E-Wallet',r.display_name],['Nama pemilik rekening',r.withdraw_name],['Metode withdraw',r.withdraw_method],['No. rekening',r.withdraw_account],['Billing First Name',r.billing_first_name],['Billing Last Name',r.billing_last_name],['Address 1',r.billing_address1],['Address 2',r.billing_address2],['City',r.billing_city],['State/Province',r.billing_state],['ZIP',r.billing_zip],['Country',r.billing_country],['Phone',r.billing_phone],['Withdrawal Method',r.billing_withdraw_method],['Withdrawal Account',r.billing_withdraw_account]].map(([k,v])=>`<div><small>${esc(k)}</small><strong>${esc(v||'—')}</strong></div>`).join('')}</div></td></tr>`).join('');
     if(tab==='pastelinks')html=rows.map(r=>`<tr><td><strong>${esc(r.title)}</strong><small><br>/${esc(r.slug)}</small></td><td>${r.created_at?new Date(r.created_at).toLocaleString('id-ID'):'-'}</td><td>${r.expires_at?new Date(r.expires_at).toLocaleString('id-ID'):'Tidak ada'}</td><td>${r.password_protected?'Ya':'Tidak'}</td><td><div class="admin-actions">${actionBtn('Edit',`data-paste-edit="${esc(r.id)}"`)}${actionBtn('Hapus',`data-paste-delete="${esc(r.id)}"`,'danger')}</div></td></tr>`).join('');
     if(tab==='shortlinks')html=rows.map(r=>`<tr><td><strong>${esc(r.title||r.slug)}</strong><small><br>/${esc(r.slug)}</small><small><br>${esc(r.destination_url||'')}</small></td><td><small>${esc(r.owner_id||'-')}</small></td><td>${Number(r.clicks||0)}</td><td>${Number(r.views||0)}</td><td>${money(r.access_price)}</td><td><div class="admin-actions">${actionBtn('Edit',`data-short-edit="${esc(r.id)}"`)}${actionBtn('Hapus',`data-short-delete="${esc(r.id)}"`,'danger')}</div></td></tr>`).join('');
     if(tab==='links')html=rows.map(r=>`<tr><td><strong>${esc(r.title)}</strong><small><br>/${esc(r.slug)}</small></td><td>${esc(r.owner_username||'-')}</td><td>${money(r.price)}</td><td><span class="status-pill">${esc(r.status)}</span></td><td>${Number(r.sales_count||0)}</td><td>${Number(r.views||0)}</td><td><div class="admin-actions">${actionBtn('Edit',`data-link-edit="${esc(r.id)}"`)}${actionBtn('Hapus',`data-link-delete="${esc(r.id)}"`,'danger')}</div></td></tr>`).join('');
@@ -111,6 +87,7 @@
   $("#manual-withdrawals-open").addEventListener('change',e=>setModeOpen('manual',e.target.checked,e.target));
   $("#instant-withdrawals-open").addEventListener('change',e=>setModeOpen('instant',e.target.checked,e.target));
   document.addEventListener('click',async e=>{
+    const detail=e.target.closest('[data-profile-details]');if(detail){const row=document.querySelector(`[data-profile-detail-row="${CSS.escape(detail.dataset.profileDetails)}"]`);if(row)row.hidden=!row.hidden;return;}
     const tab=e.target.closest('[data-tab]');if(tab){try{await loadTab(tab.dataset.tab);msg('');}catch(x){msg(x.message||'Gagal memuat data');}return;}
     if(e.target.closest('#refresh-admin')){try{await Promise.all([loadStats(),loadControls(),loadTab(current),loadWithdrawSummary()]);msg('Data admin diperbarui.',true);}catch(x){msg(x.message||'Refresh gagal');}return;}
     if(e.target.closest('#retry-withdraw-summary')){await loadWithdrawSummary();return;}

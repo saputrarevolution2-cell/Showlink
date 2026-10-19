@@ -4,21 +4,8 @@
   const t=k=>window.ShowLinkLanguage?.t?.(k)||k;
   const message=(k,f)=>t(k)!==k?t(k):f;
   const alertBox=()=> $("[data-auth-alert]");
-  let toastTimer;
-  function showAlert(msg,success=false){
-    const legacy=alertBox(); if(legacy){legacy.textContent=msg;legacy.classList.toggle("auth-success",success);legacy.classList.add("is-visible");}
-    let toast=document.getElementById("sl-auth-toast");
-    if(!toast){toast=document.createElement("div");toast.id="sl-auth-toast";toast.className="sl-auth-toast";toast.setAttribute("role",success?"status":"alert");toast.setAttribute("aria-live","polite");document.body.appendChild(toast);}
-    toast.className="sl-auth-toast is-visible "+(success?"success":"error");toast.innerHTML=`<i class="fa-solid ${success?'fa-circle-check':'fa-circle-exclamation'}"></i><span></span>`;toast.querySelector("span").textContent=msg;
-    clearTimeout(toastTimer);toastTimer=setTimeout(()=>{toast.classList.remove("is-visible");legacy?.classList.remove("is-visible")},3000);
-  }
-  function hideAlert(){alertBox()?.classList.remove("is-visible");const toast=document.getElementById("sl-auth-toast");if(toast)toast.classList.remove("is-visible");clearTimeout(toastTimer)}
-  function redirectDashboard(){
-    let layer=document.getElementById("sl-auth-loading");
-    if(!layer){layer=document.createElement("div");layer.id="sl-auth-loading";layer.className="sl-auth-loading";layer.innerHTML='<div class="sl-auth-loading-card"><span class="sl-auth-spinner"></span><strong data-i18n="redirecting">Menyiapkan Dashboard...</strong><small>ShowLink</small></div>';document.body.appendChild(layer);}
-    layer.classList.add("is-visible");showAlert(message("loginSuccess","Berhasil! Mengalihkan ke Dashboard."),true);
-    setTimeout(()=>location.replace("/dashboard.html"),850);
-  }
+  function showAlert(msg,success=false){const el=alertBox();if(!el)return;el.textContent=msg;el.classList.toggle("auth-success",success);el.classList.add("is-visible")}
+  function hideAlert(){alertBox()?.classList.remove("is-visible")}
   function setupPasswordToggles(){document.querySelectorAll("[data-password-toggle]").forEach(btn=>btn.addEventListener("click",()=>{const i=document.getElementById(btn.dataset.target);if(!i)return;const show=i.type==="password";i.type=show?"text":"password";btn.innerHTML=show?'<i class="fa-regular fa-eye-slash"></i>':'<i class="fa-regular fa-eye"></i>'}))}
   function setupStrength(){const i=$("#register-password"),b=$("[data-strength-bar]");if(!i||!b)return;i.addEventListener("input",()=>{let s=0,v=i.value;if(v.length>=8)s++;if(/[a-z]/.test(v)&&/[A-Z]/.test(v))s++;if(/\d/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;b.style.width=`${s*25}%`})}
   async function getClient(){try{return await window.ShowLinkSupabase.load()}catch(e){showAlert(e.message||message("authConfigError","Supabase belum dikonfigurasi."));return null}}
@@ -38,7 +25,7 @@
       <div class="auth-receipt-actions"><button type="button" class="auth-submit" data-save-receipt><i class="fa-solid fa-camera"></i> ${escapeHtml(message("saveScreenshot","Simpan screenshot"))}</button><button type="button" class="auth-secondary" data-close-receipt>${escapeHtml(message("continueDashboard","Lanjut ke Dashboard"))}</button></div>
     </div></div>`;
     document.body.appendChild(box);
-    box.querySelector("[data-close-receipt]").onclick=()=>{box.remove();redirectDashboard()};
+    box.querySelector("[data-close-receipt]").onclick=()=>{box.remove();location.replace("/dashboard.html")};
     box.querySelector("[data-save-receipt]").onclick=async()=>{
       const card=$("#auth-receipt-card"); if(!window.html2canvas){showAlert(message("screenshotUnavailable","Screenshot tidak tersedia di browser ini."));return}
       const canvas=await html2canvas(card,{backgroundColor:null,scale:2,useCORS:true});
@@ -53,7 +40,7 @@
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return showAlert(message("invalidEmail","Format email tidak valid."));
     if(!password)return showAlert(message("requiredField","Password wajib diisi."));
     const sb=await getClient();if(!sb)return;const btn=$(".auth-submit",form);if(btn)btn.disabled=true;
-    try{const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;persistUser(data.user);redirectDashboard()}
+    try{const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;persistUser(data.user);showAlert(message("loginSuccess","Login berhasil."),true);setTimeout(()=>location.replace("/dashboard.html"),350)}
     catch(e){showAlert(e.message||message("loginFailed","Email atau password salah."))}finally{if(btn)btn.disabled=false}
   }
 

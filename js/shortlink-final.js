@@ -1,9 +1,12 @@
-/* ShowLink Final gate: wait, then check completion of all three tasks. */
+/* ShowLink Final gate: initial wait, user acknowledgement, and task completion check. */
 document.addEventListener('DOMContentLoaded', async () => {
   const $ = (selector) => document.querySelector(selector);
   const status = $('#final-verify-status');
   const initialStatus = $('#final-initial-loading');
   const initialProgress = $('#final-initial-progress');
+  const humanWrap = $('#final-human-check-wrap');
+  const humanCheck = $('#final-human-check');
+  const downloadButton = $('#final-download-check');
   const goButton = $('#final-go');
   const restartButton = $('#final-start-over');
   const result = $('#final-result');
@@ -13,12 +16,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   const slug = new URLSearchParams(location.search).get('slug') || sessionStorage.getItem('sl_slug') || '';
   const flow = window.SLF;
   let destination = '';
+  let verifying = false;
+  let verified = false;
 
   if (directLink && slug) directLink.href = `/shortlink-payment.html?slug=${encodeURIComponent(slug)}`;
   directNotice?.classList.add('is-visible');
   directClose?.addEventListener('click', () => directNotice?.classList.remove('is-visible'));
-  document.documentElement.dataset.theme = 'light';
-  document.documentElement.style.colorScheme = 'light';
+  document.querySelectorAll('[data-task-theme-toggle]').forEach((button) => {
+    const icon = button.querySelector('i');
+    const apply = (theme) => {
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+      try { localStorage.setItem('showlink-theme', theme); } catch (_) {}
+      const dark = theme === 'dark';
+      button.setAttribute('aria-label', dark ? 'Aktifkan tema terang' : 'Aktifkan tema gelap');
+      if (icon) { icon.classList.toggle('fa-moon', !dark); icon.classList.toggle('fa-sun', dark); }
+    };
+    let theme = 'light';
+    try { theme = localStorage.getItem('showlink-theme') || 'light'; } catch (_) {}
+    apply(theme);
+    button.addEventListener('click', () => apply(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+  });
 
   function countdown(target, duration, label) {
     return new Promise((resolve) => {
@@ -28,8 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const spinner = document.createElement('span'); spinner.className = 'sl-spinner'; spinner.setAttribute('aria-hidden', 'true');
       const text = document.createElement('span'); text.className = 'sl-countdown-text';
       const track = document.createElement('span'); track.className = 'sl-progress';
-      const fill = document.createElement('span'); fill.id = 'final-initial-progress'; track.appendChild(fill);
-      wrap.append(spinner, text, track); target.appendChild(wrap);
+      const fill = document.createElement('span'); track.appendChild(fill); wrap.append(spinner, text, track); target.appendChild(wrap);
       const start = Date.now();
       function tick() {
         const elapsed = Date.now() - start;
@@ -52,90 +69,86 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!slug) return false;
     try { return sessionStorage.getItem(`sl_task${task}_complete_${slug}`) === 'true'; } catch (_) { return false; }
   }
-  function showRestart(message, isError = true) {
-    setResult(message, isError);
-    if (status) status.textContent = 'Selesaikan semua task di browser dan tab sesi yang sama, lalu buka kembali halaman Final.';
-    if (restartButton) {
-      restartButton.href = `/task1.html${slug ? `?slug=${encodeURIComponent(slug)}` : ''}`;
-      restartButton.hidden = false;
-    }
-    if (goButton) goButton.hidden = true;
-  }
 
-  function ensureEndorsementSlots() {
-    const card = document.querySelector('.final-card');
-    if (!card) return;
-    let top = card.querySelector('[data-shortlink-endorsements="top"]');
-    if (!top) {
-      top = document.createElement('div');
-      top.className = 'sl-endorsement-grid final-endorsement-top';
-      top.dataset.shortlinkEndorsements = 'top';
-      top.setAttribute('aria-label', 'Endorsement sponsor bagian atas');
-      const firstAds = card.querySelector('.final-ad-grid');
-      card.insertBefore(top, firstAds || card.firstChild);
-    }
-    let bottom = card.querySelector('[data-shortlink-endorsements="bottom"]');
-    if (!bottom) {
-      bottom = document.createElement('div');
-      bottom.className = 'sl-endorsement-grid final-endorsement-bottom';
-      bottom.dataset.shortlinkEndorsements = 'bottom';
-      bottom.setAttribute('aria-label', 'Endorsement sponsor bagian bawah');
-      const adGrids = card.querySelectorAll('.final-ad-grid');
-      const lastAds = adGrids[adGrids.length - 1];
-      if (lastAds) lastAds.insertAdjacentElement('afterend', bottom);
-      else card.appendChild(bottom);
-    }
-    [top, bottom].forEach((area) => {
-      if (!area.children.length) {
-        const placeholder = document.createElement('div');
-        placeholder.className = 'final-endorsement-placeholder';
-        placeholder.innerHTML = '<i class="fa-solid fa-bullhorn" aria-hidden="true"></i><span>Slot endorse sedang kosong</span><small>Mau endorse grup, akun sosial media, produk, layanan, atau promosi lainnya?</small><a class="sl-endorsement-cta" href="/endorse.html"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Endorse Sekarang</a>'; 
-        area.appendChild(placeholder);
-      }
-    });
+  async function recordFinalEvent(eventName) {
+    if (!slug || !window.ShowLinkSupabase?.load) return;
+    try {
+      const sb = await window.ShowLinkSupabase.load();
+      const { error } = await sb.rpc('record_shortlink_final_event', { p_slug: slug, p_event: eventName });
+      if (error) console.warn('Shortlink Final analytics:', error.message);
+    } catch (error) { console.warn('Shortlink Final analytics unavailable:', error?.message || error); }
   }
+  try {
+    const viewKey = `sl_final_view_recorded_${slug}`;
+    if (slug && sessionStorage.getItem(viewKey) !== 'true') {
+      await recordFinalEvent('view');
+      sessionStorage.setItem(viewKey, 'true');
+    }
+  } catch (_) { if (slug) await recordFinalEvent('view'); }
+
+  const initialLoading = countdown(initialStatus, 5000, 'Menyiapkan pemeriksaan awal');
 
   try {
-    if (!flow) throw new Error('Modul shortlink belum dimuat.');
+    if (!flow) throw new Error('Modul shortlink belum dimuat.')
     const data = await flow.get();
     const title = $('#title');
     if (title) title.textContent = `${data.title || 'Shortlink'} — Final`;
     destination = String(data.content_url || data.destination_url || '').trim();
     if (!/^https?:\/\//i.test(destination)) destination = '';
   } catch (error) {
-    await countdown(initialStatus, 5000, 'Memeriksa akses');
-    if (initialStatus) initialStatus.hidden = true;
-    ensureEndorsementSlots();
-    showRestart(error?.message || 'Data shortlink belum dapat dimuat. Buka kembali dari tautan lengkap.');
-    return;
+    if (status) status.textContent = error.message || 'Data shortlink belum dapat dimuat.';
   }
 
-  await countdown(initialStatus, 5000, 'Memeriksa penyelesaian Task 1, Task 2, dan Task 3');
+  await initialLoading;
   if (initialStatus) initialStatus.hidden = true;
-  ensureEndorsementSlots();
-  const missing = [1, 2, 3].filter((task) => !completeForTask(task));
-  if (missing.length) {
-    const label = missing.map((n) => `Task ${n}`).join(', ');
-    showRestart(`Belum semua tahapan selesai. Belum terdeteksi: ${label}. Silakan mulai kembali dari Task 1.`);
-    return;
-  }
-  if (!destination) {
-    showRestart('Semua task tercatat, tetapi URL tujuan asli belum tersedia. Coba mulai ulang atau hubungi pemilik link.');
-    return;
-  }
-  if (status) status.textContent = '';
-  setResult('Semua tahapan berhasil terdeteksi. Tombol GO sudah siap.', false);
-  if (restartButton) restartButton.hidden = true;
-  if (goButton) goButton.hidden = false;
+  if (humanWrap) humanWrap.hidden = false;
+  if (status) status.textContent = 'Centang konfirmasi untuk menampilkan tombol Download.';
+  humanCheck?.addEventListener('change', () => {
+    if (downloadButton) { downloadButton.hidden = !humanCheck.checked; downloadButton.disabled = !humanCheck.checked; }
+    if (status) status.textContent = humanCheck.checked ? 'Konfirmasi diterima. Tekan Download untuk memeriksa tahapan.' : 'Centang konfirmasi untuk menampilkan tombol Download.';
+  });
 
-  goButton?.addEventListener('click', () => {
-    if (!destination || [1, 2, 3].some((task) => !completeForTask(task))) {
-      showRestart('Pemeriksaan ulang menemukan tahapan yang belum selesai. Silakan mulai kembali dari Task 1.');
+  downloadButton?.addEventListener('click', async () => {
+    if (verifying || verified || !humanCheck?.checked) return;
+    verifying = true; downloadButton.disabled = true; downloadButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa tahapan';
+    await recordFinalEvent('click');
+    await countdown(status, 10000, 'Memeriksa Task 1, Task 2, dan Task 3');
+    const missing = [1, 2, 3].filter((task) => !completeForTask(task));
+    verifying = false;
+    if (missing.length) {
+      const missingLabel = missing.map((n) => `Task ${n}`).join(', ');
+      setResult(`Belum semua tahapan selesai. Belum terdeteksi: ${missingLabel}. Mulai kembali dari Task 1.`, true);
+      if (restartButton) { restartButton.href = `/task1.html${slug ? `?slug=${encodeURIComponent(slug)}` : ''}`; restartButton.hidden = false; }
+      downloadButton.hidden = true;
+      if (status) status.textContent = 'Selesaikan tiap task di browser dan tab sesi yang sama, lalu kembali ke halaman Final.';
       return;
     }
+    if (!destination) {
+      setResult('URL tujuan asli belum tersedia untuk shortlink ini. Hubungi pemilik link.', true);
+      downloadButton.disabled = false; downloadButton.innerHTML = '<i class="fa-solid fa-download"></i> Coba periksa lagi';
+      return;
+    }
+    verified = true;
+    setResult('Semua tahapan terdeteksi selesai. Kamu bisa membuka link tujuan asli.', false);
+    downloadButton.hidden = true;
+    if (goButton) goButton.hidden = false;
+    if (status) status.textContent = '';
+  });
+
+  goButton?.addEventListener('click', async () => {
+    if (!verified || !destination || goButton.disabled) return;
+    goButton.disabled = true;
+    goButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Membuka tujuan…';
+    // A redirect and its CPM-based revenue are recorded only after the visitor presses GO.
+    const redirectKey = `sl_final_redirect_recorded_${slug}`;
+    try {
+      if (!slug || sessionStorage.getItem(redirectKey) !== 'true') {
+        await recordFinalEvent('redirect');
+        if (slug) sessionStorage.setItem(redirectKey, 'true');
+      }
+    } catch (_) { await recordFinalEvent('redirect'); }
     const configured = String(goButton.dataset.adminDestination || '').trim();
     const target = /^https?:\/\//i.test(configured) ? configured : destination;
     location.assign(target);
   });
-
 });
