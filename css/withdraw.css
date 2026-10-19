@@ -592,3 +592,12 @@ html[data-theme="dark"] .withdraw-page .withdraw-total-strip>div{background:var(
 html[data-theme="dark"] .withdraw-page .withdraw-status-legend{background:var(--sl-surface-soft)}
 @media(max-width:600px){.withdraw-page .withdraw-total-strip{grid-template-columns:1fr}.withdraw-page .withdraw-total-strip>div{padding:13px}.withdraw-page .withdraw-status-legend p{display:grid;gap:7px}.withdraw-page .app-stat>span{align-items:flex-start}}
 @media(prefers-reduced-motion:reduce){.withdraw-page .app-stat{transition:none}.withdraw-page .app-stat:hover{transform:none}}
+
+
+/* Colorful ShowLink withdrawal icon system and membership badge */
+.withdraw-plan-chip{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:7px 12px;border:1px solid var(--sl-border);border-radius:999px;background:var(--sl-surface);color:var(--sl-text);font-size:12px;font-weight:800;box-shadow:var(--sl-shadow-sm)}
+.app-stat:nth-child(1) .stat-icon{color:#10b981}.app-stat:nth-child(2) .stat-icon{color:#f59e0b}.app-stat:nth-child(3) .stat-icon{color:#6366f1}.app-stat:nth-child(4) .stat-icon{color:#ef4444}.app-stat:nth-child(5) .stat-icon{color:#06b6d4}.app-stat:nth-child(6) .stat-icon{color:#8b5cf6}
+.withdraw-method-title>i{color:#8b5cf6}.withdraw-method-card#manual-withdraw-card .withdraw-method-title>i{color:#0ea5e9}.withdraw-method-card#instant-withdraw-card .withdraw-method-title>i{color:#f59e0b}
+.withdraw-total-strip>div:first-child>span i{color:#f59e0b}.withdraw-total-strip>div:last-child>span i{color:#10b981}
+.app-table thead th:nth-child(1){color:#8b5cf6}.app-table thead th:nth-child(2){color:#0ea5e9}.app-table thead th:nth-child(3){color:#f59e0b}.app-table thead th:nth-child(4){color:#10b981}.app-table thead th:nth-child(5){color:#ec4899}.app-table thead th:nth-child(6){color:#6366f1}.app-table thead th:nth-child(7){color:#14b8a6}.app-table thead th:nth-child(8){color:#f97316}.app-table thead th:nth-child(9){color:#64748b}
+.withdraw-status.paid,.withdraw-status.complete,.withdraw-status.completed{color:#059669;background:rgba(16,185,129,.12)}.withdraw-status.rejected{color:#dc2626;background:rgba(239,68,68,.12)}.withdraw-status.pending{color:#d97706;background:rgba(245,158,11,.13)}
