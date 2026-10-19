@@ -62,12 +62,9 @@
       ${link(C.paymentLink,{cls:"sl-icon-red",name:"fa-credit-card"},"paymentLink")}
       ${link("/sub4unlock.html",{cls:"sl-icon-muted",name:"fa-lock-open"},"sub4unlock")}
       <div class="sl-drawer-divider"></div>
-      ${link(C.endorse,{cls:"sl-icon-viral",name:"fa-bullhorn"},"endorse")}
-      ${link(C.notifications,{cls:"sl-icon-pink",name:"fa-bell"},"notifications",'data-menu-notifications-link').replace('</a>','<span class="sl-menu-notification-badge" data-menu-notification-badge hidden></span></a>')}
       ${link(C.withdraw,{cls:"sl-icon-green",name:"fa-money-bill-transfer"},"withdraw")}
       <div class="sl-drawer-divider"></div>
       ${link(C.profile,{cls:"sl-icon-purple",name:"fa-user"},"profile")}
-      ${link(C.vip,{cls:"sl-icon-vip",name:"fa-crown"},"vip")}
       ${link("/premium.html",{cls:"sl-icon-premium",name:"fa-gem"},"premium")}
       <div class="sl-drawer-divider"></div>
       ${link(C.support,{cls:"sl-icon-green",name:"fa-headset"},"support")}
