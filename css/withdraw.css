@@ -565,39 +565,3 @@ html[data-theme="dark"] .app-card,html[data-theme="dark"] .app-stat,html[data-th
 @media(max-width:850px){.app-wrap{width:min(100% - 24px,1120px);padding:100px 0 36px}.app-grid,.app-row{grid-template-columns:1fr}.app-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.app-hero{align-items:flex-start;flex-direction:column}.app-card{padding:18px}.app-table{min-width:650px}.page-scroll-table{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}}
 @media(max-width:420px){.app-wrap{width:calc(100% - 20px)}.app-stats{gap:10px}.app-stat{padding:13px}.app-stat strong{font-size:19px}.app-card{border-radius:15px}}
 
-
-/* Withdraw page polish: icon-led summaries, clear payout states, and readable history. */
-.withdraw-page .stat-icon{display:inline-grid;place-items:center;width:24px;height:24px;margin-right:5px;color:var(--sl-purple);font-size:14px;vertical-align:-2px}
-.withdraw-page .app-stat{border-radius:18px;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
-.withdraw-page .app-stat:hover{transform:translateY(-2px);border-color:var(--sl-border-strong);box-shadow:var(--sl-shadow)}
-.withdraw-page .app-stat>span{display:flex;align-items:center;gap:5px;line-height:1.45}
-.withdraw-page .app-stat>span [data-wd]{display:inline;color:var(--sl-muted)}
-.withdraw-page .withdraw-total-strip{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 16px}
-.withdraw-page .withdraw-total-strip>div{display:grid;gap:8px;padding:16px;border:1px solid var(--sl-border);border-radius:16px;background:var(--sl-gradient-soft)}
-.withdraw-page .withdraw-total-strip span{display:flex;align-items:center;gap:8px;color:var(--sl-muted);font-size:11px;font-weight:850;letter-spacing:.06em}
-.withdraw-page .withdraw-total-strip span i{color:var(--sl-purple);font-size:14px}
-.withdraw-page .withdraw-total-strip strong{font-size:clamp(20px,2.4vw,28px);font-weight:900;color:var(--sl-text);overflow-wrap:anywhere}
-.withdraw-page .withdraw-status-legend{padding:14px 16px;margin:0 0 16px;border:1px solid var(--sl-border);border-radius:14px;background:var(--sl-surface-soft);color:var(--sl-text)}
-.withdraw-page .withdraw-status-legend>strong{display:block;margin-bottom:8px;font-size:13px}
-.withdraw-page .withdraw-status-legend p{display:flex;flex-wrap:wrap;gap:6px 12px;margin:0;color:var(--sl-muted);font-size:12px;line-height:1.65}
-.withdraw-page .withdraw-status-legend b{color:var(--sl-text)}
-.withdraw-page .page-scroll-table{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--sl-border);border-radius:14px}
-.withdraw-page .app-table{min-width:1000px}
-.withdraw-page .app-table th{white-space:nowrap;font-size:11px;letter-spacing:.035em}
-.withdraw-page .app-table td{vertical-align:middle}
-.withdraw-page .withdraw-card-head h2{display:flex;align-items:center;gap:9px}
-.withdraw-page .account-edit{display:inline-flex;align-items:center;gap:7px}
-.withdraw-page #edit-account::before{content:'\f044';font-family:'Font Awesome 6 Free';font-weight:900}
-html[data-theme="dark"] .withdraw-page .withdraw-total-strip>div{background:var(--sl-surface-soft)}
-html[data-theme="dark"] .withdraw-page .withdraw-status-legend{background:var(--sl-surface-soft)}
-@media(max-width:600px){.withdraw-page .withdraw-total-strip{grid-template-columns:1fr}.withdraw-page .withdraw-total-strip>div{padding:13px}.withdraw-page .withdraw-status-legend p{display:grid;gap:7px}.withdraw-page .app-stat>span{align-items:flex-start}}
-@media(prefers-reduced-motion:reduce){.withdraw-page .app-stat{transition:none}.withdraw-page .app-stat:hover{transform:none}}
-
-
-/* Colorful ShowLink withdrawal icon system and membership badge */
-.withdraw-plan-chip{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:7px 12px;border:1px solid var(--sl-border);border-radius:999px;background:var(--sl-surface);color:var(--sl-text);font-size:12px;font-weight:800;box-shadow:var(--sl-shadow-sm)}
-.app-stat:nth-child(1) .stat-icon{color:#10b981}.app-stat:nth-child(2) .stat-icon{color:#f59e0b}.app-stat:nth-child(3) .stat-icon{color:#6366f1}.app-stat:nth-child(4) .stat-icon{color:#ef4444}.app-stat:nth-child(5) .stat-icon{color:#06b6d4}.app-stat:nth-child(6) .stat-icon{color:#8b5cf6}
-.withdraw-method-title>i{color:#8b5cf6}.withdraw-method-card#manual-withdraw-card .withdraw-method-title>i{color:#0ea5e9}.withdraw-method-card#instant-withdraw-card .withdraw-method-title>i{color:#f59e0b}
-.withdraw-total-strip>div:first-child>span i{color:#f59e0b}.withdraw-total-strip>div:last-child>span i{color:#10b981}
-.app-table thead th:nth-child(1){color:#8b5cf6}.app-table thead th:nth-child(2){color:#0ea5e9}.app-table thead th:nth-child(3){color:#f59e0b}.app-table thead th:nth-child(4){color:#10b981}.app-table thead th:nth-child(5){color:#ec4899}.app-table thead th:nth-child(6){color:#6366f1}.app-table thead th:nth-child(7){color:#14b8a6}.app-table thead th:nth-child(8){color:#f97316}.app-table thead th:nth-child(9){color:#64748b}
-.withdraw-status.paid,.withdraw-status.complete,.withdraw-status.completed{color:#059669;background:rgba(16,185,129,.12)}.withdraw-status.rejected{color:#dc2626;background:rgba(239,68,68,.12)}.withdraw-status.pending{color:#d97706;background:rgba(245,158,11,.13)}
