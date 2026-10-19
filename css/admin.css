@@ -310,3 +310,16 @@ html[data-theme="dark"] .admin-page .admin-page-ads-section textarea{background:
 html[data-theme="dark"] .admin-page .admin-adsterra-grid textarea::placeholder,
 html[data-theme="dark"] .admin-page .admin-page-ads-section input::placeholder,
 html[data-theme="dark"] .admin-page .admin-page-ads-section textarea::placeholder{color:#9aa9bf}
+
+/* Navbar appearance controls */
+.admin-nav-appearance{padding:14px;margin:8px 0 16px;border:1px solid var(--admin-border,rgba(148,163,184,.25));border-radius:14px;background:rgba(148,163,184,.045)}
+.admin-nav-appearance>strong,.admin-nav-visibility>strong{display:block;margin-bottom:8px;font-size:13px;font-weight:900}
+.admin-nav-color-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.admin-nav-color-grid label,.admin-nav-item-config>label:not(.admin-check-row){display:flex;flex-direction:column;gap:6px;font-size:11px;font-weight:800;color:var(--admin-muted,#64748b)}
+.admin-nav-color-grid input[type=color],.admin-nav-item-config input[type=color]{width:100%;height:38px;min-height:38px;padding:3px;border:1px solid rgba(148,163,184,.32);border-radius:9px;background:transparent;cursor:pointer}
+.admin-nav-visibility{display:flex;flex-direction:column;gap:8px}
+.admin-nav-item-config{display:grid;grid-template-columns:minmax(130px,1.15fr) minmax(110px,1fr) 76px 76px;gap:10px;align-items:center;padding:10px;border:1px solid rgba(148,163,184,.2);border-radius:12px;background:rgba(148,163,184,.035)}
+.admin-nav-item-config .admin-check-row{margin:0;min-width:0}
+.admin-nav-item-config input:not([type=checkbox]):not([type=color]){width:100%;min-width:0;box-sizing:border-box}
+.admin-nav-item-config label{font-size:11px}
+@media(max-width:620px){.admin-nav-item-config{grid-template-columns:minmax(0,1fr) minmax(100px,1fr);gap:8px}.admin-nav-item-config .admin-check-row{grid-column:1/-1}.admin-nav-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
