@@ -71,7 +71,7 @@
     const path=values.map((v,i)=>`${i?'L':'M'} ${x(i)} ${y(v.value)}`).join(' ');
     const labels=values.map((v,i)=>`<text x="${x(i)}" y="${h-14}" text-anchor="middle" class="chart-axis-label">${v.key.slice(5)}</text>`).join('');
     const dots=values.map((v,i)=>`<circle class="chart-point" tabindex="0" role="button" aria-label="${v.key}: ${kind==='money'?money(v.value):num(v.value)}" data-chart-index="${i}" cx="${x(i)}" cy="${y(v.value)}" r="7"><title>${v.key}: ${kind==='money'?money(v.value):num(v.value)}</title></circle>`).join('');
-    box.innerHTML=`<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${kind==='money'?'Pendapatan Payment Link':'Views Ads Link'} selama 7 hari">${grid}<path d="${path}" class="chart-line-path"/>${dots}${labels}</svg>`;
+    box.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="${kind==='money'?'Pendapatan Payment Link':'Views Ads Link'} selama 7 hari">${grid}<path d="${path}" class="chart-line-path"/>${dots}${labels}</svg>`;
     const detail=document.getElementById(detailId);
     const selectPoint=(i)=>{const v=values[i];if(detail)detail.textContent=kind==='money'?`${currentLang()==="en"?"Payment Link net earnings":"Pendapatan bersih Payment Link"}: ${money(v.value)} · ${v.key}`:`${currentLang()==="en"?"Views":"Jumlah views"}: ${num(v.value)} · ${v.key}`;};
     box.querySelectorAll('[data-chart-index]').forEach(dot=>{const pick=()=>selectPoint(Number(dot.dataset.chartIndex));dot.addEventListener('click',pick);dot.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}});});
