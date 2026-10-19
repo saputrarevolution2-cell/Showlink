@@ -326,3 +326,18 @@ html[data-theme="dark"] .admin-page .admin-page-ads-section textarea::placeholde
 
 /* Membership controls */
 .admin-plan-cell select{max-width:145px;min-height:36px;padding:7px 10px;border:1px solid rgba(125,145,190,.35);border-radius:10px;background:var(--admin-card,#101b31);color:inherit;font:inherit;font-weight:700;cursor:pointer}.admin-plan-cell select:focus{outline:2px solid rgba(99,102,241,.55);outline-offset:1px}.admin-plan-cell select:disabled{opacity:.55;cursor:not-allowed}
+
+/* Professional admin membership and profile details */
+.plan-pill{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.04em;background:#eef2f7;color:#334155;border:1px solid #dbe3ed}
+.plan-pill.plan-vip{background:#fff7df;color:#9a6700;border-color:#f6d77b}
+.plan-pill.plan-premium{background:#fff0e5;color:#b45309;border-color:#fdc99b}
+.plan-expiry{display:inline-block;margin-top:4px;color:var(--sl-muted);font-size:11px;line-height:1.4}
+.admin-profile-dialog{width:min(760px,calc(100vw - 28px));max-height:85vh;overflow:auto;border:1px solid var(--sl-border);border-radius:18px;padding:22px;background:var(--sl-surface);color:var(--sl-text);box-shadow:0 24px 80px #0003}
+.admin-profile-dialog::backdrop{background:#0f172a88;backdrop-filter:blur(4px)}
+.admin-profile-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-bottom:16px;margin-bottom:18px;border-bottom:1px solid var(--sl-border)}
+.admin-profile-head h2{margin:6px 0;font-size:22px}.admin-profile-head p{margin:0;color:var(--sl-muted);font-size:13px}
+.admin-profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.admin-profile-field{min-width:0;padding:12px 13px;border:1px solid var(--sl-border);border-radius:11px;background:var(--sl-bg,var(--sl-surface))}
+.admin-profile-field span{display:block;margin-bottom:6px;font-size:11px;color:var(--sl-muted);font-weight:700}
+.admin-profile-field strong{display:block;overflow-wrap:anywhere;font-size:13px;font-weight:650;line-height:1.5}
+@media(max-width:560px){.admin-profile-dialog{padding:16px}.admin-profile-grid{grid-template-columns:1fr}.admin-profile-head h2{font-size:19px}}
