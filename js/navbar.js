@@ -49,7 +49,7 @@
     return translated&&translated!==k?translated:(fallback[k]||k);
   };
   const icon=(cls,name)=>`<i class="fa-solid ${name}${cls?` ${cls}`:""}" aria-hidden="true"></i>`;
-  const link=(href,ic,key,extra="")=>`<a class="sl-nav-link" href="${href}" data-nav-link ${extra}><span>${icon(ic.cls,ic.name)}</span><span class="sl-nav-link-label" data-i18n="${key}">${t(key)}</span></a>`;
+  const link=(href,ic,key,extra="")=>`<a class="sl-nav-link" href="${href}" data-nav-link data-nav-key="${key}" ${extra}><span>${icon(ic.cls,ic.name)}</span><span class="sl-nav-link-label" data-i18n="${key}">${t(key)}</span></a>`;
   const soon=(href,ic,key)=>`${link(href,ic,key)}<span class="sl-new-badge sl-new-gray">${t("comingSoon")}</span>`;
   function withSoon(href,ic,key){return link(href,ic,key).replace("</a>",`<span class="sl-new-badge sl-new-gray sl-coming-soon-badge">${t("comingSoon")}</span></a>`);}
   function badge(label,cls){return `<span class="sl-new-badge ${cls}">${label}</span>`;}
@@ -57,18 +57,18 @@
   function authMarkup(){
     return `${link(C.dashboard,{cls:"sl-icon-blue",name:"fa-gauge-high"},"dashboard")}
       <div class="sl-drawer-divider"></div>
-      ${link(C.pastelink,{cls:"sl-icon-blue",name:"fa-file-lines"},"pastelink").replace("</a>",`${badge("NEW","sl-badge-pastelink").replace("</span>"," <i class=\"fa-solid fa-code\" aria-hidden=\"true\"></i></span>")}</a>`)}
-      ${link(C.shortlink,{cls:"sl-icon-pink",name:"fa-link"},"shortlink").replace("</a>",`${badge("TREND","sl-badge-shortlink").replace("</span>"," <i class=\"fa-solid fa-code\" aria-hidden=\"true\"></i></span>")}</a>`)}
-      ${link(C.paymentLink,{cls:"sl-icon-red",name:"fa-credit-card"},"paymentLink").replace("</a>",`${badge("NEW","sl-badge-payment").replace("</span>"," <i class=\"fa-solid fa-code\" aria-hidden=\"true\"></i></span>")}</a>`)}
-      ${disabledLink({cls:"sl-icon-muted",name:"fa-lock"},"sub4unlock",t("comingSoon"),"sl-badge-soon")}
+      ${link(C.pastelink,{cls:"sl-icon-blue",name:"fa-file-lines"},"pastelink")}
+      ${link(C.shortlink,{cls:"sl-icon-pink",name:"fa-link"},"shortlink")}
+      ${link(C.paymentLink,{cls:"sl-icon-red",name:"fa-credit-card"},"paymentLink")}
+      ${link("/sub4unlock.html",{cls:"sl-icon-muted",name:"fa-lock-open"},"sub4unlock")}
       <div class="sl-drawer-divider"></div>
-      ${link(C.endorse,{cls:"sl-icon-viral",name:"fa-bullhorn"},"endorse").replace("</a>",`${badge("VIRAL","sl-badge-viral").replace("</span>"," <i class=\"fa-solid fa-code\" aria-hidden=\"true\"></i></span>")}</a>`)}
+      ${link(C.endorse,{cls:"sl-icon-viral",name:"fa-bullhorn"},"endorse")}
       ${link(C.notifications,{cls:"sl-icon-pink",name:"fa-bell"},"notifications",'data-menu-notifications-link').replace('</a>','<span class="sl-menu-notification-badge" data-menu-notification-badge hidden></span></a>')}
       ${link(C.withdraw,{cls:"sl-icon-green",name:"fa-money-bill-transfer"},"withdraw")}
       <div class="sl-drawer-divider"></div>
       ${link(C.profile,{cls:"sl-icon-purple",name:"fa-user"},"profile")}
-      ${disabledLink({cls:"sl-icon-vip",name:"fa-crown"},"vip","BETA","sl-badge-beta")}
-      ${disabledLink({cls:"sl-icon-premium",name:"fa-gem"},"premium","BETA","sl-badge-beta")}
+      ${link(C.vip,{cls:"sl-icon-vip",name:"fa-crown"},"vip")}
+      ${link("/premium.html",{cls:"sl-icon-premium",name:"fa-gem"},"premium")}
       <div class="sl-drawer-divider"></div>
       ${link(C.support,{cls:"sl-icon-green",name:"fa-headset"},"support")}
       ${link(C.about,{cls:"sl-icon-blue",name:"fa-circle-info"},"about")}
@@ -103,6 +103,12 @@
       const {data,error}=await sb.rpc("get_public_shortlink_control_settings");if(error||!data)return;
       const map={"/dashboard.html":"dashboard","/all-public-links.html":"all-public-links","/pastelink.html":"pastelink","/shortlink.html":"shortlink","/payment-link.html":"payment-link","/order.html":"order","/notifikasi.html":"notifications","/withdraw.html":"withdraw","/profil.html":"profile","/kelola-tautan.html":"my-links","/pengaturan.html":"settings","/about.html":"about","/support.html":"support","/endorse.html":"endorse"};
       const settings=data.navbar_visibility||{};
+      const order=Array.isArray(settings.__order)?settings.__order:[];
+      const drawer=document.querySelector("[data-navbar-menu]");if(drawer&&order.length){const nodes=[...drawer.children];nodes.sort((a,b)=>{const key=x=>x.querySelector("[data-nav-link]")?.dataset.navKey||"";const ai=order.indexOf(key(a)),bi=order.indexOf(key(b));return (ai<0?999:ai)-(bi<0?999:bi)}).forEach(n=>drawer.appendChild(n));}
+      const bottomOrder=Array.isArray(settings.__bottom_order)?settings.__bottom_order:["dashboard","withdraw","create","premium","profile"];
+      const createItems={pastelink:"pastelink",shortlink:"shortlink","payment-link":"payment-link",sub4unlock:"sub4unlock"};const createMenu=document.querySelector("[data-bottom-create-menu]");createMenu?.querySelectorAll("a").forEach(a=>{const key=Object.keys(createItems).find(k=>a.getAttribute("href")===(k==="payment-link"?"/payment-link.html":`/${k}.html`));if(key){a.hidden=settings[createItems[key]]===false;a.style.display=a.hidden?"none":"";}});
+      const bottom=document.querySelector("[data-showlink-bottom-nav]");if(bottom){const nodes=[...bottom.children];nodes.sort((a,b)=>{const key=x=>x.dataset.bottomLink|| (x.querySelector("[data-bottom-create]")?"create":"");const ai=bottomOrder.indexOf(key(a)),bi=bottomOrder.indexOf(key(b));return (ai<0?999:ai)-(bi<0?999:bi)}).forEach(n=>bottom.appendChild(n));bottom.querySelectorAll("[data-bottom-link]").forEach(a=>{const k=a.dataset.bottomLink;a.hidden=settings[k]===false;a.style.display=a.hidden?"none":"";});}
+
       document.querySelectorAll("[data-showlink-navbar] [data-nav-link]").forEach(a=>{
         const key=a.dataset.navKey||map[new URL(a.href,location.origin).pathname];if(!key)return;
         const hide=settings[key]===false;a.hidden=hide;a.style.display=hide?"none":"";
@@ -117,7 +123,7 @@
           a.querySelectorAll(".sl-new-badge:not(.sl-admin-nav-badge)").forEach(existing=>existing.hidden=true);
         }else{
           if(badgeEl)badgeEl.remove();
-          a.querySelectorAll(".sl-new-badge").forEach(existing=>existing.hidden=false);
+          a.querySelectorAll(".sl-new-badge").forEach(existing=>existing.remove());
         }
       });
       const appearance=settings.__appearance||{},root=document.documentElement;
@@ -126,7 +132,7 @@
     }catch(e){console.debug("ShowLink navbar visibility settings unavailable",e);}
   }
   async function refreshAdminVisibility(){const els=document.querySelectorAll("[data-admin-nav]");if(!els.length||!logged())return;try{const sb=await window.ShowLinkSupabase?.load?.();if(!sb)return;const {data:{session}}=await sb.auth.getSession();if(!session)return;const {data,error}=await sb.rpc("is_current_user_admin");if(!error&&data===true)els.forEach(e=>e.hidden=false);}catch{}}
-  async function refreshNotificationBadge(){const h=document.querySelector("[data-showlink-navbar]"),b=h?.querySelector("[data-notification-badge]"),mb=h?.querySelector("[data-menu-notification-badge]");[b,mb].filter(Boolean).forEach(el=>{el.hidden=true;el.textContent=""});h?.querySelector("[data-navbar-notification]")?.classList.remove("has-notifications");const items=h?.querySelector("[data-notification-items]");if(!logged()){const wrap=h?.querySelector(".sl-notification-wrap");if(wrap){wrap.hidden=true;wrap.style.display="none";wrap.style.visibility="hidden";wrap.style.pointerEvents="none"}if(items)items.innerHTML='<div class="sl-notification-empty">Masuk untuk melihat notifikasi.</div>';return}try{const sb=await window.ShowLinkSupabase?.load?.();if(!sb)return;const {data:{session}}=await sb.auth.getSession();const uid=session?.user?.id;if(!uid)return;const {count,error:ce}=await sb.from("notifications").select("id",{count:"exact",head:true}).eq("user_id",uid).eq("is_read",false);if(!ce&&count>0){[b,mb].filter(Boolean).forEach(el=>{el.textContent=count>99?"99+":String(count);el.hidden=false});h?.querySelector("[data-navbar-notification]")?.classList.add("has-notifications")}if(!items)return;const {data,error}=await sb.from("notifications").select("id,type,title,message,link_url,is_read,created_at").eq("user_id",uid).order("created_at",{ascending:false}).limit(5);if(error)throw error;if(!data?.length){items.innerHTML='<div class="sl-notification-empty">Belum ada notifikasi.</div>';return}items.innerHTML=data.map(n=>`<a class="sl-notification-item ${n.is_read?'':'is-unread'}" href="${String(n.link_url||'/notifikasi.html').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}" data-preview-id="${String(n.id).replace(/[^a-zA-Z0-9_-]/g,'')}"><span class="sl-notification-dot"></span><span class="sl-notification-copy"><strong>${String(n.title||'Notifikasi').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</strong><span>${String(n.message||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</span><small>${new Date(n.created_at).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'})}</small></span></a>`).join('');h.querySelectorAll('[data-preview-id]').forEach(a=>a.addEventListener('click',async()=>{const id=a.dataset.previewId;if(a.classList.contains('is-unread')){await sb.from('notifications').update({is_read:true,read_at:new Date().toISOString()}).eq('id',id).eq('user_id',uid);setTimeout(refreshNotificationBadge,150)}}));const read=h.querySelector('[data-notification-read-all]'),del=h.querySelector('[data-notification-delete-all]');if(read)read.onclick=async()=>{read.disabled=true;const {error}=await sb.from('notifications').update({is_read:true,read_at:new Date().toISOString()}).eq('user_id',uid).eq('is_read',false);read.disabled=false;if(error){alert('Gagal menandai notifikasi.');return}await refreshNotificationBadge()};if(del)del.onclick=async()=>{if(!confirm('Hapus SEMUA notifikasi? Tindakan ini tidak bisa dibatalkan.'))return;del.disabled=true;const {error}=await sb.from('notifications').delete().eq('user_id',uid);del.disabled=false;if(error){alert('Gagal menghapus notifikasi. Pastikan policy DELETE notifications aktif di Supabase.');return}await refreshNotificationBadge()};}catch(e){if(items)items.innerHTML='<div class="sl-notification-empty">Notifikasi gagal dimuat.</div>';console.warn('ShowLink notification preview:',e)}}
+  async function refreshNotificationBadge(){const h=document.querySelector("[data-showlink-navbar]"),b=h?.querySelector("[data-notification-badge]"),mb=h?.querySelector("[data-menu-notification-badge]");[b,mb].filter(Boolean).forEach(el=>{el.hidden=true;el.textContent=""});h?.querySelector("[data-navbar-notification]")?.classList.remove("has-notifications");const items=h?.querySelector("[data-notification-items]");if(!logged()){const wrap=h?.querySelector(".sl-notification-wrap");if(wrap){wrap.hidden=true;wrap.style.display="none";wrap.style.visibility="hidden";wrap.style.pointerEvents="none"}if(items)items.innerHTML='<div class="sl-notification-empty">Masuk untuk melihat notifikasi.</div>';return}try{const sb=await window.ShowLinkSupabase?.load?.();if(!sb)return;const {data:{session}}=await sb.auth.getSession();const uid=session?.user?.id;if(!uid)return;const {count,error:ce}=await sb.from("notifications").select("id",{count:"exact",head:true}).eq("user_id",uid).eq("is_read",false);if(!ce&&Number(count)>0){[b,mb].filter(Boolean).forEach(el=>{el.textContent=count>99?"99+":String(count);el.hidden=false});h?.querySelector("[data-navbar-notification]")?.classList.add("has-notifications")}else{[b,mb].filter(Boolean).forEach(el=>{el.hidden=true;el.textContent=""});h?.querySelector("[data-navbar-notification]")?.classList.remove("has-notifications")}if(!items)return;const {data,error}=await sb.from("notifications").select("id,type,title,message,link_url,is_read,created_at").eq("user_id",uid).order("created_at",{ascending:false}).limit(5);if(error)throw error;if(!data?.length){items.innerHTML='<div class="sl-notification-empty">Belum ada notifikasi.</div>';return}items.innerHTML=data.map(n=>`<a class="sl-notification-item ${n.is_read?'':'is-unread'}" href="${String(n.link_url||'/notifikasi.html').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}" data-preview-id="${String(n.id).replace(/[^a-zA-Z0-9_-]/g,'')}"><span class="sl-notification-dot"></span><span class="sl-notification-copy"><strong>${String(n.title||'Notifikasi').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</strong><span>${String(n.message||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</span><small>${new Date(n.created_at).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'})}</small></span></a>`).join('');h.querySelectorAll('[data-preview-id]').forEach(a=>a.addEventListener('click',async()=>{const id=a.dataset.previewId;if(a.classList.contains('is-unread')){await sb.from('notifications').update({is_read:true,read_at:new Date().toISOString()}).eq('id',id).eq('user_id',uid);setTimeout(refreshNotificationBadge,150)}}));const read=h.querySelector('[data-notification-read-all]'),del=h.querySelector('[data-notification-delete-all]');if(read)read.onclick=async()=>{read.disabled=true;const {error}=await sb.from('notifications').update({is_read:true,read_at:new Date().toISOString()}).eq('user_id',uid).eq('is_read',false);read.disabled=false;if(error){alert('Gagal menandai notifikasi.');return}await refreshNotificationBadge()};if(del)del.onclick=async()=>{if(!confirm('Hapus SEMUA notifikasi? Tindakan ini tidak bisa dibatalkan.'))return;del.disabled=true;const {error}=await sb.from('notifications').delete().eq('user_id',uid);del.disabled=false;if(error){alert('Gagal menghapus notifikasi. Pastikan policy DELETE notifications aktif di Supabase.');return}await refreshNotificationBadge()};}catch(e){if(items)items.innerHTML='<div class="sl-notification-empty">Notifikasi gagal dimuat.</div>';console.warn('ShowLink notification preview:',e)}}
   function closeNotificationPanel(host){
     const btn=host?.querySelector('[data-navbar-notification]');
     const panel=host?.querySelector('[data-notification-panel]');
@@ -193,12 +199,12 @@
     const closeCreate=()=>{if(menu)menu.hidden=true;if(create)create.setAttribute("aria-expanded","false");};
     const path=location.pathname.replace(/\/$/,"")||"/";
     const isId=(document.documentElement.lang||"id").toLowerCase().startsWith("id");
-    const labels={dashboard:isId?"Dasbor":"Dashboard",all:isId?"Semua Link":"All Links",withdraw:isId?"Penarikan":"Withdraw",profile:isId?"Profil":"Profile",create:isId?"Buat":"Create"};
+    const labels={dashboard:isId?"Dashboard":"Dashboard",withdraw:isId?"Withdraw":"Withdraw",premium:"Premium",profile:isId?"Profil":"Profile",create:isId?"Buat":"Create"};
     nav.querySelectorAll("[data-bottom-link]").forEach(a=>{
       const key=a.dataset.bottomLink;
       a.setAttribute("aria-label",labels[key]||key);a.title=labels[key]||key;
       const active=(key==="dashboard"&&path==="/dashboard.html")||
-        (key==="all"&&path==="/all-public-links.html")||
+        (key==="premium"&&path==="/premium.html")||
         (key==="withdraw"&&path==="/withdraw.html")||
         (key==="profile"&&path==="/profil.html");
       a.classList.toggle("is-active",active);
