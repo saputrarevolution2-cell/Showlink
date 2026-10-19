@@ -353,3 +353,12 @@ html[data-theme="dark"] .admin-page .admin-page-ads-section textarea::placeholde
 .fee-example{border:1px solid var(--sl-border);border-radius:14px;padding:15px;background:var(--sl-gradient-soft)}
 .fee-example>strong{display:flex;align-items:center;gap:8px;color:var(--sl-text);margin-bottom:8px}.fee-example p{margin:6px 0;color:var(--sl-text);display:flex;justify-content:space-between;gap:12px}.fee-example .admin-muted{font-size:12px;display:block}
 @media(max-width:640px){.fee-settings-grid{grid-template-columns:1fr}.admin-fee-card .fee-settings-group{padding:12px}.fee-example p{align-items:flex-start}}
+
+/* Bottom navigation controls — compact, responsive admin settings. */
+.admin-bottom-nav-settings{margin-top:20px;padding:18px;border:1px solid var(--sl-border,rgba(148,163,184,.28));border-radius:16px;background:var(--sl-surface-soft,#f8fafc)}
+.admin-bottom-nav-settings>strong{display:block;color:var(--sl-text,#172033);font-size:14px;font-weight:850}
+.admin-bottom-nav-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:14px 0}
+.admin-bottom-nav-grid label{padding:10px 12px;border:1px solid var(--sl-border,rgba(148,163,184,.28));border-radius:11px;background:var(--sl-surface-strong,#fff)}
+.admin-bottom-order-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.admin-bottom-order-grid label{display:grid;gap:6px;font-size:12px;font-weight:750;color:var(--sl-muted,#64748b)}
+.admin-bottom-order-grid select{width:100%;min-height:38px;border:1px solid var(--sl-border,#e2e8f0);border-radius:10px;padding:7px 9px;background:var(--sl-surface-strong,#fff);color:var(--sl-text,#172033)}
