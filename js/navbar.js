@@ -100,15 +100,19 @@
       const {data,error}=await sb.rpc("get_public_shortlink_control_settings");if(error||!data)return;
       const map={"/dashboard.html":"dashboard","/all-public-links.html":"all-public-links","/pastelink.html":"pastelink","/shortlink.html":"shortlink","/payment-link.html":"payment-link","/order.html":"order","/notifikasi.html":"notifications","/withdraw.html":"withdraw","/profil.html":"profile","/kelola-tautan.html":"my-links","/pengaturan.html":"settings","/about.html":"about","/support.html":"support","/endorse.html":"endorse"};
       const settings=data.navbar_visibility||{};
+      // Normalize legacy/admin keys so one saved toggle controls every matching navbar entry.
+      const aliases={paymentLink:"payment-link",payment_link:"payment-link",myPaymentLinks:"my-links",myLinks:"my-links",orders:"order",profile:"profile",notifications:"notifications",sub4unlock:"sub4unlock"};
+      const isHidden=key=>{const candidates=[key,aliases[key],...Object.keys(aliases).filter(k=>aliases[k]===key)];return candidates.some(k=>k&&settings[k]===false);};
       const order=Array.isArray(settings.__order)?settings.__order:[];
       const drawer=document.querySelector("[data-navbar-menu]");if(drawer&&order.length){const nodes=[...drawer.children];nodes.sort((a,b)=>{const key=x=>x.querySelector("[data-nav-link]")?.dataset.navKey||"";const ai=order.indexOf(key(a)),bi=order.indexOf(key(b));return (ai<0?999:ai)-(bi<0?999:bi)}).forEach(n=>drawer.appendChild(n));}
       const bottomOrder=Array.isArray(settings.__bottom_order)?settings.__bottom_order:["dashboard","withdraw","create","premium","profile"];
-      const createItems={pastelink:"pastelink",shortlink:"shortlink","payment-link":"payment-link",sub4unlock:"sub4unlock"};const createMenu=document.querySelector("[data-bottom-create-menu]");createMenu?.querySelectorAll("a").forEach(a=>{const key=Object.keys(createItems).find(k=>a.getAttribute("href")===(k==="payment-link"?"/payment-link.html":`/${k}.html`));if(key){a.hidden=settings[createItems[key]]===false;a.style.display=a.hidden?"none":"";}});
-      const bottom=document.querySelector("[data-showlink-bottom-nav]");if(bottom){const nodes=[...bottom.children];nodes.sort((a,b)=>{const key=x=>x.dataset.bottomLink|| (x.querySelector("[data-bottom-create]")?"create":"");const ai=bottomOrder.indexOf(key(a)),bi=bottomOrder.indexOf(key(b));return (ai<0?999:ai)-(bi<0?999:bi)}).forEach(n=>bottom.appendChild(n));bottom.querySelectorAll("[data-bottom-link]").forEach(a=>{const k=a.dataset.bottomLink;a.hidden=settings[k]===false;a.style.display=a.hidden?"none":"";});}
+      const createItems={pastelink:"pastelink",shortlink:"shortlink","payment-link":"payment-link",sub4unlock:"sub4unlock"};const createMenu=document.querySelector("[data-bottom-create-menu]");createMenu?.querySelectorAll("a").forEach(a=>{const key=Object.keys(createItems).find(k=>a.getAttribute("href")===(k==="payment-link"?"/payment-link.html":`/${k}.html`));if(key){a.hidden=isHidden(createItems[key]);a.style.display=a.hidden?"none":"";}});
+      const bottom=document.querySelector("[data-showlink-bottom-nav]");if(bottom){
+        const createButton=bottom.querySelector("[data-bottom-create]");const createWrap=bottom.querySelector(".sl-bottom-create-wrap");if(createWrap){const allCreateHidden=["pastelink","shortlink","payment-link","sub4unlock"].every(k=>isHidden(k));createWrap.hidden=isHidden("create")||allCreateHidden;createWrap.style.display=createWrap.hidden?"none":"";}const nodes=[...bottom.children];nodes.sort((a,b)=>{const key=x=>x.dataset.bottomLink|| (x.querySelector("[data-bottom-create]")?"create":"");const ai=bottomOrder.indexOf(key(a)),bi=bottomOrder.indexOf(key(b));return (ai<0?999:ai)-(bi<0?999:bi)}).forEach(n=>bottom.appendChild(n));bottom.querySelectorAll("[data-bottom-link]").forEach(a=>{const k=a.dataset.bottomLink;a.hidden=isHidden(k);a.style.display=a.hidden?"none":"";});}
 
       document.querySelectorAll("[data-showlink-navbar] [data-nav-link]").forEach(a=>{
         const key=a.dataset.navKey||map[new URL(a.href,location.origin).pathname];if(!key)return;
-        const hide=settings[key]===false;a.hidden=hide;a.style.display=hide?"none":"";
+        const hide=isHidden(key);a.hidden=hide;a.style.display=hide?"none":"";
         let badgeEl=a.querySelector(".sl-admin-nav-badge");
         const item=settings.__items?.[key]||{},label=String(item.text||"").trim().slice(0,18);
         if(label){
