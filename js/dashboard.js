@@ -62,40 +62,35 @@
   function lastSevenDays(){const out=[];const now=new Date();for(let i=6;i>=0;i--){const d=new Date(now);d.setHours(0,0,0,0);d.setDate(d.getDate()-i);out.push({key:dayKey(d),date:d});}return out;}
   function renderLineChart(containerId,detailId,values,kind){
     const box=document.getElementById(containerId);if(!box)return;
-    const w=1000,h=440,pad={l:105,r:34,t:30,b:64},iw=w-pad.l-pad.r,ih=h-pad.t-pad.b;
-    const raw=values.map(v=>Math.max(0,Number(v.value)||0));
-    const maxValue=Math.max(1,...raw);
-    // Keep the plot close to the real data range so small daily changes remain visible.
-    const roughMax=maxValue*1.12;
-    const magnitude=Math.pow(10,Math.floor(Math.log10(roughMax)));
-    const normalized=roughMax/magnitude;
-    const niceStep=normalized<=1?1:normalized<=2?2:normalized<=2.5?2.5:normalized<=5?5:10;
-    const niceMax=niceStep*magnitude;
-    const y=v=>pad.t+ih-(Math.max(0,Number(v)||0)/niceMax)*ih;
+    const w=1000,h=440,pad={l:112,r:100,t:30,b:64},iw=w-pad.l-pad.r,ih=h-pad.t-pad.b;
+    const primary=values.map(v=>Math.max(0,Number(v.value)||0));
+    const secondary=values.map(v=>Math.max(0,Number(v.secondary)||0));
+    const scaleMax=a=>{const m=Math.max(1,...a)*1.12,mag=Math.pow(10,Math.floor(Math.log10(m))),n=m/mag;return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*mag;};
+    const maxA=scaleMax(primary),maxB=scaleMax(secondary);
+    const y=(v,m)=>pad.t+ih-(Math.max(0,Number(v)||0)/m)*ih;
     const x=i=>pad.l+(values.length===1?iw/2:i*iw/Math.max(1,values.length-1));
-    const ticks=[0,.2,.4,.6,.8,1].map(n=>niceMax*n);
-    const grid=ticks.map(v=>`<g><line x1="${pad.l}" y1="${y(v)}" x2="${w-pad.r}" y2="${y(v)}" class="chart-gridline"/><text x="${pad.l-12}" y="${y(v)+4}" text-anchor="end" class="chart-axis-label">${kind==='money'?money(v):num(Math.round(v))}</text></g>`).join('');
-    const pts=values.map((v,i)=>({x:x(i),y:y(v.value)}));
-    // Catmull-Rom style cubic curves soften corners without inventing extra data points.
-    let path='';
-    if(pts.length){path=`M ${pts[0].x} ${pts[0].y}`;for(let i=0;i<pts.length-1;i++){const a=pts[Math.max(0,i-1)],b=pts[i],c=pts[i+1],d=pts[Math.min(pts.length-1,i+2)];const cp1x=b.x+(c.x-a.x)/6,cp1y=b.y+(c.y-a.y)/6,cp2x=c.x-(d.x-b.x)/6,cp2y=c.y-(d.y-b.y)/6;path+=` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${c.x} ${c.y}`;}}
-    const area=pts.length?`${path} L ${pts[pts.length-1].x} ${pad.t+ih} L ${pts[0].x} ${pad.t+ih} Z`:'';
+    const ticks=[0,.2,.4,.6,.8,1];
+    const grid=ticks.map(n=>`<g><line x1="${pad.l}" y1="${y(maxA*n,maxA)}" x2="${w-pad.r}" y2="${y(maxA*n,maxA)}" class="chart-gridline"/><text x="${pad.l-12}" y="${y(maxA*n,maxA)+4}" text-anchor="end" class="chart-axis-label">${kind==='shortlink'?num(Math.round(maxA*n)):money(maxA*n)}</text><text x="${w-pad.r+12}" y="${y(maxB*n,maxB)+4}" text-anchor="start" class="chart-axis-label chart-axis-secondary">${num(Math.round(maxB*n))}</text></g>`).join('');
+    const makePath=(arr,max)=>{const pts=arr.map((v,i)=>({x:x(i),y:y(v,max)}));if(!pts.length)return {path:'',area:'',pts};let path=`M ${pts[0].x} ${pts[0].y}`;for(let i=0;i<pts.length-1;i++){const a=pts[Math.max(0,i-1)],b=pts[i],c=pts[i+1],d=pts[Math.min(pts.length-1,i+2)];path+=` C ${b.x+(c.x-a.x)/6} ${b.y+(c.y-a.y)/6}, ${c.x-(d.x-b.x)/6} ${c.y-(d.y-b.y)/6}, ${c.x} ${c.y}`;}return {path,area:`${path} L ${pts[pts.length-1].x} ${pad.t+ih} L ${pts[0].x} ${pad.t+ih} Z`,pts};};
+    const a=makePath(primary,maxA),b=makePath(secondary,maxB);
     const labels=values.map((v,i)=>`<text x="${x(i)}" y="${h-17}" text-anchor="middle" class="chart-axis-label">${v.key.slice(5)}</text>`).join('');
-    const dots=values.map((v,i)=>`<circle class="chart-point" tabindex="0" role="button" aria-label="${v.key}: ${kind==='money'?money(v.value):num(v.value)}" data-chart-index="${i}" cx="${x(i)}" cy="${y(v.value)}" r="5"><title>${v.key}: ${kind==='money'?money(v.value):num(v.value)}</title></circle>`).join('');
-    box.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="${kind==='money'?'Pendapatan Payment Link':'Shortlink Views'} selama 7 hari"><defs><linearGradient id="chart-fill-${containerId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6956ee" stop-opacity=".22"/><stop offset="100%" stop-color="#6956ee" stop-opacity=".015"/></linearGradient></defs>${grid}<path class="chart-area-path" d="${area}" fill="url(#chart-fill-${containerId})"/><path d="${path}" class="chart-line-path"/>${dots}${labels}</svg>`;
+    const dotsA=values.map((v,i)=>`<circle class="chart-point chart-point-primary" tabindex="0" role="button" aria-label="${v.key}: ${kind==='shortlink'?'Views '+num(primary[i]):'Pendapatan '+money(primary[i])}" data-chart-index="${i}" cx="${x(i)}" cy="${y(primary[i],maxA)}" r="6"><title>${v.key}: ${kind==='shortlink'?'Views '+num(primary[i]):'Pendapatan '+money(primary[i])}</title></circle>`).join('');
+    const dotsB=values.map((v,i)=>`<circle class="chart-point chart-point-secondary" tabindex="0" role="button" aria-label="${v.key}: ${kind==='shortlink'?'Pendapatan '+money(secondary[i]):'Transaksi '+num(secondary[i])}" data-chart-index="${i}" cx="${x(i)}" cy="${y(secondary[i],maxB)}" r="5"><title>${v.key}: ${kind==='shortlink'?'Pendapatan '+money(secondary[i]):'Transaksi '+num(secondary[i])}</title></circle>`).join('');
+    const primaryColor=kind==='shortlink'?'#2583ee':'#2583ee',secondaryColor=kind==='shortlink'?'#8b82f6':'#8b82f6';
+    box.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="${kind==='shortlink'?'Statistik Shortlink: views dan pendapatan':'Statistik Payment Link: pendapatan dan jumlah transaksi'}"><defs><linearGradient id="chart-fill-${containerId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${primaryColor}" stop-opacity=".22"/><stop offset="100%" stop-color="${primaryColor}" stop-opacity=".015"/></linearGradient></defs>${grid}<path class="chart-area-path" d="${a.area}" fill="url(#chart-fill-${containerId})"/><path d="${a.path}" class="chart-line-path chart-line-primary"/><path d="${b.path}" class="chart-line-path chart-line-secondary"/>${dotsA}${dotsB}${labels}</svg><div class="chart-legend"><span><i class="legend-primary"></i>${kind==='shortlink'?'Views':'Pendapatan'}</span><span><i class="legend-secondary"></i>${kind==='shortlink'?'Pendapatan':'Transaksi'}</span></div>`;
     const detail=document.getElementById(detailId);
-    const selectPoint=i=>{const v=values[i];if(detail)detail.textContent=kind==='money'?`${currentLang()==="en"?"Payment Link net earnings":"Pendapatan bersih Payment Link"}: ${money(v.value)} · ${v.key}`:`${currentLang()==="en"?"Views":"Jumlah views"}: ${num(v.value)} · ${v.key}`;};
+    const selectPoint=i=>{const v=values[i];if(!detail)return;detail.innerHTML=`<strong>${esc(v.key)}</strong><span>${kind==='shortlink'?'View':'Pendapatan'}: <b>${kind==='shortlink'?num(primary[i]):money(primary[i])}</b></span><span>${kind==='shortlink'?'Pendapatan':'Transaksi'}: <b>${kind==='shortlink'?money(secondary[i]):num(secondary[i])}</b></span>`;detail.classList.add('has-selection');};
     box.querySelectorAll('[data-chart-index]').forEach(dot=>{const pick=()=>selectPoint(Number(dot.dataset.chartIndex));dot.addEventListener('click',pick);dot.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}});});
   }
   function renderDailyStats(orders,shortlinkDaily=[]){
     const days=lastSevenDays();const paid=orders.filter(o=>['paid','processing','completed'].includes(String(o.status||'').toLowerCase()));
-    const payments=days.map(d=>({key:d.key,value:paid.filter(o=>dayKey(o.paid_at||o.completed_at||o.created_at)===d.key).reduce((n,o)=>n+Number(o.seller_amount||0),0)}));
+    const payments=days.map(d=>{const dayOrders=paid.filter(o=>dayKey(o.paid_at||o.completed_at||o.created_at)===d.key);return {key:d.key,value:dayOrders.reduce((n,o)=>n+Number(o.seller_amount||0),0),secondary:dayOrders.length};});
     const shortlinkByDay=new Map((shortlinkDaily||[]).map(r=>[String(r.event_date).slice(0,10),r]));
-    const shortlinks=days.map(d=>({key:d.key,value:Number(shortlinkByDay.get(d.key)?.views||0)}));
-    renderLineChart('shortlink-chart','shortlink-detail',shortlinks,'views');
-    renderLineChart('payment-link-chart','payment-link-detail',payments,'money');
+    const shortlinks=days.map(d=>{const r=shortlinkByDay.get(d.key)||{};return {key:d.key,value:Number(r.views||0),secondary:Number(r.revenue||0)};});
+    renderLineChart('shortlink-chart','shortlink-detail',shortlinks,'shortlink');
+    renderLineChart('payment-link-chart','payment-link-detail',payments,'payment');
     const body=document.getElementById('dashboard-daily-stats-body');if(!body)return;
-    body.innerHTML=days.slice().reverse().map(d=>{const pay=payments.find(x=>x.key===d.key)?.value||0;const sl=shortlinkByDay.get(d.key)||{};return `<tr><td>${d.key}</td><td>${num(Number(sl.views||0))}</td><td>${money(Number(sl.revenue||0))}</td><td>${money(pay)}</td><td>0</td><td>0</td><td>${money(Number(sl.views||0)>0?Number(sl.revenue||0)*1000/Number(sl.views):0)}</td><td>${money(0)}</td></tr>`;}).join('');
+    body.innerHTML=days.slice().reverse().map(d=>{const pay=payments.find(x=>x.key===d.key)||{value:0,secondary:0};const sl=shortlinkByDay.get(d.key)||{};return `<tr><td>${d.key}</td><td>${num(Number(sl.views||0))}</td><td>${money(Number(sl.revenue||0))}</td><td>${money(pay.value)}</td><td>0</td><td>0</td><td>${money(Number(sl.views||0)>0?Number(sl.revenue||0)*1000/Number(sl.views):0)}</td><td>${money(0)}</td></tr>`;}).join('');
   }
   function renderChart(orders){
     const box=$("#seven-day-chart"); if(!box)return;
