@@ -62,7 +62,7 @@
   function lastSevenDays(){const out=[];const now=new Date();for(let i=6;i>=0;i--){const d=new Date(now);d.setHours(0,0,0,0);d.setDate(d.getDate()-i);out.push({key:dayKey(d),date:d});}return out;}
   function renderLineChart(containerId,detailId,values,kind){
     const box=document.getElementById(containerId);if(!box)return;
-    const w=680,h=218,pad={l:42,r:14,t:18,b:42},iw=w-pad.l-pad.r,ih=h-pad.t-pad.b;
+    const w=900,h=310,pad={l:72,r:24,t:24,b:54},iw=w-pad.l-pad.r,ih=h-pad.t-pad.b;
     const maxValue=Math.max(1,...values.map(v=>Number(v.value)||0));
     const ticks=kind==='money'?[0,.25,.5,.75,1].map(n=>maxValue*n):[0,.25,.5,.75,1].map(n=>maxValue*n);
     const y=v=>pad.t+ih-(Number(v||0)/maxValue)*ih;
@@ -70,10 +70,10 @@
     const grid=ticks.map(v=>`<g><line x1="${pad.l}" y1="${y(v)}" x2="${w-pad.r}" y2="${y(v)}" class="chart-gridline"/><text x="${pad.l-8}" y="${y(v)+4}" text-anchor="end" class="chart-axis-label">${kind==='money'?money(v):num(Math.round(v))}</text></g>`).join('');
     const path=values.map((v,i)=>`${i?'L':'M'} ${x(i)} ${y(v.value)}`).join(' ');
     const labels=values.map((v,i)=>`<text x="${x(i)}" y="${h-14}" text-anchor="middle" class="chart-axis-label">${v.key.slice(5)}</text>`).join('');
-    const dots=values.map((v,i)=>`<circle class="chart-point" tabindex="0" role="button" aria-label="${v.key}: ${kind==='money'?money(v.value):num(v.value)}" data-chart-index="${i}" cx="${x(i)}" cy="${y(v.value)}" r="5"><title>${v.key}: ${kind==='money'?money(v.value):num(v.value)}</title></circle>`).join('');
+    const dots=values.map((v,i)=>`<circle class="chart-point" tabindex="0" role="button" aria-label="${v.key}: ${kind==='money'?money(v.value):num(v.value)}" data-chart-index="${i}" cx="${x(i)}" cy="${y(v.value)}" r="7"><title>${v.key}: ${kind==='money'?money(v.value):num(v.value)}</title></circle>`).join('');
     box.innerHTML=`<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${kind==='money'?'Pendapatan Payment Link':'Views Ads Link'} selama 7 hari">${grid}<path d="${path}" class="chart-line-path"/>${dots}${labels}</svg>`;
     const detail=document.getElementById(detailId);
-    const selectPoint=(i)=>{const v=values[i];if(detail)detail.textContent=kind==='money'?`Pendapatan Payment Link (Net): ${money(v.value)} · ${v.key}`:`Views: ${num(v.value)} · ${v.key}`;};
+    const selectPoint=(i)=>{const v=values[i];if(detail)detail.textContent=kind==='money'?`${currentLang()==="en"?"Payment Link net earnings":"Pendapatan bersih Payment Link"}: ${money(v.value)} · ${v.key}`:`${currentLang()==="en"?"Views":"Jumlah views"}: ${num(v.value)} · ${v.key}`;};
     box.querySelectorAll('[data-chart-index]').forEach(dot=>{const pick=()=>selectPoint(Number(dot.dataset.chartIndex));dot.addEventListener('click',pick);dot.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}});});
   }
   function renderDailyStats(orders){
