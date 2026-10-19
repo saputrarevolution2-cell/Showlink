@@ -323,3 +323,6 @@ html[data-theme="dark"] .admin-page .admin-page-ads-section textarea::placeholde
 .admin-nav-item-config input:not([type=checkbox]):not([type=color]){width:100%;min-width:0;box-sizing:border-box}
 .admin-nav-item-config label{font-size:11px}
 @media(max-width:620px){.admin-nav-item-config{grid-template-columns:minmax(0,1fr) minmax(100px,1fr);gap:8px}.admin-nav-item-config .admin-check-row{grid-column:1/-1}.admin-nav-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Membership controls */
+.admin-plan-cell select{max-width:145px;min-height:36px;padding:7px 10px;border:1px solid rgba(125,145,190,.35);border-radius:10px;background:var(--admin-card,#101b31);color:inherit;font:inherit;font-weight:700;cursor:pointer}.admin-plan-cell select:focus{outline:2px solid rgba(99,102,241,.55);outline-offset:1px}.admin-plan-cell select:disabled{opacity:.55;cursor:not-allowed}
