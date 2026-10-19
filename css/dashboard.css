@@ -691,3 +691,12 @@ html[data-theme="dark"] .app-card,html[data-theme="dark"] .app-stat,html[data-th
 .dashboard-clean .announcement-card{margin-bottom:2px}
 @media(max-width:700px){.dashboard-clean{gap:17px}.dashboard-clean .clean-chart-card{min-height:0;padding:17px}.dashboard-clean .line-chart{height:300px;min-height:300px}.dashboard-clean .line-chart svg{height:100%;min-height:0}.dashboard-clean .chart-axis-label{font-size:12px}.dashboard-clean .chart-detail{font-size:.88rem}.dashboard-clean .daily-statistics-table{min-width:860px}}
 @media(max-width:380px){.dashboard-clean .line-chart{height:280px;min-height:280px}.dashboard-clean .chart-axis-label{font-size:11px}}
+
+/* Smooth, restrained dashboard trend charts */
+.dashboard-clean .chart-line-path{fill:none;stroke:#6956ee;stroke-width:3.25;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;filter:drop-shadow(0 2px 2px rgba(105,86,238,.12))}
+.dashboard-clean .chart-area-path{stroke:none;pointer-events:none}
+.dashboard-clean .chart-gridline{stroke:var(--sl-border);stroke-width:1;stroke-dasharray:2 6;opacity:.9}
+.dashboard-clean .chart-point{fill:var(--sl-surface);stroke:#6956ee;stroke-width:2.5;r:4.5;transition:r .18s ease,fill .18s ease,stroke-width .18s ease}
+.dashboard-clean .chart-point:hover,.dashboard-clean .chart-point:focus{fill:#ede9fe;stroke-width:3;r:6.5;outline:none}
+.dashboard-clean .line-chart svg{overflow:visible}
+@media(prefers-reduced-motion:reduce){.dashboard-clean .chart-point{transition:none}}
