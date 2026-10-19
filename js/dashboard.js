@@ -62,13 +62,18 @@
   function lastSevenDays(){const out=[];const now=new Date();for(let i=6;i>=0;i--){const d=new Date(now);d.setHours(0,0,0,0);d.setDate(d.getDate()-i);out.push({key:dayKey(d),date:d});}return out;}
   function renderLineChart(containerId,detailId,values,kind){
     const box=document.getElementById(containerId);if(!box)return;
-    const w=900,h=340,pad={l:88,r:30,t:28,b:58},iw=w-pad.l-pad.r,ih=h-pad.t-pad.b;
+    const w=1000,h=440,pad={l:105,r:34,t:30,b:64},iw=w-pad.l-pad.r,ih=h-pad.t-pad.b;
     const raw=values.map(v=>Math.max(0,Number(v.value)||0));
     const maxValue=Math.max(1,...raw);
-    const niceMax=maxValue===1?1:Math.pow(10,Math.floor(Math.log10(maxValue)))*Math.ceil(maxValue/Math.pow(10,Math.floor(Math.log10(maxValue))));
+    // Keep the plot close to the real data range so small daily changes remain visible.
+    const roughMax=maxValue*1.12;
+    const magnitude=Math.pow(10,Math.floor(Math.log10(roughMax)));
+    const normalized=roughMax/magnitude;
+    const niceStep=normalized<=1?1:normalized<=2?2:normalized<=2.5?2.5:normalized<=5?5:10;
+    const niceMax=niceStep*magnitude;
     const y=v=>pad.t+ih-(Math.max(0,Number(v)||0)/niceMax)*ih;
     const x=i=>pad.l+(values.length===1?iw/2:i*iw/Math.max(1,values.length-1));
-    const ticks=[0,.25,.5,.75,1].map(n=>niceMax*n);
+    const ticks=[0,.2,.4,.6,.8,1].map(n=>niceMax*n);
     const grid=ticks.map(v=>`<g><line x1="${pad.l}" y1="${y(v)}" x2="${w-pad.r}" y2="${y(v)}" class="chart-gridline"/><text x="${pad.l-12}" y="${y(v)+4}" text-anchor="end" class="chart-axis-label">${kind==='money'?money(v):num(Math.round(v))}</text></g>`).join('');
     const pts=values.map((v,i)=>({x:x(i),y:y(v.value)}));
     // Catmull-Rom style cubic curves soften corners without inventing extra data points.
@@ -77,7 +82,7 @@
     const area=pts.length?`${path} L ${pts[pts.length-1].x} ${pad.t+ih} L ${pts[0].x} ${pad.t+ih} Z`:'';
     const labels=values.map((v,i)=>`<text x="${x(i)}" y="${h-17}" text-anchor="middle" class="chart-axis-label">${v.key.slice(5)}</text>`).join('');
     const dots=values.map((v,i)=>`<circle class="chart-point" tabindex="0" role="button" aria-label="${v.key}: ${kind==='money'?money(v.value):num(v.value)}" data-chart-index="${i}" cx="${x(i)}" cy="${y(v.value)}" r="5"><title>${v.key}: ${kind==='money'?money(v.value):num(v.value)}</title></circle>`).join('');
-    box.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${kind==='money'?'Pendapatan Payment Link':'Shortlink Views'} selama 7 hari"><defs><linearGradient id="chart-fill-${containerId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6956ee" stop-opacity=".22"/><stop offset="100%" stop-color="#6956ee" stop-opacity=".015"/></linearGradient></defs>${grid}<path class="chart-area-path" d="${area}" fill="url(#chart-fill-${containerId})"/><path d="${path}" class="chart-line-path"/>${dots}${labels}</svg>`;
+    box.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="${kind==='money'?'Pendapatan Payment Link':'Shortlink Views'} selama 7 hari"><defs><linearGradient id="chart-fill-${containerId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6956ee" stop-opacity=".22"/><stop offset="100%" stop-color="#6956ee" stop-opacity=".015"/></linearGradient></defs>${grid}<path class="chart-area-path" d="${area}" fill="url(#chart-fill-${containerId})"/><path d="${path}" class="chart-line-path"/>${dots}${labels}</svg>`;
     const detail=document.getElementById(detailId);
     const selectPoint=i=>{const v=values[i];if(detail)detail.textContent=kind==='money'?`${currentLang()==="en"?"Payment Link net earnings":"Pendapatan bersih Payment Link"}: ${money(v.value)} · ${v.key}`:`${currentLang()==="en"?"Views":"Jumlah views"}: ${num(v.value)} · ${v.key}`;};
     box.querySelectorAll('[data-chart-index]').forEach(dot=>{const pick=()=>selectPoint(Number(dot.dataset.chartIndex));dot.addEventListener('click',pick);dot.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}});});
