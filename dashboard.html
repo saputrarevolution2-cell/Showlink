@@ -22,35 +22,32 @@
   <header class="dashboard-page-heading"><h1>Dashboard</h1><p id="dashboard-greeting"><span data-user-name>User</span> 👋</p></header>
 
   <section class="announcement-card" id="dashboard-announcements-card" aria-labelledby="dashboard-announcements-title">
-    <div class="section-head"><div><h2 id="dashboard-announcements-title" data-i18n="dashAnnouncements">Pengumuman</h2><p data-i18n="dashAnnouncementsIntro">Informasi terbaru dari admin ShowLink.</p></div><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></div>
+    <div class="section-head"><div><h2 id="dashboard-announcements-title">Pengumuman</h2><p>Informasi terbaru dari admin ShowLink.</p></div><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></div>
     <div class="dashboard-announcements-list" id="dashboard-announcements-list" aria-live="polite"><p class="announcement-empty">Memuat pengumuman…</p></div>
   </section>
 
-  <section class="stat-grid earnings-summary-grid clean-summary" aria-label="Ringkasan saldo, pendapatan, dan views">
-    <article class="stat-card"><div class="stat-icon purple"><i class="fa-solid fa-wallet"></i></div><div><span data-i18n="dashCurrentBalance">Saldo Saat Ini</span><strong data-metric="currentBalance">Rp0</strong></div></article>
-    <article class="stat-card"><div class="stat-icon orange"><i class="fa-solid fa-hourglass-half"></i></div><div><span data-i18n="dashSettlementBalance">Saldo settlement</span><strong data-metric="settlementBalance">Rp0</strong></div></article>
-    <article class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-sack-dollar"></i></div><div><span data-i18n="dashTotalEarnings">Total Earnings</span><strong data-metric="totalEarnings">Rp0</strong></div></article>
-    <article class="stat-card"><div class="stat-icon blue"><i class="fa-solid fa-link"></i></div><div><span data-i18n="dashShortlinkEarnings">Shortlink Earnings</span><small>Saldo: <b data-metric="shortlinkBalance">Rp0</b></small><small>Total: <b data-metric="shortlinkEarnings">Rp0</b></small></div></article>
-    <article class="stat-card"><div class="stat-icon cyan"><i class="fa-solid fa-eye"></i></div><div><span data-i18n="dashPasteViews">Total Views Pastelink</span><strong data-metric="pasteViewsSummary">0 Views</strong></div></article>
-    <article class="stat-card"><div class="stat-icon blue"><i class="fa-solid fa-arrow-pointer"></i></div><div><span data-i18n="dashShortlinkViews">Total Views Shortlink</span><strong data-metric="shortlinkViewsSummary">0 Views</strong></div></article>
-    <article class="stat-card"><div class="stat-icon orange"><i class="fa-solid fa-unlock-keyhole"></i></div><div><span data-i18n="dashSub4Views">Total Views Sub4unlock</span><strong data-metric="sub4ViewsSummary">0 Views</strong></div></article>
-    <article class="stat-card"><div class="stat-icon orange"><i class="fa-solid fa-users"></i></div><div><span data-i18n="dashReferralEarnings">Referral Earnings</span><small>Saldo: <b data-metric="referralBalance">Rp0</b></small><small>Total: <b data-metric="referralEarnings">Rp0</b></small></div></article>
-    <article class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-money-bill-wave"></i></div><div><span data-i18n="dashPaymentEarnings">Payment Link Earnings</span><small>Saldo: <b data-metric="availableBalanceInline">Rp0</b></small><small>Total: <b data-metric="paymentEarnings">Rp0</b></small></div></article>
-    <article class="stat-card"><div class="stat-icon yellow"><i class="fa-solid fa-chart-line"></i></div><div><span data-i18n="dashAverageCpm">Average CPM</span><strong data-metric="averageCpm">0</strong></div></article>
-  </section>
-  <section class="analytics-card trend-card clean-chart-card">
-    <div class="trend-heading"><div><h2 data-i18n="dashShortlinkChartTitle">Statistik Shortlink</h2><p data-i18n="dashTimezone">Data menggunakan zona waktu Asia/Jakarta</p></div><div class="trend-current"><small data-i18n="dashCpmLabel">Pendapatan / 1.000 views</small><b data-metric="averageCpm">0</b></div></div>
-    <div class="line-chart" id="shortlink-chart" aria-label="Grafik Statistik Shortlink"></div><div class="chart-detail" id="shortlink-detail" aria-live="polite">Pilih titik grafik untuk melihat jumlah views.</div>
+  <section class="stat-grid earnings-summary-grid clean-summary" aria-label="Ringkasan pendapatan">
+    <article class="stat-card"><div class="stat-icon purple"><i class="fa-solid fa-wallet"></i></div><div><span>Total Earnings</span><strong data-metric="totalEarnings">Rp0.00</strong></div></article>
+    <article class="stat-card"><div class="stat-icon blue"><i class="fa-solid fa-link"></i></div><div><span>ShortLink Earnings</span><strong data-metric="shortlinkEarnings">Rp0.00</strong><small>Saldo: <b data-metric="shortlinkBalance">Rp0</b></small></div></article>
+    <article class="stat-card"><div class="stat-icon cyan"><i class="fa-solid fa-eye"></i></div><div><span>Total Views</span><strong data-metric="totalViewsSummary">0 Views</strong></div></article>
+    <article class="stat-card"><div class="stat-icon orange"><i class="fa-solid fa-users"></i></div><div><span>Referral Earnings</span><strong data-metric="referralEarnings">Rp0.00</strong><small>Saldo: <b data-metric="referralBalance">Rp0</b></small></div></article>
+    <article class="stat-card"><div class="stat-icon green"><i class="fa-solid fa-money-bill-wave"></i></div><div><span>Payment Link Earnings</span><strong data-metric="paymentEarnings">Rp0.00</strong><small>Saldo: <b data-metric="availableBalanceInline">Rp29,700.00</b></small></div></article>
+    <article class="stat-card"><div class="stat-icon yellow"><i class="fa-solid fa-chart-line"></i></div><div><span>Average CPM</span><strong data-metric="averageCpm">0</strong></div></article>
   </section>
 
   <section class="analytics-card trend-card clean-chart-card">
-    <div class="trend-heading"><div><h2 data-i18n="dashPaymentTitle">Statistik Payment Link</h2><p data-i18n="dashPaymentIntro">Pendapatan bersih berdasarkan transaksi berhasil.</p></div><div class="trend-current"><small data-i18n="dashNetIncome">Pendapatan bersih</small><b data-metric="paymentEarnings">Rp0</b></div></div>
+    <div class="trend-heading"><div><h2>Statistik Ads Link</h2><p>Data is reported in Asia/Jakarta timezone</p></div><div class="trend-current"><small>Pendapatan / 1.000 views</small><b data-metric="averageCpm">0</b></div></div>
+    <div class="line-chart" id="ads-link-chart" aria-label="Grafik Statistik Ads Link"></div><div class="chart-detail" id="ads-link-detail" aria-live="polite">Pilih titik grafik untuk melihat jumlah views.</div>
+  </section>
+
+  <section class="analytics-card trend-card clean-chart-card">
+    <div class="trend-heading"><div><h2>Statistik Payment Link</h2><p>Pendapatan bersih berdasarkan transaksi berhasil.</p></div><div class="trend-current"><small>Pendapatan bersih</small><b data-metric="paymentEarnings">Rp0</b></div></div>
     <div class="line-chart" id="payment-link-chart" aria-label="Grafik Statistik Payment Link"></div><div class="chart-detail" id="payment-link-detail" aria-live="polite">Pilih titik grafik untuk melihat pendapatan bersih.</div>
   </section>
 
   <section class="analytics-card daily-statistics-card clean-daily-card">
-    <div class="section-head"><div><h2 data-i18n="dashDailyStats">Statistik Harian</h2></div></div>
-    <div class="links-table-wrap"><table class="links-table daily-statistics-table"><thead><tr><th data-i18n="dashDate">TANGGAL</th><th data-i18n="dashViews">VIEWS</th><th data-i18n="dashShortlinkEarnings">SHORTLINK</th><th>PAYMENT LINK</th><th data-i18n="dashSub4Views">TOTAL VIEWS SUB4UNLOCK</th><th>VIEW PASTELINK</th><th>DAILY CPM</th><th data-i18n="dashReferralEarnings">PENDAPATAN REFERRAL</th></tr></thead><tbody id="dashboard-daily-stats-body"><tr><td colspan="8" class="table-loading">Memuat statistik...</td></tr></tbody></table></div>
+    <div class="section-head"><div><h2>Statistik Harian</h2></div></div>
+    <div class="links-table-wrap"><table class="links-table daily-statistics-table"><thead><tr><th>DATE</th><th>VIEWS</th><th>ADS LINK</th><th>DAILY CPM</th><th>REFERRAL EARNINGS</th><th>PAYMENT LINK</th></tr></thead><tbody id="dashboard-daily-stats-body"><tr><td colspan="6" class="table-loading">Memuat statistik...</td></tr></tbody></table></div>
   </section>
 </div>
 </main>
