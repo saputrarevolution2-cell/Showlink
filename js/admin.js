@@ -10,7 +10,7 @@
   async function boot(){
     try{sb=await window.ShowLinkSupabase.load();const {data:{session}}=await sb.auth.getSession();if(!session){location.replace('/login.html?next=/admin.html');return;}
       const admin=await rpc('is_current_user_admin');if(!admin){document.body.innerHTML='<main style="max-width:620px;margin:15vh auto;padding:30px;text-align:center;font-family:Inter,sans-serif"><h1>Akses Ditolak</h1><p>Akun ini bukan administrator.</p><a href="/dashboard.html">Kembali ke Dashboard</a></main>';return;}
-      await Promise.all([loadStats(),loadGateway(),loadControls(),loadControlCenterSettings(),loadTab('users'),loadSupport(),loadWithdrawSummary()]);
+      await Promise.all([loadStats(),loadGateway(),loadControls(),loadControlCenterSettings(),loadTab('users'),loadSupport(),loadWithdrawSummary(),loadWithdrawalFeeSettings()]);
     }catch(e){msg(e.message||'Gagal memuat Admin Panel');}
   }
   async function loadStats(){const d=await rpc('admin_dashboard_stats');$("#s-users").textContent=d.users;$("#s-links").textContent=d.payment_links;$("#s-orders").textContent=d.orders;$("#s-gross").textContent=money(d.gross_sales);$("#s-platform").textContent=money(d.platform_earnings);$("#s-pending").textContent=money(d.pending_settlement);}
@@ -82,6 +82,21 @@
   const supportFields={email:'support-email',telegram:'support-telegram',youtube:'support-youtube',whatsapp:'support-whatsapp',facebook:'support-facebook'};
   async function loadSupport(){const {data,error}=await sb.from('showlink_support_contacts').select('*').eq('id',1).maybeSingle();if(error)throw error;const d=data||{};for(const [k,id] of Object.entries(supportFields)){$('#'+id).value=d[k]||'';$('#support-'+k+'-visible').checked=d[k+'_visible']!==false;}}
   $('#support-form').addEventListener('submit',async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{const row={id:1,updated_at:new Date().toISOString()};for(const [k,id] of Object.entries(supportFields)){row[k]=$('#'+id).value.trim();row[k+'_visible']=$('#support-'+k+'-visible').checked;}const {error}=await sb.from('showlink_support_contacts').upsert(row,{onConflict:'id'});if(error)throw error;msg('Kontak Support berhasil disimpan.',true);}catch(x){msg((x.message||'Gagal menyimpan kontak Support')+' Pastikan SUPPORT-CONTACTS-MIGRATION.sql sudah dijalankan di Supabase.');}finally{b.disabled=false;}});
+
+  const feeInputIds=['fee-platform-manual','fee-platform-instant','fee-plan-free','fee-plan-vip','fee-plan-premium'];
+  const feeMoney=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n||0));
+  function renderFeePreview(){const m=Number($('#fee-platform-manual').value||0),i=Number($('#fee-platform-instant').value||0),f=Number($('#fee-plan-free').value||0);$('#fee-preview-manual-free').textContent=feeMoney(m+f);$('#fee-preview-instant-free').textContent=feeMoney(i+f);}
+  async function loadWithdrawalFeeSettings(){const d=await rpc('admin_get_withdraw_fee_settings');$('#fee-platform-manual').value=d.manual_platform_fee??5000;$('#fee-platform-instant').value=d.instant_platform_fee??5000;$('#fee-plan-free').value=d.free_plan_fee??5000;$('#fee-plan-vip').value=d.vip_plan_fee??0;$('#fee-plan-premium').value=d.premium_plan_fee??0;renderFeePreview();}
+  feeInputIds.forEach(id=>$('#'+id).addEventListener('input',renderFeePreview));
+  $('#withdraw-fee-form').addEventListener('submit',async e=>{e.preventDefault();const b=e.submitter;const vals=feeInputIds.map(id=>Number($('#'+id).value));if(vals.some(n=>!Number.isSafeInteger(n)||n<0||n>10000000)){msg('Semua fee harus berupa angka bulat Rp0 sampai Rp10.000.000.');return;}if(!confirm(`Simpan fee withdrawal?
+Manual platform: ${feeMoney(vals[0])}
+Instant platform: ${feeMoney(vals[1])}
+Fee Free: ${feeMoney(vals[2])}
+Fee VIP: ${feeMoney(vals[3])}
+Fee Premium: ${feeMoney(vals[4])}
+
+Total fee akan dihitung dari fee platform + fee membership.`))return;b.disabled=true;try{await rpc('admin_save_withdraw_fee_settings',{p_manual_platform_fee:vals[0],p_instant_platform_fee:vals[1],p_free_plan_fee:vals[2],p_vip_plan_fee:vals[3],p_premium_plan_fee:vals[4]});await loadWithdrawalFeeSettings();msg('Pengaturan fee withdrawal berhasil disimpan dan diterapkan pada pengajuan baru.',true);}catch(x){msg((x.message||'Gagal menyimpan fee withdrawal')+' Pastikan WITHDRAW-FEE-COMPONENTS-MIGRATION.sql sudah dijalankan di Supabase.');}finally{b.disabled=false;}});
+
   const maps={users:{fn:'admin_users',heads:['ID','User','Email','Membership','Saldo','Status','Aksi']},pastelinks:{fn:'admin_pastelinks',heads:['PasteLink','Dibuat','Kedaluwarsa','Password','Aksi']},shortlinks:{fn:'admin_shortlinks',heads:['Shortlink','Pemilik ID','Klik','Views','Harga','Aksi']},links:{fn:'admin_payment_links',heads:['File / Payment Link','Pemilik','Harga','Status','Sales','Views','Aksi']},orders:{fn:'admin_orders',heads:['Order','Seller','Amount','Status','Provider','Waktu']},withdrawals:{fn:'admin_withdrawals',heads:['User','Amount','Net','Status','Metode','Waktu / Aksi']}};
   async function loadTab(tab){current=tab;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));$("#admin-table-caption").textContent=({users:'Kelola akun: ban, buka ban, atau hapus user.',pastelinks:'Edit isi/judul/kedaluwarsa atau hapus PasteLink.',shortlinks:'Edit URL, harga akses, atau hapus Shortlink.',links:'Edit metadata dan status atau hapus payment link.',orders:'Pantau semua order platform.',withdrawals:'Approve, proses, atau reject permintaan withdrawal.'})[tab];const spec=maps[tab];$("#admin-head").innerHTML='<tr>'+spec.heads.map(h=>`<th>${h}</th>`).join('')+'</tr>';$("#admin-body").innerHTML='<tr><td colspan="8">Memuat data…</td></tr>';const data=await rpc(spec.fn,{p_limit:500});cache[tab]=Array.isArray(data)?data:[];render(tab);}
   function actionBtn(label,attrs,klass=''){return `<button type="button" class="admin-table-action ${klass}" ${attrs}>${label}</button>`;}
