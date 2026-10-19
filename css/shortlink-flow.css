@@ -19,7 +19,7 @@ html[data-theme="dark"] .sl-task-footer{border-color:#2b3850;color:#aebbd0}
 
 /* Shared fixed task navigation and ticker */
 .task-auth-nav{position:sticky;top:0;z-index:1000;box-shadow:0 4px 16px rgba(20,25,50,.06)}
-.sl-promo-ticker{position:sticky;top:66px;z-index:990;overflow:hidden;background:linear-gradient(90deg,#5b4ae6,#276fce);color:#fff;padding:10px 0;font-size:13px;font-weight:800;white-space:nowrap}
+.sl-promo-ticker{position:relative;z-index:900;overflow:hidden;background:linear-gradient(90deg,#5b4ae6,#276fce);color:#fff;padding:10px 0;font-size:13px;font-weight:800;white-space:nowrap}
 .sl-promo-ticker span{display:inline-block;padding-left:100%;animation:sl-promo-marquee 27s linear infinite}
 .sl-promo-ticker a{color:#fff;text-decoration:underline;text-underline-offset:3px}
 .sl-promo-ticker:hover span{animation-play-state:paused}
@@ -28,17 +28,3 @@ html[data-theme="dark"] .sl-task-footer{border-color:#2b3850;color:#aebbd0}
 [data-shortlink-ad-page]{scroll-margin-top:100px}
 
 .sl-generated-ad-slot{display:block;min-height:90px;margin:18px 0;padding:14px;border:1px dashed #c8d1e0;border-radius:14px;background:rgba(120,130,160,.06);scroll-margin-top:100px}.sl-generated-ad-slot>strong{display:block;margin-bottom:8px}.sl-generated-ad-slot p{margin:6px 0;font-size:13px;color:#64748b}.sl-generated-ad-slot .sl-admin-ad-slot{width:100%;overflow:hidden}.sl-generated-ad-slot iframe{max-width:100%}html[data-theme="dark"] .sl-generated-ad-slot{border-color:#34445d;background:rgba(30,42,62,.5)}html[data-theme="dark"] .sl-generated-ad-slot p{color:#b6c2d3}html[data-theme="dark"] .task-auth-nav{background:#111a2b;border-color:#273349}html[data-theme="dark"] .task-auth-brand{color:#f3f6fc}
-
-/* Keep the ticker visible below the sticky account bar while scrolling. */
-@media(max-width:420px){.sl-promo-ticker{top:60px;padding:8px 0;font-size:12px}}
-.sl-generated-ad-slot.sl-ad-active,.ad.sl-ad-active{min-height:0;padding:8px 0;border-color:transparent;background:transparent}
-.sl-ad-active>.sl-admin-ad-slot{margin:0}
-.sl-ad-active>strong[hidden],.sl-ad-active>p[hidden]{display:none!important}
-
-/* Empty endorsement slot: invitation to book a promotion */
-.sl-endorsement-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:150px;padding:18px;border:1px dashed #c7c4ef;border-radius:16px;background:linear-gradient(145deg,#faf9ff,#f3f6ff);color:#4d4b68;text-align:center;grid-column:1/-1}
-.sl-endorsement-empty-icon{display:grid;place-items:center;width:35px;height:35px;border-radius:11px;background:#e8e5ff;color:#6554e8;font-size:15px}
-.sl-endorsement-empty strong{font-size:14px;font-weight:900}
-.sl-endorsement-empty p{max-width:570px;margin:0;color:#77758c;font-size:12px;line-height:1.65}
-.sl-endorsement-cta{display:inline-flex;align-items:center;justify-content:center;gap:9px;margin-top:7px;padding:10px 14px;border:0;border-radius:12px;background:linear-gradient(135deg,#6757ee,#8b5cf6);color:#fff!important;text-decoration:none;font-size:12px;font-weight:900;box-shadow:0 8px 20px rgba(103,87,238,.2)}
-.sl-endorsement-cta:hover{transform:translateY(-1px);box-shadow:0 12px 24px rgba(103,87,238,.26)}
