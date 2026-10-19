@@ -302,3 +302,32 @@ html:not([data-theme="dark"]) .sl-nav-menu,html:not([data-theme="dark"]) .sl-dra
 .sl-nav-notification:not(.has-notifications) .sl-nav-notification-pulse{display:none!important}
 .sl-nav-notification-badge[hidden],.sl-menu-notification-badge[hidden]{display:none!important}
 @media(max-width:480px){.sl-bottom-item{font-size:10px;gap:4px}.sl-bottom-label{font-size:9px}.sl-bottom-create-icon{margin-top:-12px}}
+
+
+/* Corrective override: light mode must win over saved admin appearance colors. */
+html[data-theme="light"] .sl-navbar,
+html:not([data-theme="dark"]) .sl-navbar {
+  background: rgba(255,255,255,.97) !important;
+  color: #172033 !important;
+  border-bottom-color: rgba(148,163,184,.32) !important;
+}
+html[data-theme="light"] .sl-nav-drawer,
+html:not([data-theme="dark"]) .sl-nav-drawer {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border-right-color: rgba(148,163,184,.32) !important;
+}
+html[data-theme="light"] .sl-drawer-head,
+html:not([data-theme="dark"]) .sl-drawer-head { background: rgba(255,255,255,.98) !important; }
+html[data-theme="light"] .sl-nav-link,
+html:not([data-theme="dark"]) .sl-nav-link { color: #334155; }
+html[data-theme="light"] .sl-nav-link.active { color: #4f46e5; background: rgba(79,70,229,.08); }
+html[data-theme="light"] .sl-nav-menu,
+html[data-theme="light"] .sl-drawer-close,
+html:not([data-theme="dark"]) .sl-nav-menu,
+html:not([data-theme="dark"]) .sl-drawer-close { background: #ffffff !important; color: #334155 !important; }
+html[data-theme="light"] .sl-nav-notification:not(.has-notifications),
+html:not([data-theme="dark"]) .sl-nav-notification:not(.has-notifications) {
+  color: #64748b !important; background: #ffffff !important; border-color: rgba(148,163,184,.35) !important; box-shadow: 0 4px 14px rgba(15,23,42,.06) !important;
+}
+.sl-nav-notification:not(.has-notifications) .sl-nav-notification-pulse { display:none !important; }
