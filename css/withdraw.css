@@ -592,3 +592,71 @@ html[data-theme="dark"] .withdraw-page .withdraw-total-strip>div{background:var(
 html[data-theme="dark"] .withdraw-page .withdraw-status-legend{background:var(--sl-surface-soft)}
 @media(max-width:600px){.withdraw-page .withdraw-total-strip{grid-template-columns:1fr}.withdraw-page .withdraw-total-strip>div{padding:13px}.withdraw-page .withdraw-status-legend p{display:grid;gap:7px}.withdraw-page .app-stat>span{align-items:flex-start}}
 @media(prefers-reduced-motion:reduce){.withdraw-page .app-stat{transition:none}.withdraw-page .app-stat:hover{transform:none}}
+
+/* Withdraw refresh: polished, responsive cards and colorful semantic icons. */
+.withdraw-page{padding-top:clamp(18px,3vw,34px);padding-bottom:48px;isolation:isolate}
+.withdraw-page .app-hero{margin-bottom:22px;align-items:center}
+.withdraw-page .app-hero .app-kicker i{color:#8b5cf6}
+.withdraw-page .app-stats{gap:14px;margin-bottom:22px}
+.withdraw-page .app-stat{position:relative;overflow:hidden;border-radius:18px;transition:transform .2s ease,box-shadow .2s ease}
+.withdraw-page .app-stat:hover{transform:translateY(-2px);box-shadow:var(--sl-shadow)}
+.withdraw-page .stat-icon{display:inline-flex;width:34px;height:34px;align-items:center;justify-content:center;border-radius:11px;background:var(--sl-gradient-soft);color:#8b5cf6;margin-right:7px}
+.withdraw-page .app-stat:nth-child(1) .stat-icon{color:#f59e0b;background:rgba(245,158,11,.12)}
+.withdraw-page .app-stat:nth-child(2) .stat-icon{color:#06b6d4;background:rgba(6,182,212,.12)}
+.withdraw-page .app-stat:nth-child(3) .stat-icon{color:#8b5cf6;background:rgba(139,92,246,.12)}
+.withdraw-page .app-stat:nth-child(4) .stat-icon{color:#ef4444;background:rgba(239,68,68,.12)}
+.withdraw-page .app-stat:nth-child(5) .stat-icon{color:#10b981;background:rgba(16,185,129,.12)}
+.withdraw-page .app-stat:nth-child(6) .stat-icon{color:#3b82f6;background:rgba(59,130,246,.12)}
+.withdraw-page .app-grid{gap:20px;align-items:start}
+.withdraw-page .app-card,.withdraw-page .withdraw-method-card{border-radius:20px;box-shadow:var(--sl-shadow-sm);transition:border-color .2s ease,box-shadow .2s ease}
+.withdraw-page .withdraw-method-title>i{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:rgba(139,92,246,.12);color:#8b5cf6;font-size:18px;flex:0 0 auto}
+#manual-withdraw-card .withdraw-method-title>i{color:#3b82f6;background:rgba(59,130,246,.12)}
+#instant-withdraw-card .withdraw-method-title>i{color:#f59e0b;background:rgba(245,158,11,.14)}
+.withdraw-page .app-form input,.withdraw-page .account-form input{min-height:46px;border-radius:12px;transition:border-color .18s ease,box-shadow .18s ease}
+.withdraw-page input:focus,.withdraw-page select:focus{outline:none;border-color:#8b5cf6!important;box-shadow:0 0 0 3px rgba(139,92,246,.14)}
+.withdraw-page .app-btn{min-height:45px;border-radius:12px;transition:transform .18s ease,filter .18s ease}
+.withdraw-page .app-btn:not(:disabled):hover{transform:translateY(-1px);filter:brightness(1.04)}
+.withdraw-page .withdraw-note{border-radius:13px;line-height:1.55}
+.withdraw-fee-preview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:13px 14px;margin:12px 0;border:1px solid rgba(139,92,246,.22);border-radius:14px;background:linear-gradient(135deg,rgba(139,92,246,.08),rgba(59,130,246,.05));animation:wdPreviewIn .18s ease-out}
+.withdraw-fee-preview[hidden]{display:none}
+.withdraw-fee-preview>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.withdraw-fee-preview span{font-size:12px;color:var(--sl-muted);display:flex;align-items:center;gap:6px}
+.withdraw-fee-preview span i{color:#8b5cf6}
+.withdraw-fee-preview strong{font-size:clamp(14px,2vw,18px);font-weight:850;color:var(--sl-text);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.withdraw-fee-preview>div:last-child strong{color:#10b981}
+.withdraw-closed{display:flex;gap:14px;align-items:center;border-radius:16px;padding:17px 16px;margin:10px 0 14px;background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(59,130,246,.08));border:1px solid rgba(139,92,246,.25)}
+.withdraw-closed>i{display:grid;place-items:center;width:48px;height:48px;flex:0 0 48px;border-radius:15px;background:rgba(139,92,246,.14);color:#8b5cf6;font-size:22px;animation:wdSleepFloat 2.6s ease-in-out infinite}
+.withdraw-closed.is-refreshing{background:linear-gradient(135deg,rgba(16,185,129,.11),rgba(245,158,11,.10));border-color:rgba(16,185,129,.28)}
+.withdraw-closed.is-refreshing>i{background:rgba(16,185,129,.13);color:#10b981;animation:wdTripFloat 2.2s ease-in-out infinite}
+.withdraw-closed>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.withdraw-closed strong{font-size:13px;font-weight:850;line-height:1.4;color:var(--sl-text)}
+.withdraw-closed span{font-size:12px;line-height:1.6;color:var(--sl-muted);overflow-wrap:anywhere}
+.withdraw-page .page-scroll-table{border:1px solid var(--sl-border);border-radius:15px;overflow:auto}
+.withdraw-page .app-table{min-width:760px;border-collapse:separate;border-spacing:0}
+.withdraw-page .app-table th{font-size:11px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.withdraw-page .app-table td{vertical-align:middle;padding:13px 12px;font-size:12px}
+.withdraw-page .app-table tbody tr{transition:background .15s ease}
+.withdraw-page .app-table tbody tr:hover{background:var(--sl-hover)}
+.withdraw-page .withdraw-status{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;font-weight:800;font-size:11px;white-space:nowrap}
+.withdraw-page .withdraw-status.paid,.withdraw-page .withdraw-status.complete,.withdraw-page .withdraw-status.completed{background:rgba(16,185,129,.12);color:#059669}
+.withdraw-page .withdraw-status.pending{background:rgba(245,158,11,.14);color:#b45309}
+.withdraw-page .withdraw-status.processing{background:rgba(59,130,246,.13);color:#2563eb}
+.withdraw-page .withdraw-status.rejected,.withdraw-page .withdraw-status.cancelled{background:rgba(239,68,68,.12);color:#dc2626}
+.withdraw-fee-value{color:#f59e0b;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.withdraw-net-value{color:#10b981;font-variant-numeric:tabular-nums;white-space:nowrap}
+.withdraw-mode-pill{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.withdraw-mode-pill.manual i{color:#3b82f6}.withdraw-mode-pill.instant i{color:#f59e0b}
+.withdraw-account-meta{display:block;margin-top:4px;color:var(--sl-muted);font-size:11px;overflow-wrap:anywhere}
+.withdraw-page .withdraw-modal-card{border-radius:22px;box-shadow:0 24px 80px rgba(15,23,42,.25)}
+.withdraw-page .confirm-list>div{gap:12px}
+@keyframes wdPreviewIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes wdSleepFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-4px) rotate(3deg)}}
+@keyframes wdTripFloat{0%,100%{transform:translateX(0) rotate(-2deg)}50%{transform:translateX(4px) rotate(2deg)}}
+@media(max-width:760px){.withdraw-page{padding-top:14px}.withdraw-page .app-grid{gap:14px}.withdraw-page .app-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.withdraw-page .app-stat{padding:14px}.withdraw-page .app-stat strong{font-size:clamp(16px,4.5vw,21px)}.withdraw-fee-preview{gap:8px;padding:11px}.withdraw-page .app-card{padding:16px}.withdraw-page .withdraw-method-card{padding:14px}.withdraw-page .app-table{min-width:740px}}
+@media(prefers-reduced-motion:reduce){.withdraw-page *, .withdraw-closed>i{animation:none!important;transition:none!important}}
+
+@media(prefers-color-scheme:dark){
+  html:not([data-theme="light"]):not([data-theme="dark"]){
+    --sl-bg:#0b1220;--sl-bg-2:#111c2e;--sl-surface:rgba(17,28,46,.94);--sl-surface-strong:#111c2e;--sl-surface-soft:#172338;--sl-text:#f8fafc;--sl-muted:#a8b4c7;--sl-border:rgba(148,163,184,.20);--sl-border-strong:rgba(129,140,248,.45);--sl-hover:rgba(129,140,248,.12);--sl-shadow:0 18px 48px rgba(0,0,0,.24);--sl-shadow-sm:0 6px 20px rgba(0,0,0,.18);color-scheme:dark;background:var(--sl-bg);
+  }
+}
