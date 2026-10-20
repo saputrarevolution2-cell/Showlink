@@ -137,3 +137,132 @@ body.app-page,body.app-page.coming-page{
   .paste-promo p{flex:1 1 calc(100% - 55px);}
   .paste-promo-join{margin-left:auto}
 }
+
+/* Definitive PasteLink view polish: consistent light palette and readable type. */
+html, body, body.app-page, body.app-page.coming-page {
+  background: #f4f6fb !important;
+  color: #172033 !important;
+  color-scheme: light !important;
+}
+body.app-page.coming-page .paste-shell {
+  width: min(820px, calc(100% - 32px)) !important;
+  margin: 30px auto 56px !important;
+}
+body.app-page.coming-page .paste-card {
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border: 1px solid #e4e9f2 !important;
+  border-radius: 22px !important;
+  box-shadow: 0 16px 42px rgba(29, 43, 76, .08) !important;
+  padding: clamp(22px, 4vw, 36px) !important;
+}
+body.app-page.coming-page .paste-card :is(h1,h2,h3,h4,p,label,span,small,strong) {
+  text-shadow: none !important;
+}
+body.app-page.coming-page .paste-card #view-title {
+  color: #18243b !important;
+  font-size: clamp(24px, 4.6vw, 32px) !important;
+  line-height: 1.35 !important;
+  letter-spacing: -.025em !important;
+  font-weight: 750 !important;
+  margin: 12px 0 22px !important;
+}
+body.app-page.coming-page .paste-card #view-content {
+  background: #fbfcff !important;
+  color: #28364f !important;
+  border: 1px solid #e2e8f2 !important;
+  border-radius: 18px !important;
+  padding: clamp(18px, 3.6vw, 28px) !important;
+  font-size: clamp(16px, 2.3vw, 18px) !important;
+  line-height: 1.85 !important;
+  overflow-wrap: anywhere !important;
+}
+body.app-page.coming-page .paste-card #view-content :is(p,div,span,li) {
+  color: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+}
+body.app-page.coming-page .paste-card #view-content a {
+  color: #4f46e5 !important;
+  text-decoration-thickness: 1.5px !important;
+  text-underline-offset: 3px !important;
+}
+body.app-page.coming-page .paste-card .paste-back {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 0 24px !important;
+  color: #4f46e5 !important;
+  font-size: 16px !important;
+  font-weight: 750 !important;
+  text-decoration: none !important;
+}
+body.app-page.coming-page .paste-card .paste-submit {
+  width: 100% !important;
+  min-height: 54px !important;
+  margin-top: 20px !important;
+  border-radius: 14px !important;
+  font-size: 16px !important;
+  font-weight: 750 !important;
+}
+body.app-page.coming-page .paste-promo {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 22px max(20px, calc((100% - 820px) / 2)) !important;
+  box-sizing: border-box !important;
+  background: #ffffff !important;
+  color: #172033 !important;
+  border-bottom: 1px solid #e4e9f2 !important;
+  box-shadow: 0 8px 24px rgba(29, 43, 76, .045) !important;
+  z-index: 1 !important;
+}
+body.app-page.coming-page .paste-promo-inner {
+  width: 100% !important;
+  max-width: 820px !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  grid-template-columns: 52px minmax(0,1fr) auto !important;
+  align-items: center !important;
+  gap: 16px !important;
+}
+body.app-page.coming-page .paste-promo p {
+  min-width: 0 !important;
+  margin: 0 !important;
+  color: #52617a !important;
+  font-size: 16px !important;
+  line-height: 1.55 !important;
+}
+body.app-page.coming-page .paste-promo p strong {
+  display: block !important;
+  margin-bottom: 4px !important;
+  color: #172033 !important;
+  font-size: 19px !important;
+  line-height: 1.35 !important;
+}
+body.app-page.coming-page .paste-promo-join {
+  white-space: nowrap !important;
+  border-radius: 14px !important;
+  font-size: 16px !important;
+  font-weight: 750 !important;
+}
+body.app-page.coming-page .paste-promo :is(span,i) { color: inherit; }
+body.app-page.coming-page .paste-promo-join :is(span,i) { color: #ffffff !important; }
+body.app-page.coming-page .human-check-title,
+body.app-page.coming-page #human-check-title { color: #172033 !important; font-size: clamp(23px, 4vw, 30px) !important; line-height: 1.3 !important; }
+body.app-page.coming-page .human-check-description { color: #586780 !important; font-size: 16px !important; line-height: 1.65 !important; }
+body.app-page.coming-page .human-check-option { background: #f8faff !important; color: #1e293b !important; border-color: #dfe6f2 !important; font-size: 16px !important; }
+@media (max-width: 600px) {
+  body.app-page.coming-page .paste-promo { padding: 16px 18px !important; }
+  body.app-page.coming-page .paste-promo-inner { grid-template-columns: 42px minmax(0,1fr) !important; gap: 10px 12px !important; }
+  body.app-page.coming-page .paste-promo-icon { grid-row: 1; width: 42px !important; height: 42px !important; }
+  body.app-page.coming-page .paste-promo p { font-size: 15px !important; line-height: 1.5 !important; }
+  body.app-page.coming-page .paste-promo p strong { font-size: 18px !important; }
+  body.app-page.coming-page .paste-promo-join { grid-column: 2; justify-self: start; margin: 2px 0 0 !important; padding: 11px 17px !important; font-size: 15px !important; }
+  body.app-page.coming-page .paste-shell { width: calc(100% - 24px) !important; margin: 22px auto 38px !important; }
+  body.app-page.coming-page .paste-card { padding: 22px 18px !important; border-radius: 20px !important; }
+  body.app-page.coming-page .paste-card #view-content { padding: 17px !important; font-size: 16px !important; }
+}
