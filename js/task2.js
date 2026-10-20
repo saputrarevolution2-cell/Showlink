@@ -130,8 +130,8 @@
     // Dua unit iklan dengan jalur animasi berbeda: iklan pertama turun dari atas, iklan kedua naik dari bawah.
     // Unit pertama muncul tiap 5 detik, unit kedua tiap 7 detik.
     const adPopup1 = $('#sl-adsterra-popup'), adClose1 = $('#sl-adsterra-close'), adContent1 = $('#sl-adsterra-content');
-    const adPopup2 = $('#sl-adsterra-popup-2'), adClose2 = $('#sl-adsterra-close-2'), adContent2 = $('#sl-adsterra-content-2');
-    let ad1Loaded = false, ad2Loaded = false;
+    const adPopup2 = $('#sl-adsterra-popup-2'), adClose2 = $('#sl-adsterra-close-2'), adContent2 = $('#sl-adsterra-content-2'), adRestore2 = $('#sl-adsterra-restore-2');
+    let ad1Loaded = false, ad2Loaded = false, ad2Collapsed = false;
     function loadAd1() {
       if (ad1Loaded || !adContent1) return;
       ad1Loaded = true;
@@ -175,6 +175,9 @@
     }
     function showAd2() {
       if (!adPopup2 || document.visibilityState === 'hidden') return;
+      // Kemunculan otomatis berikutnya mengembalikan iklan meskipun sebelumnya diminimalkan.
+      ad2Collapsed = false;
+      if (adRestore2) adRestore2.hidden = true;
       if (adPopup1) adPopup1.hidden = true;
       adPopup2.hidden = true;
       // Reset the entrance animation so every 7-second appearance slides up again.
@@ -191,12 +194,28 @@
       event.stopPropagation();
       if (adPopup1) { adPopup1.hidden = true; adPopup1.classList.remove('sl-ad1-slide-in'); }
     });
-    // X kedua hanya menutup popup kedua, tidak mengubah status popup pertama.
+    // X kedua meminimalkan iklan kedua ke tombol ^ di bawah; iklan pertama tidak terpengaruh.
     adClose2?.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
+      ad2Collapsed = true;
       if (adPopup2) { adPopup2.hidden = true; adPopup2.classList.remove('sl-ad2-slide-in'); }
+      if (adRestore2) adRestore2.hidden = false;
     });
+    // Tombol ^ di bawah menampilkan kembali iklan kedua.
+    adRestore2?.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      ad2Collapsed = false;
+      if (adRestore2) adRestore2.hidden = true;
+      showAd2();
+    });
+    // Jika iklan kedua sedang diminimalkan, sentuhan/klik di halaman juga menampilkannya lagi.
+    document.addEventListener('pointerdown', (event) => {
+      if (!ad2Collapsed) return;
+      if (event.target?.closest?.('#sl-adsterra-restore-2, #sl-adsterra-close-2')) return;
+      showAd2();
+    }, { passive: true });
     window.setTimeout(showAd1, 5000);
     window.setInterval(showAd1, 5000);
     window.setTimeout(showAd2, 7000);
