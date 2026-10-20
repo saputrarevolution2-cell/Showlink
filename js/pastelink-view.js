@@ -39,8 +39,15 @@ async function copy(t){
  }catch{$('#view-message').textContent=tr('copyFail')}
 }
 async function init(){
- const box=$('#view-password-box'), input=$('#view-password'), unlock=$('#unlock-paste'), loading=$('#paste-loading'), content=$('#view-content'), copyAll=$('#copy-all'), message=$('#view-message');
- loading.hidden=false; box.hidden=true; content.hidden=true; copyAll.hidden=true; message.hidden=true; $('#view-title').hidden=true;
+ const box=$('#view-password-box'), input=$('#view-password'), unlock=$('#unlock-paste'), loading=$('#paste-loading'), content=$('#view-content'), copyAll=$('#copy-all'), message=$('#view-message'), gate=$('#paste-human-check'), checkbox=$('#human-check-checkbox'), status=$('#human-check-status'), checkStatusText=$('[data-human-loading]'), languageButton=$('#human-language');
+ let currentLang='en',started=false;
+ const copy={
+  en:{title:'Confirm You Are Human',desc:'Please complete the security check below to verify your connection before viewing this paste.',checkbox:"I'm not a robot",brand:'Security check',loading:'Verifying your connection…',foot:'Your connection is checked before the paste is displayed.',join:'Join',promo:'Register and earn with high-CPM shortlinks and instant-access PaymentLinks.',heading:'Earn with ShowLink',kicker:'SHOWLINK SECURITY',loadingDone:'Verification complete. Loading PasteLink…',lang:'🇮🇩 Bahasa Indonesia'},
+  id:{title:'Konfirmasi Bahwa Anda Manusia',desc:'Selesaikan pemeriksaan keamanan di bawah ini untuk memverifikasi koneksi sebelum melihat PasteLink ini.',checkbox:'Saya bukan robot',brand:'Pemeriksaan keamanan',loading:'Memverifikasi koneksi Anda…',foot:'Koneksi Anda diperiksa sebelum PasteLink ditampilkan.',join:'Gabung',promo:'Daftar dan dapatkan penghasilan dari shortlink dengan CPM tinggi dan PaymentLink akses langsung.',heading:'Raih penghasilan bersama ShowLink',kicker:'KEAMANAN SHOWLINK',loadingDone:'Verifikasi selesai. Memuat PasteLink…',lang:'🇬🇧 English'}
+ };
+ function setLang(lang){currentLang=lang;const d=copy[lang];document.documentElement.lang=lang;$('#human-check-title').textContent=d.title; $('[data-human-description]').textContent=d.desc;$('[data-human-checkbox]').textContent=d.checkbox;$('[data-human-brand]').textContent=d.brand;$('[data-human-foot]').textContent=d.foot;$('[data-human-kicker]').textContent=d.kicker;$('#human-language').textContent=d.lang;$('#human-language').setAttribute('aria-label',lang==='en'?'Switch to Indonesian':'Ganti ke bahasa Inggris');$('[data-promo-heading]').textContent=d.heading;$('[data-promo-text]').textContent=d.promo;$('[data-promo-join]').textContent=d.join;if(!started)checkStatusText.textContent=d.loading;}
+ languageButton.addEventListener('click',()=>setLang(currentLang==='en'?'id':'en'));
+ gate.hidden=false;loading.hidden=true;box.hidden=true;content.hidden=true;copyAll.hidden=true;message.hidden=true;$('#view-title').hidden=true;
  async function loadPaste(password){
   const c=await window.ShowLinkSupabase.load();
   const {data,error}=await c.rpc('get_pastelink',{p_slug:slug,p_password:password||null});
@@ -49,28 +56,29 @@ async function init(){
   if(!row){const err=new Error(tr('missing'));err.code='PASTE_NOT_FOUND';throw err}
   if(row.password_required){loading.hidden=true;box.hidden=false;content.hidden=true;copyAll.hidden=true;$('#view-title').hidden=true;message.hidden=true;
    if(password){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');$('#paste-mood').classList.remove('is-correct');toast(tr('passwordWrong'),'error')}else toast(tr('passwordRequired'),'info');return false}
-  if(row.content==null){throw new Error('Isi PasteLink tidak tersedia.')}
+  if(row.content==null)throw new Error('Isi PasteLink tidak tersedia.');
   box.hidden=true;loading.hidden=true;$('#view-title').hidden=true;content.hidden=true;copyAll.hidden=true;message.hidden=true;
   $('#paste-mood-icon').className='fa-solid fa-face-smile';$('#paste-mood').classList.remove('is-wrong');
-  if(password){$('#paste-mood').classList.add('is-correct');toast(tr('passwordRight'),'success');await new Promise(r=>setTimeout(r,2100));}
+  if(password){$('#paste-mood').classList.add('is-correct');toast(tr('passwordRight'),'success');await new Promise(r=>setTimeout(r,1200));}
   $('#view-title').textContent=row.title||'PasteLink';$('#view-title').hidden=false;
   content.innerHTML=render(row.content);content.hidden=false;copyAll.hidden=false;
-  content.onclick=e=>{if(e.target.closest('a'))return;const p=e.target.closest('.paste-copy-line:not(.paste-empty-line)');if(p&&!p.classList.contains('paste-empty-line'))copy(p.textContent)};
+  content.onclick=e=>{if(e.target.closest('a'))return;const p=e.target.closest('.paste-copy-line:not(.paste-empty-line)');if(p)copy(p.textContent)};
   copyAll.onclick=()=>copy(row.content.replace(/^> ?/gm,'').replace(/~~(.+?)~~/gs,'$1').replace(/\*\*(.+?)\*\*/gs,'$1').replace(/\*(.+?)\*/gs,'$1'));
   document.title=(row.title||'PasteLink')+' — ShowLink';return true;
  }
-
- try{
-  if(!slug||slug==='pastelink-view.html')throw new Error(tr('badSlug'));
-  loading.hidden=false;
-  const progress=$('#paste-loading-progress');let pct=0;const ticker=setInterval(()=>{pct=Math.min(95,pct+5);if(progress)progress.style.width=pct+'%'},250);const began=Date.now();
-  try{await loadPaste(null);await new Promise(r=>setTimeout(r,Math.max(0,5000-(Date.now()-began))));}finally{clearInterval(ticker);if(progress)progress.style.width='100%';}
-  unlock.onclick=async()=>{if(!input.value){toast(tr('passwordMissing'),'error');return}unlock.disabled=true;message.hidden=true;$('#paste-mood-icon').className='fa-solid fa-robot fa-bounce';$('#paste-mood').classList.remove('is-wrong','is-correct');try{const opened=await loadPaste(input.value);}catch(e){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');toast(tr('passwordWrong'),'error')}finally{unlock.disabled=false}};
- }catch(e){
-  loading.hidden=true;box.hidden=true;content.hidden=true;$('#view-title').hidden=false;$('#view-title').textContent=tr('loadFail');
-  message.hidden=true;toast(e.message||'Gagal memuat PasteLink.','error');
-  copyAll.hidden=true;
+ async function beginViewing(){
+  if(started)return;started=true;checkbox.disabled=true;gate.classList.add('is-verifying');status.hidden=false;checkStatusText.textContent=copy[currentLang].loading;
+  await new Promise(r=>setTimeout(r,1600));checkStatusText.textContent=copy[currentLang].loadingDone;gate.classList.add('is-verified');
+  await new Promise(r=>setTimeout(r,500));gate.hidden=true;loading.hidden=false;
+  try{
+   if(!slug||slug==='pastelink-view.html')throw new Error(tr('badSlug'));
+   const progress=$('#paste-loading-progress');let pct=0;const ticker=setInterval(()=>{pct=Math.min(95,pct+5);if(progress)progress.style.width=pct+'%'},180);const began=Date.now();
+   try{await loadPaste(null);await new Promise(r=>setTimeout(r,Math.max(0,700-(Date.now()-began))));}finally{clearInterval(ticker);if(progress)progress.style.width='100%';}
+   unlock.onclick=async()=>{if(!input.value){toast(tr('passwordMissing'),'error');return}unlock.disabled=true;message.hidden=true;$('#paste-mood-icon').className='fa-solid fa-robot fa-bounce';$('#paste-mood').classList.remove('is-wrong','is-correct');try{await loadPaste(input.value)}catch(e){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');toast(tr('passwordWrong'),'error')}finally{unlock.disabled=false}};
+  }catch(e){loading.hidden=true;box.hidden=true;content.hidden=true;$('#view-title').hidden=false;$('#view-title').textContent=tr('loadFail');message.hidden=true;toast(e.message||'Gagal memuat PasteLink.','error')}
  }
+ checkbox.addEventListener('change',()=>{if(checkbox.checked)beginViewing();});
+ setLang('en');
 }
 document.addEventListener('DOMContentLoaded',init);
 })();
