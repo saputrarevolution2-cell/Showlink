@@ -2,7 +2,7 @@
 const $=s=>document.querySelector(s);
 const slug=String(window.__SHOWLINK_PASTELINK_SLUG||new URLSearchParams(location.search).get('slug')||location.pathname.split('/').filter(Boolean).pop()||'').trim();
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function tr(key,fallback){const lang=(document.documentElement.lang||'id').toLowerCase().startsWith('en')?'en':'id';const dict={id:{loading:'Memuat PasteLink…',missing:'PasteLink tidak ditemukan atau sudah kedaluwarsa.',badSlug:'Slug PasteLink tidak valid.',loadFail:'PasteLink tidak dapat dibuka',passwordPrompt:'Masukkan kata sandi untuk membuka PasteLink',passwordRequired:'PasteLink ini membutuhkan kata sandi.',passwordMissing:'Masukkan kata sandi terlebih dahulu.',passwordWrong:'Kata sandi salah. Coba lagi.',passwordRight:'Kata sandi benar! PasteLink berhasil dibuka.',copyOk:'Teks berhasil disalin.',copyFail:'Gagal menyalin. Coba tombol Salin semua teks.'},en:{loading:'Loading PasteLink…',missing:'PasteLink was not found or has expired.',badSlug:'Invalid PasteLink slug.',loadFail:'Unable to open PasteLink',passwordPrompt:'Enter the password to open this PasteLink',passwordRequired:'This PasteLink requires a password.',passwordMissing:'Please enter a password first.',passwordWrong:'Incorrect password. Please try again.',passwordRight:'Correct password! PasteLink opened successfully.',copyOk:'Text copied successfully.',copyFail:'Could not copy. Try the Copy all text button.'}};return dict[lang][key]||fallback||key}
+function tr(key,fallback){const lang=(localStorage.getItem('showlink-language')||document.documentElement.lang||'id').toLowerCase().startsWith('en')?'en':'id';const dict={id:{humanTitle:'Konfirmasi Bahwa Anda Manusia',humanDescription:'Selesaikan pemeriksaan keamanan berikut untuk memverifikasi koneksi sebelum melihat PasteLink ini.',humanCheckbox:'Saya bukan robot',humanStatus:'Pemeriksaan keamanan',humanFootnote:'Koneksi Anda akan diperiksa sebelum PasteLink ditampilkan.',humanContinue:'Lanjutkan',humanVerified:'Koneksi berhasil diperiksa',loading:'Memuat PasteLink…',missing:'PasteLink tidak ditemukan atau sudah kedaluwarsa.',badSlug:'Slug PasteLink tidak valid.',loadFail:'PasteLink tidak dapat dibuka',passwordPrompt:'Masukkan kata sandi untuk membuka PasteLink',passwordRequired:'PasteLink ini membutuhkan kata sandi.',passwordMissing:'Masukkan kata sandi terlebih dahulu.',passwordWrong:'Kata sandi salah. Coba lagi.',passwordRight:'Kata sandi benar! PasteLink berhasil dibuka.',copyOk:'Teks berhasil disalin.',copyFail:'Gagal menyalin. Coba tombol Salin semua teks.'},en:{humanTitle:'Confirm You Are Human',humanDescription:'Please complete the security check below to verify your connection before viewing this paste.',humanCheckbox:"I'm not a robot",humanStatus:'Security check',humanFootnote:'Your connection is checked before the paste is displayed.',humanContinue:'Continue',humanVerified:'Connection check complete',loading:'Loading PasteLink…',missing:'PasteLink was not found or has expired.',badSlug:'Invalid PasteLink slug.',loadFail:'Unable to open PasteLink',passwordPrompt:'Enter the password to open this PasteLink',passwordRequired:'This PasteLink requires a password.',passwordMissing:'Please enter a password first.',passwordWrong:'Incorrect password. Please try again.',passwordRight:'Correct password! PasteLink opened successfully.',copyOk:'Text copied successfully.',copyFail:'Could not copy. Try the Copy all text button.'}};return dict[lang][key]||fallback||key}
 let toastTimer;
 function toast(text,kind='info'){
  let el=document.getElementById('paste-toast');
@@ -39,15 +39,8 @@ async function copy(t){
  }catch{$('#view-message').textContent=tr('copyFail')}
 }
 async function init(){
- const box=$('#view-password-box'), input=$('#view-password'), unlock=$('#unlock-paste'), loading=$('#paste-loading'), content=$('#view-content'), copyAll=$('#copy-all'), message=$('#view-message'), gate=$('#paste-human-check'), checkbox=$('#human-check-checkbox'), status=$('#human-check-status'), checkStatusText=$('[data-human-loading]'), languageButton=$('#human-language');
- let currentLang='en',started=false;
- const copy={
-  en:{title:'Confirm You Are Human',desc:'Please complete the security check below to verify your connection before viewing this paste.',checkbox:"I'm not a robot",brand:'Security check',loading:'Verifying your connection…',foot:'Your connection is checked before the paste is displayed.',join:'Join',promo:'Register and earn with high-CPM shortlinks and instant-access PaymentLinks.',heading:'Earn with ShowLink',kicker:'SHOWLINK SECURITY',loadingDone:'Verification complete. Loading PasteLink…',lang:'🇮🇩 Bahasa Indonesia'},
-  id:{title:'Konfirmasi Bahwa Anda Manusia',desc:'Selesaikan pemeriksaan keamanan di bawah ini untuk memverifikasi koneksi sebelum melihat PasteLink ini.',checkbox:'Saya bukan robot',brand:'Pemeriksaan keamanan',loading:'Memverifikasi koneksi Anda…',foot:'Koneksi Anda diperiksa sebelum PasteLink ditampilkan.',join:'Gabung',promo:'Daftar dan dapatkan penghasilan dari shortlink dengan CPM tinggi dan PaymentLink akses langsung.',heading:'Raih penghasilan bersama ShowLink',kicker:'KEAMANAN SHOWLINK',loadingDone:'Verifikasi selesai. Memuat PasteLink…',lang:'🇬🇧 English'}
- };
- function setLang(lang){currentLang=lang;const d=copy[lang];document.documentElement.lang=lang;$('#human-check-title').textContent=d.title; $('[data-human-description]').textContent=d.desc;$('[data-human-checkbox]').textContent=d.checkbox;$('[data-human-brand]').textContent=d.brand;$('[data-human-foot]').textContent=d.foot;$('[data-human-kicker]').textContent=d.kicker;$('#human-language').textContent=d.lang;$('#human-language').setAttribute('aria-label',lang==='en'?'Switch to Indonesian':'Ganti ke bahasa Inggris');$('[data-promo-heading]').textContent=d.heading;$('[data-promo-text]').textContent=d.promo;$('[data-promo-join]').textContent=d.join;if(!started)checkStatusText.textContent=d.loading;}
- languageButton.addEventListener('click',()=>setLang(currentLang==='en'?'id':'en'));
- gate.hidden=false;loading.hidden=true;box.hidden=true;content.hidden=true;copyAll.hidden=true;message.hidden=true;$('#view-title').hidden=true;
+ const box=$('#view-password-box'), input=$('#view-password'), unlock=$('#unlock-paste'), loading=$('#paste-loading'), content=$('#view-content'), copyAll=$('#copy-all'), message=$('#view-message');
+ loading.hidden=false; box.hidden=true; content.hidden=true; copyAll.hidden=true; message.hidden=true; $('#view-title').hidden=true;
  async function loadPaste(password){
   const c=await window.ShowLinkSupabase.load();
   const {data,error}=await c.rpc('get_pastelink',{p_slug:slug,p_password:password||null});
@@ -56,29 +49,38 @@ async function init(){
   if(!row){const err=new Error(tr('missing'));err.code='PASTE_NOT_FOUND';throw err}
   if(row.password_required){loading.hidden=true;box.hidden=false;content.hidden=true;copyAll.hidden=true;$('#view-title').hidden=true;message.hidden=true;
    if(password){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');$('#paste-mood').classList.remove('is-correct');toast(tr('passwordWrong'),'error')}else toast(tr('passwordRequired'),'info');return false}
-  if(row.content==null)throw new Error('Isi PasteLink tidak tersedia.');
+  if(row.content==null){throw new Error('Isi PasteLink tidak tersedia.')}
   box.hidden=true;loading.hidden=true;$('#view-title').hidden=true;content.hidden=true;copyAll.hidden=true;message.hidden=true;
   $('#paste-mood-icon').className='fa-solid fa-face-smile';$('#paste-mood').classList.remove('is-wrong');
-  if(password){$('#paste-mood').classList.add('is-correct');toast(tr('passwordRight'),'success');await new Promise(r=>setTimeout(r,1200));}
+  if(password){$('#paste-mood').classList.add('is-correct');toast(tr('passwordRight'),'success');await new Promise(r=>setTimeout(r,2100));}
   $('#view-title').textContent=row.title||'PasteLink';$('#view-title').hidden=false;
   content.innerHTML=render(row.content);content.hidden=false;copyAll.hidden=false;
-  content.onclick=e=>{if(e.target.closest('a'))return;const p=e.target.closest('.paste-copy-line:not(.paste-empty-line)');if(p)copy(p.textContent)};
+  content.onclick=e=>{if(e.target.closest('a'))return;const p=e.target.closest('.paste-copy-line:not(.paste-empty-line)');if(p&&!p.classList.contains('paste-empty-line'))copy(p.textContent)};
   copyAll.onclick=()=>copy(row.content.replace(/^> ?/gm,'').replace(/~~(.+?)~~/gs,'$1').replace(/\*\*(.+?)\*\*/gs,'$1').replace(/\*(.+?)\*/gs,'$1'));
   document.title=(row.title||'PasteLink')+' — ShowLink';return true;
  }
- async function beginViewing(){
-  if(started)return;started=true;checkbox.disabled=true;gate.classList.add('is-verifying');status.hidden=false;checkStatusText.textContent=copy[currentLang].loading;
-  await new Promise(r=>setTimeout(r,1600));checkStatusText.textContent=copy[currentLang].loadingDone;gate.classList.add('is-verified');
-  await new Promise(r=>setTimeout(r,500));gate.hidden=true;loading.hidden=false;
-  try{
-   if(!slug||slug==='pastelink-view.html')throw new Error(tr('badSlug'));
-   const progress=$('#paste-loading-progress');let pct=0;const ticker=setInterval(()=>{pct=Math.min(95,pct+5);if(progress)progress.style.width=pct+'%'},180);const began=Date.now();
-   try{await loadPaste(null);await new Promise(r=>setTimeout(r,Math.max(0,700-(Date.now()-began))));}finally{clearInterval(ticker);if(progress)progress.style.width='100%';}
-   unlock.onclick=async()=>{if(!input.value){toast(tr('passwordMissing'),'error');return}unlock.disabled=true;message.hidden=true;$('#paste-mood-icon').className='fa-solid fa-robot fa-bounce';$('#paste-mood').classList.remove('is-wrong','is-correct');try{await loadPaste(input.value)}catch(e){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');toast(tr('passwordWrong'),'error')}finally{unlock.disabled=false}};
-  }catch(e){loading.hidden=true;box.hidden=true;content.hidden=true;$('#view-title').hidden=false;$('#view-title').textContent=tr('loadFail');message.hidden=true;toast(e.message||'Gagal memuat PasteLink.','error')}
+
+ try{
+  if(!slug||slug==='pastelink-view.html')throw new Error(tr('badSlug'));
+  loading.hidden=false;
+  const progress=$('#paste-loading-progress');let pct=0;const ticker=setInterval(()=>{pct=Math.min(95,pct+5);if(progress)progress.style.width=pct+'%'},250);const began=Date.now();
+  try{await loadPaste(null);await new Promise(r=>setTimeout(r,Math.max(0,5000-(Date.now()-began))));}finally{clearInterval(ticker);if(progress)progress.style.width='100%';}
+  unlock.onclick=async()=>{if(!input.value){toast(tr('passwordMissing'),'error');return}unlock.disabled=true;message.hidden=true;$('#paste-mood-icon').className='fa-solid fa-robot fa-bounce';$('#paste-mood').classList.remove('is-wrong','is-correct');try{const opened=await loadPaste(input.value);}catch(e){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');toast(tr('passwordWrong'),'error')}finally{unlock.disabled=false}};
+ }catch(e){
+  loading.hidden=true;box.hidden=true;content.hidden=true;$('#view-title').hidden=false;$('#view-title').textContent=tr('loadFail');
+  message.hidden=true;toast(e.message||'Gagal memuat PasteLink.','error');
+  copyAll.hidden=true;
  }
- checkbox.addEventListener('change',()=>{if(checkbox.checked)beginViewing();});
- setLang('en');
 }
-document.addEventListener('DOMContentLoaded',init);
+document.addEventListener('DOMContentLoaded',()=>{
+ const gate=document.getElementById('paste-human-check'),check=document.getElementById('human-confirm'),go=document.getElementById('human-continue'),status=document.getElementById('human-status'),statusText=status?.querySelector('span:last-child'),card=document.getElementById('paste-content-card');
+ const lang=(localStorage.getItem('showlink-language')||document.documentElement.lang||'id').toLowerCase().startsWith('en')?'en':'id';
+ const copy={id:{title:'Konfirmasi Bahwa Anda Manusia',description:'Selesaikan pemeriksaan keamanan berikut untuk memverifikasi koneksi sebelum melihat PasteLink ini.',checkbox:'Saya bukan robot',status:'Pemeriksaan keamanan',foot:'Koneksi Anda akan diperiksa sebelum PasteLink ditampilkan.',continue:'Lanjutkan',working:'Memeriksa koneksi…',done:'Pemeriksaan selesai'},en:{title:'Confirm You Are Human',description:'Please complete the security check below to verify your connection before viewing this paste.',checkbox:"I'm not a robot",status:'Security check',foot:'Your connection is checked before the paste is displayed.',continue:'Continue',working:'Checking your connection…',done:'Security check complete'}}[lang];
+ document.documentElement.lang=lang;
+ document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');const map={pasteViewCreate:lang==='en'?'Create PasteLink':'Buat PasteLink',pasteViewLoading:lang==='en'?'Loading PasteLink…':'Memuat PasteLink…'};if(map[k])el.textContent=map[k]});
+ if(gate&&check&&go&&card){document.querySelector('[data-i18n="humanTitle"]').textContent=copy.title;document.querySelector('[data-i18n="humanDescription"]').textContent=copy.description;document.querySelector('[data-i18n="humanCheckbox"]').textContent=copy.checkbox;document.querySelector('[data-i18n="humanStatus"]').textContent=copy.status;document.querySelector('[data-i18n="humanFootnote"]').textContent=copy.foot;go.textContent=copy.continue;
+ check.addEventListener('change',()=>{go.disabled=!check.checked;status.classList.toggle('is-loading',check.checked);if(statusText)statusText.textContent=check.checked?copy.working:copy.status});
+ go.addEventListener('click',async()=>{if(!check.checked)return;go.disabled=true;check.disabled=true;status.classList.add('is-loading');if(statusText)statusText.textContent=copy.working;await new Promise(r=>setTimeout(r,900));status.classList.remove('is-loading');status.classList.add('is-success');if(statusText)statusText.textContent=copy.done;gate.hidden=true;card.hidden=false;init()});
+ }else init();
+});
 })();
