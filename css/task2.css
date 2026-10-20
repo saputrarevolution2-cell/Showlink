@@ -168,3 +168,27 @@ html,body{background:#f5f7fc!important;color:#253047!important;color-scheme:ligh
 .sl-adsterra-content{min-height:300px!important;display:flex;align-items:center;justify-content:center;overflow:auto!important}
 .sl-adsterra-content iframe{max-width:100%!important}
 @media(max-width:600px){.sl-adsterra-popup{width:calc(100vw - 12px)!important;max-height:calc(100vh - 12px)!important;padding:5px!important}.sl-adsterra-card{padding:8px!important}.sl-adsterra-content{min-height:280px!important}.task1-download-actions{gap:7px}}
+
+/* Task 2 requested finishing pass: fixed access notice below navbar, full-screen ad creatives, Telegram gate. */
+html,body{background:#f5f7fc!important;color:#253047!important;color-scheme:light!important}
+.sl-direct-floating-notice{position:fixed!important;display:none;top:68px!important;left:50%!important;right:auto!important;bottom:auto!important;transform:translateX(-50%)!important;width:min(320px,calc(100vw - 20px))!important;max-height:calc(100vh - 84px)!important;overflow:auto!important;margin:0!important;padding:12px 14px!important;background:#fff!important;border:1px solid #dfe4f2!important;border-radius:13px!important;box-shadow:0 12px 36px rgba(18,25,48,.22)!important;z-index:11000!important;color:#253047!important;box-sizing:border-box!important}
+.sl-direct-floating-notice.is-visible{display:block!important;animation:slDirectTopIn .22s ease-out!important}
+.sl-direct-floating-notice .sl-notice-direct>strong{display:block;font-size:13px!important;line-height:1.35;padding-right:24px}
+.sl-direct-floating-notice .sl-notice-direct>p{font-size:11px!important;line-height:1.45;margin:6px 0 9px!important}
+.sl-direct-floating-notice .sl-direct-access-button{display:flex;width:max-content;max-width:100%;margin:0 auto;align-items:center;justify-content:center;gap:6px;min-height:34px;padding:7px 10px;font-size:11px;border-radius:9px}
+.sl-direct-notice-close{position:absolute;top:6px;right:6px;width:24px;height:24px}
+.sl-adsterra-popup[hidden]{display:none!important}
+.sl-adsterra-popup{position:fixed!important;inset:0!important;left:0!important;top:0!important;right:0!important;bottom:0!important;transform:none!important;width:100vw!important;height:100dvh!important;max-height:100dvh!important;overflow:auto!important;z-index:12000!important;display:flex;align-items:center;justify-content:center;background:rgba(8,13,25,.48)!important;padding:12px!important;box-sizing:border-box!important;border:0!important;border-radius:0!important}
+.sl-adsterra-content{position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;min-height:0!important;width:auto!important;height:auto!important;max-width:100%!important;max-height:100%!important;overflow:visible!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
+.sl-adsterra-content iframe{display:block!important;max-width:none!important;max-height:none!important;border:0!important;transform:scale(1.45)!important;transform-origin:center center!important;margin:0!important}
+.sl-adsterra-popup-one #sl-adsterra-content{width:min(460px,90vw)!important;min-height:360px!important}
+.sl-adsterra-popup-two #sl-adsterra-content-2{width:260px!important;min-height:450px!important}
+.sl-ad-close-overlay{position:fixed!important;top:12px!important;right:12px!important;z-index:12002!important;display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(255,255,255,.6);border-radius:50%;background:rgba(255,255,255,.95);color:#1f2937;font-size:20px;box-shadow:0 5px 20px rgba(0,0,0,.2);cursor:pointer}
+.telegram-join-gate{width:100%;max-width:500px;margin:12px auto;padding:14px;border:1px solid #dbe5f5;border-radius:13px;background:#fff;text-align:center;box-sizing:border-box}
+.telegram-join-gate>strong{display:block;font-size:14px;line-height:1.5;color:#253047}
+.telegram-join-gate>strong i{color:#229ed9;margin-right:5px}
+.telegram-join-gate>p{font-size:12px;line-height:1.55;color:#5f6b80;margin:8px 0}
+.telegram-join-gate .task1-btn{margin:10px auto!important}
+#join-status .sl-countdown{justify-content:center}
+#task-completion-area #success{background:#e8fff3!important;color:#087443!important}
+@media(max-width:600px){.sl-direct-floating-notice{top:64px!important;width:min(300px,calc(100vw - 16px))!important;padding:10px 12px!important}.sl-adsterra-popup{padding:8px!important}.sl-adsterra-content iframe{transform:scale(1.08)!important}.sl-adsterra-popup-one #sl-adsterra-content{min-height:300px!important}.sl-adsterra-popup-two #sl-adsterra-content-2{min-height:360px!important}.sl-ad-close-overlay{top:8px!important;right:8px!important;width:34px;height:34px}}
