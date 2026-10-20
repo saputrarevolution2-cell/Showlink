@@ -142,3 +142,11 @@ html[data-theme="dark"] .task1-step-copy{background:#1a2540;color:#e7ecf5}html[d
 .sl-adsterra-content{min-height:310px!important;padding:12px!important}
 .sl-adsterra-content iframe{transform:scale(1.08);transform-origin:center center;margin:8px auto!important}
 @media(max-width:480px){.task1-download-actions{gap:7px}.task1-download-actions .task1-btn{min-width:120px}.sl-adsterra-popup{width:min(370px,calc(100vw - 16px))!important}.sl-adsterra-content{min-height:290px!important}.sl-adsterra-content iframe{transform:scale(1.02)}}
+
+
+/* Clear color distinction: download actions red; task navigation actions blue. */
+.task1-btn-red{background:#e53935!important;border:1px solid #d32f2f!important;color:#fff!important}
+.task1-btn-blue{background:#2563eb!important;border:1px solid #1d4ed8!important;color:#fff!important;box-shadow:0 4px 12px rgba(37,99,235,.18)!important}
+.task1-btn-blue:hover{background:#1d4ed8!important;color:#fff!important}
+#top,#save,#now,.task1-external-download{background:#e53935!important;border-color:#d32f2f!important;color:#fff!important}
+#next,#down,#up,#next-final{background:#2563eb!important;border-color:#1d4ed8!important;color:#fff!important}
