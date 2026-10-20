@@ -127,8 +127,8 @@
     });
     noticeClose?.addEventListener('click', () => notice?.classList.remove('is-visible'));
 
-    // Dua unit iklan sponsor: unit 1 setiap 5 detik, unit 2 setiap 10 detik.
-    // Kreatif iklan dimuat sekali dan popup hanya menampilkan materi iklan tanpa kartu/form.
+    // Dua unit iklan dengan jalur animasi berbeda: iklan pertama turun dari atas, iklan kedua naik dari bawah.
+    // Unit pertama muncul tiap 5 detik, unit kedua tiap 7 detik.
     const adPopup1 = $('#sl-adsterra-popup'), adClose1 = $('#sl-adsterra-close'), adContent1 = $('#sl-adsterra-content');
     const adPopup2 = $('#sl-adsterra-popup-2'), adClose2 = $('#sl-adsterra-close-2'), adContent2 = $('#sl-adsterra-content-2');
     let ad1Loaded = false, ad2Loaded = false;
@@ -164,8 +164,13 @@
     }
     function showAd1() {
       if (!adPopup1 || document.visibilityState === 'hidden') return;
-      if (adPopup2) adPopup2.hidden = true;
+      if (adPopup2) { adPopup2.hidden = true; adPopup2.classList.remove('sl-ad2-slide-in'); }
+      adPopup1.hidden = true;
+      adPopup1.classList.remove('sl-ad1-slide-in');
+      void adPopup1.offsetWidth;
       adPopup1.hidden = false;
+      void adPopup1.offsetWidth;
+      adPopup1.classList.add('sl-ad1-slide-in');
       loadAd1();
     }
     function showAd2() {
@@ -180,8 +185,18 @@
       adPopup2.classList.add('sl-ad2-slide-in');
       loadAd2();
     }
-    adClose1?.addEventListener('click', () => { if (adPopup1) adPopup1.hidden = true; });
-    adClose2?.addEventListener('click', () => { if (adPopup2) adPopup2.hidden = true; });
+    // Tombol X benar-benar independen: X pertama hanya menutup popup pertama.
+    adClose1?.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (adPopup1) { adPopup1.hidden = true; adPopup1.classList.remove('sl-ad1-slide-in'); }
+    });
+    // X kedua hanya menutup popup kedua, tidak mengubah status popup pertama.
+    adClose2?.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (adPopup2) { adPopup2.hidden = true; adPopup2.classList.remove('sl-ad2-slide-in'); }
+    });
     window.setTimeout(showAd1, 5000);
     window.setInterval(showAd1, 5000);
     window.setTimeout(showAd2, 7000);
