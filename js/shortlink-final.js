@@ -70,13 +70,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     try { return sessionStorage.getItem(`sl_task${task}_complete_${slug}`) === 'true'; } catch (_) { return false; }
   }
 
+  function eventId(eventName) {
+    // Reuse one receipt per event type and Shortlink in this tab session.
+    // The database has a UNIQUE receipt constraint, so network retries cannot credit twice.
+    const key = `sl_final_event_id_${eventName}_${slug}`;
+    try {
+      let id = sessionStorage.getItem(key);
+      if (!id) {
+        id = (window.crypto && typeof window.crypto.randomUUID === 'function')
+          ? window.crypto.randomUUID()
+          : `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); });
+        sessionStorage.setItem(key, id);
+      }
+      return id;
+    } catch (_) {
+      return (window.crypto && typeof window.crypto.randomUUID === 'function')
+        ? window.crypto.randomUUID()
+        : `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); });
+    }
+  }
   async function recordFinalEvent(eventName) {
-    if (!slug || !window.ShowLinkSupabase?.load) return;
+    if (!slug || !window.ShowLinkSupabase?.load) return false;
     try {
       const sb = await window.ShowLinkSupabase.load();
-      const { error } = await sb.rpc('record_shortlink_final_event', { p_slug: slug, p_event: eventName });
-      if (error) console.warn('Shortlink Final analytics:', error.message);
-    } catch (error) { console.warn('Shortlink Final analytics unavailable:', error?.message || error); }
+      const { data, error } = await sb.rpc('record_shortlink_final_event', {
+        p_slug: slug,
+        p_event: eventName,
+        p_event_id: eventId(eventName)
+      });
+      if (error) throw error;
+      return data?.ok === true;
+    } catch (error) {
+      console.warn('Shortlink Final analytics unavailable:', error?.message || error);
+      return false;
+    }
   }
   try {
     const viewKey = `sl_final_view_recorded_${slug}`;
@@ -140,13 +167,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     goButton.disabled = true;
     goButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Membuka tujuan…';
     // A redirect and its CPM-based revenue are recorded only after the visitor presses GO.
-    const redirectKey = `sl_final_redirect_recorded_${slug}`;
-    try {
-      if (!slug || sessionStorage.getItem(redirectKey) !== 'true') {
-        await recordFinalEvent('redirect');
-        if (slug) sessionStorage.setItem(redirectKey, 'true');
-      }
-    } catch (_) { await recordFinalEvent('redirect'); }
+    // Wait for the database receipt before leaving; only this explicit GO action can accrue CPM.
+    // If recording fails, do not silently redirect and lose the earning event.
+    const recorded = await recordFinalEvent('redirect');
+    if (!recorded) {
+      goButton.disabled = false;
+      goButton.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Coba lagi';
+      setResult('Pencatatan redirect belum berhasil. Periksa koneksi lalu tekan GO lagi.', true);
+      return;
+    }
     const configured = String(goButton.dataset.adminDestination || '').trim();
     const target = /^https?:\/\//i.test(configured) ? configured : destination;
     location.assign(target);
