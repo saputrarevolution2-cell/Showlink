@@ -660,3 +660,7 @@ html[data-theme="dark"] .withdraw-page .withdraw-status-legend{background:var(--
     --sl-bg:#0b1220;--sl-bg-2:#111c2e;--sl-surface:rgba(17,28,46,.94);--sl-surface-strong:#111c2e;--sl-surface-soft:#172338;--sl-text:#f8fafc;--sl-muted:#a8b4c7;--sl-border:rgba(148,163,184,.20);--sl-border-strong:rgba(129,140,248,.45);--sl-hover:rgba(129,140,248,.12);--sl-shadow:0 18px 48px rgba(0,0,0,.24);--sl-shadow-sm:0 6px 20px rgba(0,0,0,.18);color-scheme:dark;background:var(--sl-bg);
   }
 }
+
+/* Match the working Dashboard/Settings top spacing; navbar is fixed at 72px. */
+body.app-page main.app-wrap.withdraw-page{padding-top:118px !important;}
+@media(max-width:850px){body.app-page main.app-wrap.withdraw-page{padding-top:100px !important;}}
