@@ -19,8 +19,8 @@
   <script src="/js/navbar.js?v=20261020-nav-control2" defer></script>
   <script src="/js/footer.js" defer></script>
   <script src="/js/language.js?v=20261019-endorse1" defer></script>
-  <script src="/js/endorse.js" defer></script>
-</head>
+  <script src="/js/endorse.js?v=20261020-chatbot1" defer></script>
+<link rel="stylesheet" href="/css/endorse-chat.css?v=20261020-1"></head>
 <body class="app-page endorse-page">
   <div data-showlink-navbar></div>
   <main class="endorse-wrap">
@@ -36,12 +36,10 @@
       <article><span><i class="fa-solid fa-share-nodes"></i></span><h2>Akun sosial media</h2><p>Kenalkan akun Instagram, TikTok, YouTube, Facebook, channel, dan media sosial lainnya.</p></article>
       <article><span><i class="fa-solid fa-shop"></i></span><h2>Produk & layanan</h2><p>Ajukan promosi toko, aplikasi, website, jasa, event, atau kampanye brand.</p></article>
     </section>
-    <section class="endorse-contact-card" id="endorse-contact">
-      <div class="endorse-contact-icon"><i class="fa-solid fa-handshake-angle"></i></div>
-      <div class="endorse-contact-copy"><span class="endorse-label">KERJA SAMA PROMOSI</span><h2>Siap memasang endorse?</h2><p>Pilih kanal kontak admin yang tersedia di bawah ini. Sampaikan jenis promosi, tautan tujuan, materi gambar/video, dan durasi yang diinginkan. Harga dan ketersediaan slot akan dikonfirmasi oleh admin.</p></div>
-      <div id="endorse-contact-list" class="endorse-contact-list"><p class="endorse-loading">Memuat kontak admin...</p></div>
-      <p id="endorse-contact-empty" class="endorse-empty" hidden>Kontak endorse belum tersedia. Silakan buka halaman Support untuk melihat kanal bantuan yang tersedia.</p>
-      <a class="endorse-support-link" href="/support.html"><i class="fa-solid fa-headset"></i> Buka halaman Support</a>
+    <section class="endorse-contact-card endorse-chat-card" id="endorse-contact">
+      <div class="endorse-contact-icon"><i class="fa-solid fa-robot"></i></div>
+      <div class="endorse-contact-copy"><span class="endorse-label">BOT ENDORSE SHOWLINK</span><h2>Ajukan Endorse Otomatis</h2><p>Bot membantu memilih halaman dan posisi slot. Admin akan memeriksa materi serta bukti pembayaran sebelum iklan ditayangkan.</p></div>
+      <div id="endorse-chat" class="endorse-chat" aria-live="polite"><div id="endorse-chat-log" class="endorse-chat-log"></div><form id="endorse-chat-form" class="endorse-chat-form"><label for="endorse-chat-input">Pesan</label><div class="endorse-chat-compose"><input id="endorse-chat-input" maxlength="500" placeholder="Kirim chat pertama…" autocomplete="off"><button type="submit" aria-label="Kirim chat"><i class="fa-solid fa-paper-plane"></i></button></div></form><div id="endorse-chat-actions" class="endorse-chat-actions"></div><div id="endorse-chat-upload" class="endorse-chat-upload" hidden></div><p id="endorse-chat-status" class="endorse-empty" role="status"></p></div>
     </section>
     <p class="endorse-note"><i class="fa-solid fa-circle-info"></i> Semua promosi akan ditinjau sebelum ditampilkan. Pastikan materi dan tautan promosi valid serta tidak menyesatkan.</p>
   </main>
