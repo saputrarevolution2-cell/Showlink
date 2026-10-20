@@ -52,7 +52,7 @@ async function init(){
   if(row.content==null){throw new Error('Isi PasteLink tidak tersedia.')}
   box.hidden=true;loading.hidden=true;$('#view-title').hidden=true;content.hidden=true;copyAll.hidden=true;message.hidden=true;
   $('#paste-mood-icon').className='fa-solid fa-face-smile';$('#paste-mood').classList.remove('is-wrong');
-  if(password){$('#paste-mood').classList.add('is-correct');toast(tr('passwordRight'),'success');await new Promise(r=>setTimeout(r,2100));}
+  if(password){$('#paste-mood').classList.add('is-correct');toast(tr('passwordRight'),'success');}
   $('#view-title').textContent=row.title||'PasteLink';$('#view-title').hidden=false;
   content.innerHTML=render(row.content);content.hidden=false;copyAll.hidden=false;
   content.onclick=e=>{if(e.target.closest('a'))return;const p=e.target.closest('.paste-copy-line:not(.paste-empty-line)');if(p&&!p.classList.contains('paste-empty-line'))copy(p.textContent)};
@@ -63,8 +63,14 @@ async function init(){
  try{
   if(!slug||slug==='pastelink-view.html')throw new Error(tr('badSlug'));
   loading.hidden=false;
-  const progress=$('#paste-loading-progress');let pct=0;const ticker=setInterval(()=>{pct=Math.min(95,pct+5);if(progress)progress.style.width=pct+'%'},250);const began=Date.now();
-  try{await loadPaste(null);await new Promise(r=>setTimeout(r,Math.max(0,5000-(Date.now()-began))));}finally{clearInterval(ticker);if(progress)progress.style.width='100%';}
+  // Do not add an artificial minimum loading delay; show the paste as soon as the request finishes.
+  const progress=$('#paste-loading-progress');
+  if(progress)progress.style.width='20%';
+  try {
+   await loadPaste(null);
+  } finally {
+   if(progress)progress.style.width='100%';
+  }
   unlock.onclick=async()=>{if(!input.value){toast(tr('passwordMissing'),'error');return}unlock.disabled=true;message.hidden=true;$('#paste-mood-icon').className='fa-solid fa-robot fa-bounce';$('#paste-mood').classList.remove('is-wrong','is-correct');try{const opened=await loadPaste(input.value);}catch(e){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');toast(tr('passwordWrong'),'error')}finally{unlock.disabled=false}};
  }catch(e){
   loading.hidden=true;box.hidden=true;content.hidden=true;$('#view-title').hidden=false;$('#view-title').textContent=tr('loadFail');
