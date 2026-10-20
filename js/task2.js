@@ -38,6 +38,7 @@
     const firstDownload = $('#top'), saveButton = $('#save'), scrollDownButton = $('#down');
     const finalDownload = $('#now'), scrollUpButton = $('#up'), continueButton = $('#next'), finalNextButton = $('#next-final');
     const successMessage = $('#success'), notice = $('#task-completion-area'), noticeClose = $('#task-notice-close');
+    const joinGate = $('#telegram-join-gate'), joinButton = $('#join-telegram'), joinStatus = $('#join-status');
     const footer = $('.sl-task-footer');
     let firstStarted = false, saveStarted = false, finalStarted = false, continueStarted = false, adScriptLoaded = false;
 
@@ -89,12 +90,24 @@
       window.setTimeout(() => { reveal(continueButton); notice?.classList.add('is-visible'); scrollToElement(continueButton); }, 450);
     });
 
-    // Klik lanjut: loading 3 detik, lalu tampilkan notifikasi sukses dan tombol Next final.
-    continueButton?.addEventListener('click', async () => {
+    // Sebelum selesai, tampilkan syarat bergabung ke grup Telegram.
+    continueButton?.addEventListener('click', () => {
       if (continueStarted || continueButton.disabled) return;
-      continueStarted = true; setBusy(continueButton, true);
-      await countdown(status, 3000, 'Menyelesaikan Task 2');
+      continueStarted = true;
       conceal(continueButton);
+      reveal(joinGate);
+      if (joinStatus) joinStatus.textContent = '';
+      scrollToElement(joinGate, 'center');
+    });
+
+    // Tombol Join Now membuka grup dan memulai hitung mundur 3 detik.
+    // Klik ini tidak memverifikasi keanggotaan Telegram secara otomatis.
+    joinButton?.addEventListener('click', async () => {
+      if (!joinButton || joinButton.disabled) return;
+      setBusy(joinButton, true);
+      window.open('https://t.me/+3u6SmGI90PJhMmFl', '_blank', 'noopener,noreferrer');
+      await countdown(joinStatus, 3000, 'Menyiapkan langkah berikutnya');
+      conceal(joinGate);
       try { sessionStorage.setItem(`sl_task2_complete_${flow.slug()}`, 'true'); } catch (_) {}
       if (successMessage) {
         successMessage.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Success — Task 2 Done';
@@ -102,7 +115,7 @@
       }
       reveal(finalNextButton);
       notice?.classList.add('is-visible');
-      setBusy(continueButton, false);
+      setBusy(joinButton, false);
       finalNextButton?.focus({ preventScroll: true });
     });
     finalNextButton?.addEventListener('click', () => {
@@ -113,27 +126,50 @@
     });
     noticeClose?.addEventListener('click', () => notice?.classList.remove('is-visible'));
 
-    // Adsterra floating popup, muncul setiap 11 detik. Script iklan dimuat sekali.
-    const adPopup = $('#sl-adsterra-popup'), adClose = $('#sl-adsterra-close'), adContent = $('#sl-adsterra-content');
-    function loadAdsterra() {
-      if (adScriptLoaded || !adContent) return;
-      adScriptLoaded = true;
+    // Dua unit iklan sponsor: unit 1 setiap 5 detik, unit 2 setiap 10 detik.
+    // Kreatif iklan dimuat sekali dan popup hanya menampilkan materi iklan tanpa kartu/form.
+    const adPopup1 = $('#sl-adsterra-popup'), adClose1 = $('#sl-adsterra-close'), adContent1 = $('#sl-adsterra-content');
+    const adPopup2 = $('#sl-adsterra-popup-2'), adClose2 = $('#sl-adsterra-close-2'), adContent2 = $('#sl-adsterra-content-2');
+    let ad1Loaded = false, ad2Loaded = false;
+    function loadAd1() {
+      if (ad1Loaded || !adContent1) return;
+      ad1Loaded = true;
+      const script = document.createElement('script');
+      script.async = true;
+      script.setAttribute('data-cfasync', 'false');
+      script.src = 'https://pl31626334.profitableratecpmnetwork.com/ef7f0e942fbcf5b02dd491deb0f7ac5f/invoke.js';
+      adContent1.appendChild(script);
+    }
+    function loadAd2() {
+      if (ad2Loaded || !adContent2) return;
+      ad2Loaded = true;
       const config = document.createElement('script');
-      config.text = "atOptions = {'key':'995976d1f84651e529f61b1fec35968c','format':'iframe','height':250,'width':300,'params':{}};";
-      adContent.appendChild(config);
-      const adScript = document.createElement('script');
-      adScript.src = 'https://www.highrevenueformat.com/995976d1f84651e529f61b1fec35968c/invoke.js';
-      adScript.async = true;
-      adContent.appendChild(adScript);
+      config.text = "atOptions = {'key':'b2fb4d9766519ed2c5073f02f6610543','format':'iframe','height':300,'width':160,'params':{}};";
+      adContent2.appendChild(config);
+      const script = document.createElement('script');
+      script.src = 'https://www.highrevenueformat.com/b2fb4d9766519ed2c5073f02f6610543/invoke.js';
+      script.async = true;
+      adContent2.appendChild(script);
     }
-    function showAdPopup() {
-      if (!adPopup || document.visibilityState === 'hidden') return;
-      adPopup.hidden = false;
-      loadAdsterra();
+    function showAd1() {
+      if (!adPopup1 || document.visibilityState === 'hidden') return;
+      if (adPopup2) adPopup2.hidden = true;
+      adPopup1.hidden = false;
+      loadAd1();
     }
-    adClose?.addEventListener('click', () => { if (adPopup) adPopup.hidden = true; });
-    window.setTimeout(showAdPopup, 11000);
-    window.setInterval(showAdPopup, 11000);
+    function showAd2() {
+      if (!adPopup2 || document.visibilityState === 'hidden') return;
+      if (adPopup1) adPopup1.hidden = true;
+      adPopup2.hidden = false;
+      loadAd2();
+    }
+    adClose1?.addEventListener('click', () => { if (adPopup1) adPopup1.hidden = true; });
+    adClose2?.addEventListener('click', () => { if (adPopup2) adPopup2.hidden = true; });
+    window.setTimeout(showAd1, 5000);
+    window.setInterval(showAd1, 5000);
+    window.setTimeout(showAd2, 10000);
+    window.setInterval(showAd2, 10000);
+
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 })();
