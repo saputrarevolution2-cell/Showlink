@@ -192,3 +192,29 @@ html,body{background:#f5f7fc!important;color:#253047!important;color-scheme:ligh
 #join-status .sl-countdown{justify-content:center}
 #task-completion-area #success{background:#e8fff3!important;color:#087443!important}
 @media(max-width:600px){.sl-direct-floating-notice{top:64px!important;width:min(300px,calc(100vw - 16px))!important;padding:10px 12px!important}.sl-adsterra-popup{padding:8px!important}.sl-adsterra-content iframe{transform:scale(1.08)!important}.sl-adsterra-popup-one #sl-adsterra-content{min-height:300px!important}.sl-adsterra-popup-two #sl-adsterra-content-2{min-height:360px!important}.sl-ad-close-overlay{top:8px!important;right:8px!important;width:34px;height:34px}}
+/* Task 2 second ad fallback: visible only while the provider creative is loading. */
+.sl-ad2-fallback{position:absolute;z-index:1;left:50%;top:50%;transform:translate(-50%,-50%);max-width:85vw;padding:12px 16px;border-radius:10px;background:rgba(255,255,255,.94);color:#253047;font:700 14px/1.5 system-ui,sans-serif;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.16);pointer-events:none}
+#sl-adsterra-content-2{position:relative!important}
+
+
+/* Task 2: Adsterra kedua — muncul tiap 7 detik, slide dari bawah ke tengah layar. */
+#sl-adsterra-popup-2.sl-ad2-slide-in {
+  animation: slAd2RiseFromBottom 520ms cubic-bezier(.2,.8,.2,1) both !important;
+}
+@keyframes slAd2RiseFromBottom {
+  from { opacity: 0; transform: translate3d(0, 100vh, 0) !important; }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) !important; }
+}
+#sl-adsterra-popup-2 {
+  display: flex;
+  align-items: center !important;
+  justify-content: center !important;
+}
+#sl-adsterra-popup-2[hidden] { display: none !important; }
+#sl-adsterra-popup-2 #sl-adsterra-content-2 {
+  margin: auto !important;
+  align-self: center !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  #sl-adsterra-popup-2.sl-ad2-slide-in { animation-duration: 1ms !important; }
+}
