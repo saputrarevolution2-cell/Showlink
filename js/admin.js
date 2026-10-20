@@ -109,7 +109,7 @@
         <section class="endorse-request-target"><strong>Link tujuan promosi</strong>${r.target_url?`<a href="${esc(r.target_url)}" target="_blank" rel="noopener">${esc(r.target_url)}</a>`:'<span>Belum diisi</span>'}</section>
         <details class="endorse-chat-details"><summary>Riwayat percakapan <span>${transcript.length} pesan</span></summary><div class="endorse-admin-chat">${transcript.map(m=>`<div class="endorse-admin-chat-message ${m.who==='user'?'from-user':'from-bot'}"><strong>${m.who==='user'?'User':'Bot ShowLink'}</strong><p>${esc(m.text||'')}</p><small>${m.at&&!Number.isNaN(Date.parse(m.at))?new Date(m.at).toLocaleString('id-ID',{dateStyle:'short',timeStyle:'short'}):'Waktu tidak tersedia'}</small></div>`).join('')||'<p class="admin-muted">Belum ada riwayat pesan yang tersimpan.</p>'}</div></details>
         ${r.admin_note?`<p class="endorse-admin-note"><strong>Catatan admin:</strong> ${esc(r.admin_note)}</p>`:''}
-        <div class="endorse-admin-actions"><button class="app-btn primary" type="button" data-endorse-action="approved" data-endorse-id="${esc(r.id)}" ${r.status==='approved'?'disabled':''}>Setujui & pasang</button><button class="app-btn secondary" type="button" data-endorse-action="queued" data-endorse-id="${esc(r.id)}" ${r.status==='queued'?'disabled':''}>Masukkan antrean</button><button class="app-btn secondary" type="button" data-endorse-action="rejected" data-endorse-id="${esc(r.id)}" ${r.status==='rejected'?'disabled':''}>Tolak</button></div>
+        <div class="endorse-admin-actions"><button class="app-btn primary" type="button" data-endorse-action="approved" data-endorse-id="${esc(r.id)}" ${r.status==='approved'?'disabled':''}>Setujui & pasang</button><button class="app-btn secondary" type="button" data-endorse-action="queued" data-endorse-id="${esc(r.id)}" ${r.status==='queued'?'disabled':''}>Masukkan antrean</button><button class="app-btn secondary" type="button" data-endorse-action="rejected" data-endorse-id="${esc(r.id)}" ${r.status==='rejected'?'disabled':''}>Tolak</button><button class="app-btn danger" type="button" data-endorse-delete="${esc(r.id)}">Hapus chat + iklan</button></div>
       </article>`;
     }).join('');
   }
@@ -118,7 +118,28 @@
   $('#endorse-search')?.addEventListener('input',renderEndorseRequests);
   $('#endorse-prices-form')?.addEventListener('submit',async e=>{e.preventDefault();const prices={go:{},final:{}};for(const page of ['go','final'])for(const pos of ['top','middle','bottom'])prices[page][pos]=Number($(`#endorse-price-${page}-${pos}`).value||0);try{await rpc('admin_save_endorse_settings',{p_prices:prices});await loadEndorsePrices();msg('Harga slot endorse berhasil disimpan dan diterapkan untuk pengajuan baru.',true);}catch(x){msg(x.message||'Gagal menyimpan harga endorse.');}});
   $('#endorse-request-refresh')?.addEventListener('click',loadEndorseRequests);
-  document.addEventListener('click',async e=>{const b=e.target.closest('[data-endorse-action]');if(!b)return;const status=b.dataset.endorseAction;let note='';if(status==='rejected'){note=prompt('Alasan penolakan (opsional):')||'';}if(status==='approved'&&!confirm('Setujui dan pasang iklan ini pada slot yang dipilih?'))return;b.disabled=true;try{await rpc('admin_update_endorse_request',{p_request_id:b.dataset.endorseId,p_status:status,p_admin_note:note});await loadEndorseRequests();msg(status==='approved'?'Endorse disetujui dan dipasang.':`Status endorse diubah menjadi ${status}.`,true);}catch(x){msg(x.message||'Gagal memperbarui pengajuan endorse.');}finally{b.disabled=false;}});
+  function endorseStoragePath(url){
+    if(!url)return null;
+    try{const u=new URL(url);const marker='/storage/v1/object/public/showlink-endorsements/';const signed='/storage/v1/object/sign/showlink-endorsements/';let i=u.pathname.indexOf(marker),prefix=marker;if(i<0){i=u.pathname.indexOf(signed);prefix=signed;}if(i<0)return null;return decodeURIComponent(u.pathname.slice(i+prefix.length));}catch{return null;}
+  }
+  document.addEventListener('click',async e=>{
+    const del=e.target.closest('[data-endorse-delete]');
+    if(del){
+      const row=endorseRequestCache.find(r=>String(r.id)===String(del.dataset.endorseDelete));if(!row)return;
+      if(!confirm('Hapus chat/pengajuan ini beserta iklan yang sedang tayang, gambar endorse, dan bukti pembayaran? Tindakan ini tidak dapat dibatalkan.'))return;
+      del.disabled=true;
+      try{
+        const paths=[endorseStoragePath(row.image_url),endorseStoragePath(row.payment_proof_url)].filter(Boolean);
+        if(paths.length){const {error}=await sb.storage.from('showlink-endorsements').remove([...new Set(paths)]);if(error)throw new Error('File belum terhapus dari Storage: '+error.message+' Pengajuan belum dihapus.');}
+        await rpc('admin_delete_endorse_request',{p_request_id:row.id});
+        await loadEndorseRequests();
+        msg('Chat/pengajuan dihapus. Iklan dilepas dari slot, gambar dan bukti pembayaran di Storage dihapus jika tersimpan di bucket endorse.',true);
+      }catch(x){msg(x.message||'Gagal menghapus pengajuan endorse. Pastikan SQL migrasi dan izin hapus Storage sudah dipasang.');}
+      finally{del.disabled=false;}
+      return;
+    }
+    const b=e.target.closest('[data-endorse-action]');if(!b)return;const status=b.dataset.endorseAction;let note='';if(status==='rejected'){note=prompt('Alasan penolakan (opsional):')||'';}if(status==='approved'&&!confirm('Setujui dan pasang iklan ini pada slot yang dipilih?'))return;b.disabled=true;try{await rpc('admin_update_endorse_request',{p_request_id:b.dataset.endorseId,p_status:status,p_admin_note:note});await loadEndorseRequests();msg(status==='approved'?'Endorse disetujui dan dipasang.':`Status endorse diubah menjadi ${status}.`,true);}catch(x){msg(x.message||'Gagal memperbarui pengajuan endorse.');}finally{b.disabled=false;}
+  });
 
   const supportFields={email:'support-email',telegram:'support-telegram',youtube:'support-youtube',whatsapp:'support-whatsapp',facebook:'support-facebook'};
   async function loadSupport(){const {data,error}=await sb.from('showlink_support_contacts').select('*').eq('id',1).maybeSingle();if(error)throw error;const d=data||{};for(const [k,id] of Object.entries(supportFields)){$('#'+id).value=d[k]||'';$('#support-'+k+'-visible').checked=d[k+'_visible']!==false;}}
