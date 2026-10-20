@@ -25,8 +25,7 @@
   function setBusy(button, busy) { if (button) button.disabled = busy; }
   function scrollToElement(element, block = 'center') { if (element) element.scrollIntoView({ behavior: 'smooth', block }); }
   function init() {
-    if (!window.SLF) return;
-    const flow = window.SLF;
+    const flow = window.SLF || null;
     const status = $('#status'), status2 = $('#status2'), saveStatus = $('#save-status');
     const directSlug = new URLSearchParams(location.search).get('slug') || sessionStorage.getItem('sl_slug') || '';
     const directAccessLink = $('#sl-direct-access-link');
@@ -42,8 +41,10 @@
     const footer = $('.sl-task-footer');
     let firstStarted = false, saveStarted = false, finalStarted = false, continueStarted = false, adScriptLoaded = false;
 
-    flow.get().then((data) => { const title = $('#title'); if (title) title.textContent = `${data.title || 'Shortlink'} — Task 2`; })
-      .catch((error) => { if (status) status.textContent = error.message || 'Data shortlink belum bisa dimuat.'; });
+    if (flow && typeof flow.get === 'function') {
+      flow.get().then((data) => { const title = $('#title'); if (title) title.textContent = `${data.title || 'Shortlink'} — Task 2`; })
+        .catch((error) => { if (status) status.textContent = error.message || 'Data shortlink belum bisa dimuat.'; });
+    }
 
     // Step 1: tombol Download di bawah judul Task 2 berubah menjadi loading.
     firstDownload?.addEventListener('click', async () => {
@@ -108,7 +109,7 @@
       window.open('https://t.me/+3u6SmGI90PJhMmFl', '_blank', 'noopener,noreferrer');
       await countdown(joinStatus, 3000, 'Menyiapkan langkah berikutnya');
       conceal(joinGate);
-      try { sessionStorage.setItem(`sl_task2_complete_${flow.slug()}`, 'true'); } catch (_) {}
+      try { if (flow && typeof flow.slug === 'function') sessionStorage.setItem(`sl_task2_complete_${flow.slug()}`, 'true'); } catch (_) {}
       if (successMessage) {
         successMessage.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> Success — Task 2 Done';
         successMessage.classList.remove('hide');
@@ -122,7 +123,7 @@
       if (finalNextButton.disabled) return;
       setBusy(finalNextButton, true);
       finalNextButton.innerHTML = '<span class="sl-spinner" aria-hidden="true"></span> Membuka Task 3…';
-      window.setTimeout(() => flow.go('task3.html'), 300);
+      window.setTimeout(() => { if (flow && typeof flow.go === 'function') flow.go('task3.html'); else location.href = 'task3.html'; }, 300);
     });
     noticeClose?.addEventListener('click', () => notice?.classList.remove('is-visible'));
 
@@ -143,13 +144,23 @@
     function loadAd2() {
       if (ad2Loaded || !adContent2) return;
       ad2Loaded = true;
+      // Set the provider config on window so the external invoke.js can always read it.
+      window.atOptions = { key: 'b2fb4d9766519ed2c5073f02f6610543', format: 'iframe', height: 300, width: 160, params: {} };
       const config = document.createElement('script');
-      config.text = "atOptions = {'key':'b2fb4d9766519ed2c5073f02f6610543','format':'iframe','height':300,'width':160,'params':{}};";
+      config.textContent = "window.atOptions = { key: 'b2fb4d9766519ed2c5073f02f6610543', format: 'iframe', height: 300, width: 160, params: {} };";
       adContent2.appendChild(config);
       const script = document.createElement('script');
       script.src = 'https://www.highrevenueformat.com/b2fb4d9766519ed2c5073f02f6610543/invoke.js';
-      script.async = true;
+      script.async = false;
+      script.setAttribute('data-cfasync', 'false');
       adContent2.appendChild(script);
+      if (!adContent2.querySelector('.sl-ad2-fallback')) {
+        const fallback = document.createElement('div');
+        fallback.className = 'sl-ad2-fallback';
+        fallback.textContent = 'Iklan sponsor sedang dimuat…';
+        adContent2.appendChild(fallback);
+        window.setTimeout(() => { if (fallback.isConnected && adContent2.querySelector('iframe')) fallback.remove(); }, 2500);
+      }
     }
     function showAd1() {
       if (!adPopup1 || document.visibilityState === 'hidden') return;
@@ -160,15 +171,21 @@
     function showAd2() {
       if (!adPopup2 || document.visibilityState === 'hidden') return;
       if (adPopup1) adPopup1.hidden = true;
+      adPopup2.hidden = true;
+      // Reset the entrance animation so every 7-second appearance slides up again.
+      void adPopup2.offsetWidth;
       adPopup2.hidden = false;
+      adPopup2.classList.remove('sl-ad2-slide-in');
+      void adPopup2.offsetWidth;
+      adPopup2.classList.add('sl-ad2-slide-in');
       loadAd2();
     }
     adClose1?.addEventListener('click', () => { if (adPopup1) adPopup1.hidden = true; });
     adClose2?.addEventListener('click', () => { if (adPopup2) adPopup2.hidden = true; });
     window.setTimeout(showAd1, 5000);
     window.setInterval(showAd1, 5000);
-    window.setTimeout(showAd2, 10000);
-    window.setInterval(showAd2, 10000);
+    window.setTimeout(showAd2, 7000);
+    window.setInterval(showAd2, 7000);
 
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
