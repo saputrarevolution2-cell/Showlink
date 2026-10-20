@@ -1,122 +1,92 @@
-/* ShowLink Task 3 — independent loading indicators beneath each action. */
-(function () {
+(() => {
   'use strict';
+  const OUTBOUND_URL = 'https://www.profitableratecpmnetwork.com/pkmkxfrmiy?key=5b5750804fb6a29007e75d321e567d75';
+  const AD_SCRIPT_URL = 'https://pl31626285.profitableratecpmnetwork.com/1e/25/0c/1e250cc0da41c572970286fab29d5009.js';
+  const COPY = {
+    id: {eyebrow:'TAUTAN TERAKHIR',title:'Selesaikan Task 3',copy:'Klik tombol di bawah untuk melanjutkan. Halaman akan menampilkan proses loading sebelum membuka tautan.',statusTitle:'Langkah terakhir',statusCopy:'Pastikan halaman tetap terbuka selama proses berlangsung.',continue:'Lanjutkan',openLink:'Buka tautan',note:'Tombol akan membuka tautan tujuan setelah loading singkat.',info:'Jika tautan tidak terbuka otomatis, klik salah satu tombol di atas sekali lagi.',footer:'Task 3 · Halaman tugas',loadingTitle:'Menyiapkan tautan...',loadingCopy:'Mohon tunggu sebentar'},
+    en: {eyebrow:'FINAL LINK',title:'Complete Task 3',copy:'Click a button below to continue. A short loading screen appears before the destination opens.',statusTitle:'Final step',statusCopy:'Keep this page open while the process is running.',continue:'Continue',openLink:'Open link',note:'The destination link opens after a short loading screen.',info:'If the link does not open automatically, click one of the buttons above again.',footer:'Task 3 · Task page',loadingTitle:'Preparing your link...',loadingCopy:'Please wait a moment'}
+  };
   const $ = (selector) => document.querySelector(selector);
-  const setBusy = (button, busy) => { if (button) button.disabled = Boolean(busy); };
+  const loading = $('#loadingOverlay');
+  const ad = $('#floatingAd');
+  const slot = $('#adSlot');
+  const closeAd = $('#closeAd');
+  const restoreAd = $('#restoreAd');
+  const languageToggle = $('#languageToggle');
+  let language = 'id';
+  let adTimer = null;
+  let loadingTimer = null;
+  let adWasDismissed = false;
 
-  function countdown(status, duration, label) {
-    return new Promise((resolve) => {
-      if (!status) { window.setTimeout(resolve, duration); return; }
-      status.replaceChildren();
-      status.classList.add('is-loading');
-      const wrap = document.createElement('div'); wrap.className = 'sl-countdown';
-      const spinner = document.createElement('span'); spinner.className = 'sl-spinner'; spinner.setAttribute('aria-hidden', 'true');
-      const text = document.createElement('span'); text.className = 'sl-countdown-text';
-      const track = document.createElement('span'); track.className = 'sl-progress';
-      const fill = document.createElement('span'); track.appendChild(fill);
-      wrap.append(spinner, text, track); status.appendChild(wrap);
-      const start = Date.now();
-      function tick() {
-        const elapsed = Date.now() - start;
-        text.textContent = `${label} · ${Math.max(0, Math.ceil((duration - elapsed) / 1000))} detik`;
-        fill.style.width = `${Math.min(100, elapsed / duration * 100)}%`;
-        if (elapsed >= duration) {
-          text.textContent = `${label} selesai`;
-          fill.style.width = '100%';
-          status.classList.remove('is-loading');
-          status.classList.add('is-complete');
-          resolve();
-          return;
-        }
-        window.requestAnimationFrame(tick);
-      }
-      tick();
+  $('#year').textContent = new Date().getFullYear();
+
+  function setLanguage(next) {
+    language = next;
+    document.documentElement.lang = next;
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+      const key = element.dataset.i18n;
+      if (COPY[next][key]) element.textContent = COPY[next][key];
     });
+    languageToggle.textContent = next === 'id' ? 'EN' : 'ID';
   }
+  languageToggle.addEventListener('click', () => setLanguage(language === 'id' ? 'en' : 'id'));
 
-  function scrollTo(element) {
-    if (element) element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  document.querySelectorAll('.outbound-button').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (button.disabled) return;
+      document.querySelectorAll('.outbound-button').forEach((item) => { item.disabled = true; });
+      loading.classList.add('visible');
+      loading.setAttribute('aria-hidden', 'false');
+      loadingTimer = window.setTimeout(() => {
+        // Navigate in the current tab after the visible loading state.
+        window.location.assign(OUTBOUND_URL);
+      }, 1100);
+    });
+  });
+
+  function injectAdScript() {
+    if (adWasDismissed || document.hidden) return;
+    // Recreate the slot for each refresh so ad markup from a previous run is cleared.
+    slot.replaceChildren();
+    const script = document.createElement('script');
+    script.src = AD_SCRIPT_URL;
+    script.async = true;
+    script.referrerPolicy = 'strict-origin-when-cross-origin';
+    slot.appendChild(script);
+    ad.classList.add('visible');
+    ad.setAttribute('aria-hidden', 'false');
+    restoreAd.hidden = true;
   }
-
-  function init() {
-    if (!window.SLF) return;
-    const flow = window.SLF;
-    const slug = new URLSearchParams(location.search).get('slug') || sessionStorage.getItem('sl_slug') || '';
-    const directLink = $('#sl-direct-access-link');
-    const directNotice = $('#sl-direct-floating-notice');
-    const directNoticeClose = $('#sl-direct-notice-close');
-    if (directLink && slug) directLink.href = `/shortlink-payment.html?slug=${encodeURIComponent(slug)}`;
-    directNotice?.classList.add('is-visible');
-    directNoticeClose?.addEventListener('click', () => directNotice?.classList.remove('is-visible'));
-
-    const startButton = $('#top');
-    const startStatus = $('#status-top');
-    const steps = [1, 2, 3].map((number) => ({
-      button: $(`[data-step="${number}"]`),
-      status: $(`#status-step-${number}`),
-      number
-    }));
-    const redirectButton = $('#redirect-final');
-    const redirectStatus = $('#status-final');
-    let started = false;
-    let completedSteps = 0;
-    let redirecting = false;
-
-    flow.get().then((data) => {
-      const title = $('#title');
-      if (title) title.textContent = `${data.title || 'Shortlink'} — Task 3`;
-    }).catch((error) => {
-      if (startStatus) startStatus.textContent = error.message || 'Data shortlink belum bisa dimuat.';
-    });
-
-    startButton?.addEventListener('click', async () => {
-      if (started || startButton.disabled) return;
-      started = true;
-      setBusy(startButton, true);
-      await countdown(startStatus, 10000, 'Menyiapkan Task 3');
-      startButton.classList.add('hide');
-      setBusy(startButton, false);
-      const first = steps[0];
-      if (first?.button) {
-        first.button.classList.remove('hide');
-        first.button.disabled = false;
-        scrollTo(first.button);
-      }
-    });
-
-    steps.forEach(({ button, status, number }) => {
-      button?.addEventListener('click', async () => {
-        if (!started || number !== completedSteps + 1 || button.disabled) return;
-        setBusy(button, true);
-        await countdown(status, 5000, `Menyelesaikan langkah ${number}`);
-        button.innerHTML = `<i class="fa-solid fa-circle-check"></i> Langkah ${number} selesai`;
-        button.classList.add('is-done');
-        button.setAttribute('aria-label', `Langkah ${number} selesai`);
-        completedSteps = number;
-        const next = steps[number];
-        if (next?.button) {
-          next.button.disabled = false;
-          next.button.classList.remove('hide');
-          scrollTo(next.button);
-        } else if (completedSteps === steps.length) {
-          try { sessionStorage.setItem(`sl_task3_complete_${flow.slug()}`, 'true'); } catch (_) {}
-          redirectButton?.classList.remove('hide');
-          if (redirectButton) redirectButton.disabled = false;
-          if (redirectStatus) redirectStatus.textContent = 'Semua langkah selesai. Kamu sekarang dapat membuka halaman Final.';
-          scrollTo(redirectButton);
-        }
-      });
-    });
-
-    redirectButton?.addEventListener('click', async () => {
-      if (redirecting || completedSteps !== steps.length || redirectButton.disabled) return;
-      redirecting = true;
-      setBusy(redirectButton, true);
-      await countdown(redirectStatus, 2500, 'Membuka halaman Final');
-      flow.go('shortlink-final.html');
-    });
+  function startAdCycle() {
+    if (adTimer) window.clearInterval(adTimer);
+    injectAdScript();
+    adTimer = window.setInterval(injectAdScript, 3000);
   }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
-  else init();
+  function dismissAd() {
+    adWasDismissed = true;
+    ad.classList.remove('visible');
+    ad.setAttribute('aria-hidden', 'true');
+    slot.replaceChildren();
+    restoreAd.hidden = false;
+    if (adTimer) window.clearInterval(adTimer);
+    adTimer = null;
+  }
+  closeAd.addEventListener('click', dismissAd);
+  restoreAd.addEventListener('click', () => {
+    adWasDismissed = false;
+    restoreAd.hidden = true;
+    startAdCycle();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (adTimer) window.clearInterval(adTimer);
+      adTimer = null;
+    } else if (!adWasDismissed) startAdCycle();
+  });
+  // Begin after a short delay so the page content is visible first.
+  window.setTimeout(startAdCycle, 800);
+  window.addEventListener('pagehide', () => {
+    if (adTimer) window.clearInterval(adTimer);
+    if (loadingTimer) window.clearTimeout(loadingTimer);
+  });
 })();
