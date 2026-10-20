@@ -79,3 +79,27 @@ html[data-theme="dark"] .sl-direct-notice-close{background:#26324b;color:#dedaff
 html[data-theme="dark"] .task1-step-copy{background:#1a2540;color:#e7ecf5}html[data-theme="dark"] .task1-step-copy span{color:#b5c0d3}html[data-theme="dark"] .sl-adsterra-card{background:#131d2f;color:#e7ecf5;border-color:#33415a}html[data-theme="dark"] .sl-adsterra-head{background:#1a2540;border-color:#33415a}html[data-theme="dark"] .sl-adsterra-head button{background:#26324b;color:#dedaff}
 
 .task1-bottom-controls{max-width:1000px;margin:0 auto 18px;padding:14px 16px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;border:1px solid #e0e5f2;border-radius:14px;background:#fbfcff}.task1-bottom-controls .task1-step-copy{width:100%}html[data-theme="dark"] .task1-bottom-controls{background:#17233a;border-color:#34415a}
+
+
+/* Task 1 refinement: centered controls, compact direct access and centered ad modal. */
+.sl-promo-ticker{display:flex;justify-content:center;align-items:center;text-align:center;padding:8px 14px;min-height:0;line-height:1.55;overflow:hidden}
+.sl-promo-ticker>span{display:block;max-width:1100px;margin:0 auto;font-size:12px;white-space:normal}
+.sl-promo-ticker a{display:inline-flex;align-items:center;gap:5px;margin-left:7px;padding:4px 9px;border-radius:7px;background:#fff;color:#4f46c8;font-weight:800;text-decoration:none;white-space:nowrap;border:1px solid rgba(100,87,232,.2)}
+.task1-btn{align-self:center!important;display:flex;width:max-content;max-width:100%;margin:8px auto!important;justify-content:center;text-align:center}
+.task1-step-copy{width:100%;text-align:center;align-items:center}
+.sl-article-controls,.task1-bottom-controls{align-items:center!important;text-align:center}
+.sl-control-heading{justify-content:center;text-align:left}
+#status,#status2,#save-status{text-align:center;width:100%}
+.task1-bottom-controls .task1-step-copy{width:100%}
+.sl-direct-floating-notice{top:72px!important;left:50%!important;right:auto!important;bottom:auto!important;transform:translateX(-50%);width:min(320px,calc(100vw - 28px));max-height:calc(100vh - 92px);padding:12px 14px;border-radius:13px;box-shadow:0 10px 34px rgba(18,25,48,.18)}
+.sl-direct-floating-notice.is-visible{animation:slDirectTopIn .22s ease-out}
+.sl-direct-floating-notice .sl-notice-direct>strong{display:block;padding-right:24px;font-size:13px;line-height:1.35}
+.sl-direct-floating-notice .sl-notice-direct>p{margin:6px 0 10px;font-size:11px;line-height:1.45}
+.sl-direct-access-button{display:flex;align-items:center;justify-content:center;gap:7px;width:max-content;max-width:100%;margin:0 auto;padding:7px 11px;border-radius:8px;font-size:11px;font-weight:800;text-decoration:none}
+.sl-direct-notice-close{width:25px;height:25px}
+.sl-adsterra-popup{position:fixed!important;inset:50% auto auto 50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%);width:min(330px,calc(100vw - 24px));max-height:calc(100vh - 30px);overflow:auto;z-index:12000}
+.sl-adsterra-popup[hidden]{display:none!important}
+.sl-adsterra-card{width:100%;max-height:calc(100vh - 30px)}
+.sl-adsterra-content{width:100%;min-height:250px}
+@keyframes slDirectTopIn{from{opacity:0;transform:translate(-50%,-8px)}to{opacity:1;transform:translate(-50%,0)}}
+@media(max-width:480px){.sl-promo-ticker{padding:7px 10px}.sl-promo-ticker>span{font-size:11px}.sl-promo-ticker a{margin:5px 0 0 5px;padding:4px 7px;font-size:10px}.sl-direct-floating-notice{top:68px!important;width:min(300px,calc(100vw - 20px));padding:11px 12px}.sl-adsterra-popup{width:min(310px,calc(100vw - 20px))}.task1-btn{margin:8px auto!important}}
