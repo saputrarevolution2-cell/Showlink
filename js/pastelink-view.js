@@ -67,14 +67,17 @@ async function init(){
   const progress=$('#paste-loading-progress');
   if(progress)progress.style.width='20%';
   try {
-   await loadPaste(null);
+   await Promise.race([
+    loadPaste(null),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Permintaan PasteLink terlalu lama. Periksa koneksi lalu muat ulang halaman.')), 12000))
+   ]);
   } finally {
    if(progress)progress.style.width='100%';
   }
   unlock.onclick=async()=>{if(!input.value){toast(tr('passwordMissing'),'error');return}unlock.disabled=true;message.hidden=true;$('#paste-mood-icon').className='fa-solid fa-robot fa-bounce';$('#paste-mood').classList.remove('is-wrong','is-correct');try{const opened=await loadPaste(input.value);}catch(e){$('#paste-mood-icon').className='fa-solid fa-face-angry';$('#paste-mood').classList.add('is-wrong');toast(tr('passwordWrong'),'error')}finally{unlock.disabled=false}};
  }catch(e){
   loading.hidden=true;box.hidden=true;content.hidden=true;$('#view-title').hidden=false;$('#view-title').textContent=tr('loadFail');
-  message.hidden=true;toast(e.message||'Gagal memuat PasteLink.','error');
+  message.hidden=false;message.textContent=e.message||'Gagal memuat PasteLink.';toast(e.message||'Gagal memuat PasteLink.','error');
   copyAll.hidden=true;
  }
 }
