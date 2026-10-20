@@ -120,8 +120,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = await flow.get();
     const title = $('#title');
     if (title) title.textContent = `${data.title || 'Shortlink'} — Final`;
-    destination = String(data.content_url || data.destination_url || '').trim();
+    destination = Number(data.access_price || 0) > 0 ? '' : String(data.content_url || data.destination_url || '').trim();
     if (!/^https?:\/\//i.test(destination)) destination = '';
+    if (Number(data.access_price || 0) > 0) {
+      const directLink = $('#sl-direct-access-link');
+      if (directLink) directLink.href = `/shortlink-payment.html?slug=${encodeURIComponent(slug)}`;
+    }
   } catch (error) {
     if (status) status.textContent = error.message || 'Data shortlink belum dapat dimuat.';
   }
@@ -151,6 +155,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
     if (!destination) {
+      if (Number((JSON.parse(sessionStorage.getItem('sl_data') || '{}')).access_price || 0) > 0) {
+        location.href = `/shortlink-payment.html?slug=${encodeURIComponent(slug)}`;
+        return;
+      }
       setResult('URL tujuan asli belum tersedia untuk shortlink ini. Hubungi pemilik link.', true);
       downloadButton.disabled = false; downloadButton.innerHTML = '<i class="fa-solid fa-download"></i> Coba periksa lagi';
       return;
