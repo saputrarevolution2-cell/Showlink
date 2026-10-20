@@ -1,1 +1,43 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Pilih Akses — ShowLink</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/shortlink-flow.css"><link rel="stylesheet" href="/css/go.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/supabase-config.js"></script><script src="/js/shortlink-flow.js" defer></script><script src="/js/go.js" defer></script><script src="/js/shortlink-admin-config.js?v=20261021-endorse-publish-fix" defer></script><link rel="stylesheet" href="/css/shortlink-endorse.css?v=20261020-1"></head><body data-shortlink-page="go"><main class="wrap"><section class="card"><div class="sl-endorsement-grid" data-shortlink-endorsements="top" aria-label="Endorse bagian atas"></div><div class="brand">SHOWLINK SHORTLINK</div><h1 id="title">Pilih cara melanjutkan</h1><p>Pilih akses gratis melalui tahapan atau akses langsung.</p><div class="sl-endorsement-grid" data-shortlink-endorsements="middle" aria-label="Endorse bagian tengah"></div><div class="notice" id="price">Memuat harga…</div><button class="btn alt" id="free">Lanjut dengan Free (AdsLink)</button><button class="btn" id="paid">Lanjut Langsung Akses Tanpa Ribet</button><p class="status" id="status"></p><div class="sl-endorsement-grid" data-shortlink-endorsements="bottom" aria-label="Endorse bagian bawah"></div></section><footer class="foot">ShowLink</footer></main></body></html>
+<!doctype html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow"><meta name="color-scheme" content="light">
+  <title>Pilih Akses — ShowLink</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/shortlink-flow.css"><link rel="stylesheet" href="/css/shortlink-endorse.css"><link rel="stylesheet" href="/css/go.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/supabase-config.js"></script>
+  <script src="/js/language.js" defer></script><script src="/js/navbar.js" defer></script><script src="/js/shortlink-flow.js" defer></script><script src="/js/go.js" defer></script><script src="/js/shortlink-admin-config.js?v=20261021-endorse-publish-fix" defer></script><script src="/js/footer.js" defer></script>
+</head>
+<body data-shortlink-page="go">
+  <div data-showlink-navbar></div>
+  <div class="sl-promo-ticker" role="status" aria-label="ShowLink platform announcement"><span data-i18n="goTicker">Showlink Adalah Web Platform Semua Kebutuhan Mulai dari shortlink, paymentlink, pastelink, Sub4unlock Dan endorse</span></div>
+  <aside class="sl-telegram-notice" id="telegramNotice" aria-label="Telegram channel announcement">
+    <a class="sl-telegram-notice-link" href="https://t.me/noticsaluran" target="_blank" rel="noopener noreferrer">
+      <span class="sl-telegram-icon"><i class="fa-brands fa-telegram" aria-hidden="true"></i></span>
+      <span class="sl-telegram-copy"><strong data-i18n="goTelegramTitle">Cari Video Viral Yang Lagi Tren?? Join Sekarang</strong><small data-i18n="goTelegramDesc">(di klik masuk ke https://t.me/noticsaluran)</small></span>
+    </a><button type="button" class="sl-notice-close" id="closeTelegramNotice" aria-label="Close notification">×</button>
+  </aside>
+  <main class="go-page">
+    <section class="go-endorse-area" aria-label="Endorse bagian atas"><div class="sl-endorsement-grid" data-shortlink-endorsements="top"></div></section>
+    <section class="go-content" aria-labelledby="title">
+      <div class="go-brand-mark" aria-hidden="true"><i class="fa-solid fa-link"></i></div>
+      <div class="go-eyebrow" data-i18n="goEyebrow">SHOWLINK SHORTLINK</div>
+      <h1 id="title" data-i18n="goTitle">Pilih Akses</h1>
+      <p class="go-intro" data-i18n="goIntro">Pilih metode akses yang sesuai dengan kebutuhan Anda.</p>
+      <div class="go-choice-card">
+        <div class="go-choice-icon" aria-hidden="true"><i class="fa-solid fa-gift"></i></div>
+        <div class="go-choice-copy"><h2 data-i18n="goFreeTitle">Akses Gratis</h2><p data-i18n="goFreeDesc">Lanjutkan melalui tahapan AdsLink.</p><span class="go-pill" data-i18n="goFreeTag">Free (AdsLink)</span></div>
+        <button class="btn alt go-action" id="free" type="button"><span data-i18n="goFreeButton">Lanjut dengan Free (AdsLink)</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+      </div>
+      <div class="go-price-panel"><div class="go-price-icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></div><h2 data-i18n="goDirectTitle">Lanjut Langsung Akses Tanpa Ribet</h2><p><span data-i18n="goPriceLabel">Harga akses langsung:</span> <strong id="price">Memuat harga…</strong></p><button class="btn go-action" id="paid" type="button"><span data-i18n="goPaidButton">Akses Langsung</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button></div>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+    </section>
+    <section class="go-endorse-area go-endorse-middle" aria-label="Endorse bagian tengah"><div class="sl-endorsement-grid" data-shortlink-endorsements="middle"></div></section>
+    <section class="go-endorse-area go-endorse-bottom" aria-label="Endorse bagian bawah"><div class="sl-endorsement-grid" data-shortlink-endorsements="bottom"></div></section>
+  </main>
+  <div data-showlink-footer></div>
+</body></html>
