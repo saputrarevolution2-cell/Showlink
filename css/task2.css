@@ -234,3 +234,9 @@ html,body{background:#f5f7fc!important;color:#253047!important;color-scheme:ligh
 @media (prefers-reduced-motion: reduce) {
   #sl-adsterra-popup.sl-ad1-slide-in, #sl-adsterra-popup-2.sl-ad2-slide-in { animation-duration: 1ms !important; }
 }
+
+
+/* Iklan kedua: tombol X meminimalkan ke pegangan ^ di bawah layar. */
+.sl-ad2-restore[hidden]{display:none!important}
+.sl-ad2-restore{position:fixed!important;left:50%!important;bottom:12px!important;top:auto!important;transform:translateX(-50%)!important;z-index:12010!important;width:48px!important;height:38px!important;display:grid!important;place-items:center!important;border:1px solid rgba(255,255,255,.8)!important;border-radius:999px!important;background:#fff!important;color:#1769e0!important;font-size:20px!important;box-shadow:0 5px 22px rgba(0,0,0,.24)!important;cursor:pointer!important}
+.sl-ad2-restore:focus-visible{outline:3px solid #60a5fa!important;outline-offset:3px!important}
