@@ -68,3 +68,72 @@ body.app-page.coming-page{background:radial-gradient(ellipse at 50% 0%,#e8edff 0
 html[data-theme="dark"],html.dark,html.theme-dark,body[data-theme="dark"],body.dark,body.theme-dark{color-scheme:light!important;background:#f5f7fc!important;color:#172033!important}
 @media(max-width:600px){.paste-promo{padding:10px 12px}.paste-promo-inner{gap:9px}.paste-promo-icon{width:36px;height:36px;flex-basis:36px;border-radius:11px;font-size:16px}.paste-promo p{font-size:11px}.paste-promo p strong{font-size:12px}.paste-promo-join{padding:10px 11px;font-size:12px;gap:6px}.paste-shell{width:calc(100% - 20px);margin:22px auto 40px}.paste-card{padding:23px 17px;border-radius:19px}.paste-back{margin-bottom:22px}.human-check-option{padding:12px;gap:10px}.human-check-description{font-size:13px}.human-check-brand small{font-size:8px}#view-content{padding:13px;font-size:14px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+
+
+/* Final layout/theme correction: navbar is fixed, so reserve its space before promo. */
+:root{
+  color-scheme:light!important;
+  --sl-nav-bg:#ffffff!important;
+  --sl-nav-text:#172033!important;
+  --sl-nav-muted:#64748b!important;
+  --sl-drawer-bg:#ffffff!important;
+  --sl-line:#e3e8f2!important;
+  --sl-admin-nav-bg:#ffffff!important;
+  --sl-admin-drawer-bg:#ffffff!important;
+  --sl-admin-nav-text:#172033!important;
+  --sl-admin-nav-accent:#4f46e5!important;
+}
+html,html[data-theme="dark"],html.dark,html.theme-dark,
+body,body[data-theme="dark"],body.dark,body.theme-dark,
+body.app-page,body.app-page.coming-page{
+  color-scheme:light!important;
+  background:#f5f7fc!important;
+  color:#172033!important;
+}
+.sl-navbar{
+  background:#ffffff!important;
+  color:#172033!important;
+  border-bottom-color:#e3e8f2!important;
+  box-shadow:0 4px 18px rgba(24,39,75,.07)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.sl-navbar .sl-brand,.sl-navbar .sl-btn-ghost,.sl-navbar .showlink-tool-btn,
+.sl-navbar .sl-nav-menu,.sl-navbar .sl-nav-notification{
+  color:#172033!important;
+}
+.sl-navbar .sl-btn-ghost,.sl-navbar .showlink-tool-btn,.sl-navbar .sl-nav-menu{
+  background:#ffffff!important;
+  border-color:#e3e8f2!important;
+}
+.sl-nav-drawer,.sl-nav-drawer .sl-drawer-head{
+  background:#ffffff!important;
+  color:#172033!important;
+  border-color:#e3e8f2!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.sl-nav-drawer .sl-drawer-brand{color:#172033!important}
+.sl-nav-drawer .sl-nav-link{color:#64748b!important}
+.sl-nav-drawer .sl-nav-link.active,.sl-nav-drawer .sl-nav-link:hover{color:#4f46e5!important;background:#eef2ff!important}
+.paste-promo{
+  position:relative!important;
+  z-index:1!important;
+  margin-top:var(--sl-nav-height,72px)!important;
+  background:#ffffff!important;
+  color:#172033!important;
+}
+.paste-promo *{color:inherit}
+.paste-promo p{color:#64708a!important}
+.paste-promo p strong{color:#18233a!important}
+.paste-promo-join,.paste-promo-join *{color:#ffffff!important}
+.paste-card,.paste-password-box{background:#ffffff!important;color:#172033!important}
+.paste-card h1,.paste-card h2,.paste-card label,.paste-password-box label{color:#172033!important}
+#view-content{background:#fcfdff!important;color:#26334b!important}
+#view-content a{color:#4f46e5!important}
+@media(max-width:600px){
+  .paste-promo{margin-top:var(--sl-nav-height,72px)!important;padding:10px 12px!important}
+  .paste-promo-inner{align-items:center;flex-wrap:wrap}
+  .paste-promo p{flex:1 1 calc(100% - 55px);}
+  .paste-promo-join{margin-left:auto}
+}
