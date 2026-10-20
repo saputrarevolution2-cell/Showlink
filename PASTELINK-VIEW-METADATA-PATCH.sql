@@ -1,6 +1,6 @@
--- PasteLink View metadata patch for ShowLink.
--- Run in Supabase SQL Editor if get_pastelink currently does not return `views`.
--- Keeps the existing password validation and increments views only after successful access.
+-- ShowLink PasteLink metadata and expired-state patch.
+-- Run this in Supabase SQL Editor after deploying the frontend files.
+-- Expired rows return metadata only; content is never returned for expired pastes.
 create or replace function public.get_pastelink(p_slug text, p_password text default null)
 returns jsonb
 language plpgsql
@@ -12,8 +12,20 @@ declare
   r public.pastelinks%rowtype;
 begin
   select * into r from public.pastelinks where slug = p_slug limit 1;
-  if not found or (r.expires_at is not null and r.expires_at <= now()) then
+  if not found then
     return null;
+  end if;
+
+  if r.expires_at is not null and r.expires_at <= now() then
+    return jsonb_build_object(
+      'slug', r.slug,
+      'title', r.title,
+      'created_at', r.created_at,
+      'expires_at', r.expires_at,
+      'views', coalesce(r.views, 0),
+      'expired', true,
+      'password_required', false
+    );
   end if;
 
   if r.password_hash is not null and
@@ -24,18 +36,20 @@ begin
       'password_required', true,
       'created_at', r.created_at,
       'expires_at', r.expires_at,
-      'views', r.views
+      'views', coalesce(r.views, 0),
+      'expired', false
     );
   end if;
 
-  update public.pastelinks set views = views + 1 where id = r.id returning * into r;
+  update public.pastelinks set views = coalesce(views, 0) + 1 where id = r.id returning * into r;
   return jsonb_build_object(
     'slug', r.slug,
     'title', r.title,
     'content', r.content,
     'created_at', r.created_at,
     'expires_at', r.expires_at,
-    'views', r.views,
+    'views', coalesce(r.views, 0),
+    'expired', false,
     'password_required', false
   );
 end;
