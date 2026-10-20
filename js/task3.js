@@ -221,6 +221,36 @@
     window.setTimeout(showAd2, 7000);
     window.setInterval(showAd2, 7000);
 
+    // Iklan sponsor layar penuh: muncul setiap 3 detik, dapat ditutup, tidak mengambil alih tautan tombol.
+    const fullAd = $('#sl-task3-fullscreen-ad');
+    const fullAdClose = $('#sl-task3-full-ad-close');
+    const fullAdContent = $('#sl-task3-full-ad-content');
+    let fullAdScriptLoaded = false;
+    function loadFullscreenAdScript() {
+      if (fullAdScriptLoaded || !fullAdContent) return;
+      fullAdScriptLoaded = true;
+      fullAdContent.innerHTML = '<p class="sl-full-ad-note">Iklan sedang dimuat…</p>';
+      const script = document.createElement('script');
+      script.async = true;
+      script.setAttribute('data-cfasync', 'false');
+      script.src = 'https://pl31626285.profitableratecpmnetwork.com/1e/25/0c/1e250cc0da41c572970286fab29d5009.js';
+      fullAdContent.appendChild(script);
+    }
+    function showFullscreenAd() {
+      if (!fullAd || document.visibilityState === 'hidden') return;
+      fullAd.hidden = false;
+      loadFullscreenAdScript();
+    }
+    function hideFullscreenAd() {
+      if (fullAd) fullAd.hidden = true;
+    }
+    fullAdClose?.addEventListener('click', hideFullscreenAd);
+    fullAd?.addEventListener('click', (event) => {
+      if (event.target === fullAd) hideFullscreenAd();
+    });
+    window.setTimeout(showFullscreenAd, 3000);
+    window.setInterval(showFullscreenAd, 3000);
+
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 })();
