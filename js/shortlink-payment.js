@@ -51,6 +51,21 @@
     app.insertBefore(wrap, $('#status'));
     $('#pay').hidden = true;
   }
+  async function openVerifiedDestination() {
+    const { data, error } = await sb.rpc('resolve_shortlink', {
+      p_slug: slug(),
+      p_guest_access_token: isUser ? null : (guestToken || sessionStorage.getItem('sl_guest_access_token') || null)
+    });
+    if (error) throw error;
+    const resolved = Array.isArray(data) ? data[0] : data;
+    if (resolved?.payment_required || !resolved?.destination_url) {
+      throw new Error('Pembayaran terverifikasi, tetapi akses Shortlink belum tercatat. Jangan bayar ulang; periksa fungsi grant_payment_access dan settle_paid_order di Supabase.');
+    }
+    const dest = new URL(resolved.destination_url);
+    if (!['http:', 'https:'].includes(dest.protocol)) throw new Error('URL tujuan tidak aman.');
+    location.replace(dest.href);
+  }
+
   async function startCheckout(gateway, button) {
     button.disabled=true; status('Membuat order pembayaran…'); activeGateway=gateway;
     try {
@@ -58,12 +73,12 @@
       guestToken = isUser ? '' : guestAccessToken();
       const {data:order,error}=await sb.rpc('create_shortlink_checkout_order', { p_slug:slug(), p_guest_access_token:isUser ? null : guestToken });
       if(error) throw error;
-      if(order?.already_accessible) { status('Akses sudah tersedia. Membuka tautan…'); location.href='/d/'+encodeURIComponent(slug()); return; }
+      if(order?.already_accessible) { status('Akses sudah tersedia. Membuka tautan…'); await openVerifiedDestination(); return; }
       orderId=order?.order_id;
       if(!orderId) throw new Error('Order tidak berhasil dibuat.');
       const body={order_id:orderId, ...(isUser?{}:{guest_access_token:guestToken})};
       const result=await edge(gateway==='CASHI'?'cashi-create-payment':'bayar-gg-create-payment',body);
-      if(result.already_paid){status('Pembayaran sudah terverifikasi. Membuka tautan…');location.href='/d/'+encodeURIComponent(slug());return;}
+      if(result.already_paid){status('Pembayaran sudah terverifikasi. Membuka tautan…');await openVerifiedDestination();return;}
       renderPayment(result, order);
       pollStatus();
     } catch(e) { status(e.message || 'Checkout gagal dibuat.',true); button.disabled=false; }
@@ -87,9 +102,10 @@
     try {
       const result=await edge(activeGateway==='CASHI'?'cashi-check-status':'bayar-gg-check-status',{order_id:orderId,...(isUser?{}:{guest_access_token:guestToken})});
       if(result.paid===true || String(result.status||'').toUpperCase()==='SETTLED') {
-        status('Pembayaran terverifikasi. Membuka tautan…');
+        status('Pembayaran terverifikasi. Memeriksa hak akses Shortlink…');
         if(pollTimer) clearTimeout(pollTimer);
-        location.href='/d/'+encodeURIComponent(slug()); return true;
+        await openVerifiedDestination();
+        return true;
       }
       status('Status pembayaran: '+(result.status||'PENDING')+'. Menunggu konfirmasi…');
     } catch(e) { status(e.message || 'Pengecekan pembayaran gagal.',true); }
