@@ -103,3 +103,42 @@ html[data-theme="dark"] .task1-step-copy{background:#1a2540;color:#e7ecf5}html[d
 .sl-adsterra-content{width:100%;min-height:250px}
 @keyframes slDirectTopIn{from{opacity:0;transform:translate(-50%,-8px)}to{opacity:1;transform:translate(-50%,0)}}
 @media(max-width:480px){.sl-promo-ticker{padding:7px 10px}.sl-promo-ticker>span{font-size:11px}.sl-promo-ticker a{margin:5px 0 0 5px;padding:4px 7px;font-size:10px}.sl-direct-floating-notice{top:68px!important;width:min(300px,calc(100vw - 20px));padding:11px 12px}.sl-adsterra-popup{width:min(310px,calc(100vw - 20px))}.task1-btn{margin:8px auto!important}}
+
+
+/* Final correction: remove promo ticker completely; keep direct access as a compact top notice. */
+.sl-promo-ticker{display:none!important;height:0!important;min-height:0!important;padding:0!important;margin:0!important;border:0!important;overflow:hidden!important}
+.sl-direct-floating-notice{position:fixed!important;top:14px!important;left:50%!important;right:auto!important;bottom:auto!important;transform:translateX(-50%)!important;width:min(320px,calc(100vw - 24px))!important;z-index:11000!important}
+.sl-direct-floating-notice.is-visible{animation:slDirectTopIn .22s ease-out!important}
+.sl-adsterra-popup{position:fixed!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;width:min(330px,calc(100vw - 24px))!important;max-height:calc(100vh - 24px)!important;overflow:auto!important;z-index:12000!important}
+@media(max-width:480px){.sl-direct-floating-notice{top:10px!important;width:min(300px,calc(100vw - 20px))!important}.sl-adsterra-popup{width:min(310px,calc(100vw - 20px))!important}}
+
+
+/* Task 1 final layout adjustments: centered controls, red download actions, inline Task 2 completion. */
+.task1-btn{display:flex!important;width:max-content!important;max-width:100%;margin:10px auto!important;align-self:center!important;justify-content:center!important;text-align:center!important}
+.task1-btn.hide{display:none!important}
+.task1-btn-red{background:#e53935!important;border:1px solid #d32f2f!important;color:#fff!important;box-shadow:0 4px 12px rgba(229,57,53,.2)!important}
+.task1-btn-red:hover{background:#c62828!important}
+#task-completion-area.task-completion-area{position:relative!important;inset:auto!important;transform:none!important;display:block;width:100%;max-width:100%;margin:14px 0;padding:12px 14px;border:1px solid #e2e7f0;border-radius:12px;background:#f8faff;box-shadow:none;z-index:auto}
+#task-completion-area .sl-notice-close{display:none!important}
+#task-completion-area .task2-instruction{margin:0 0 8px;text-align:center;font-size:12px;line-height:1.5;color:#626b80}
+#task-completion-area .success{text-align:center;font-weight:800;margin:5px 0 10px}
+#task-completion-area #next,#task-completion-area #next-final{margin:8px auto!important}
+#task-completion-area #next-final{background:#2563eb!important;color:#fff!important}
+.sl-article-controls,#bottom-step,.task1-bottom-controls{display:flex;flex-direction:column;align-items:center}
+.task1-step-copy{width:100%;box-sizing:border-box}
+.sl-adsterra-popup{position:fixed!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;width:min(390px,calc(100vw - 20px))!important;max-height:calc(100vh - 20px)!important;overflow:auto!important;z-index:12000!important}
+.sl-adsterra-card{width:100%;padding:0;border-radius:16px;box-shadow:0 20px 65px rgba(15,23,42,.32)}
+.sl-adsterra-content{min-height:280px!important;padding:8px;box-sizing:border-box}
+.sl-adsterra-content iframe{display:block!important;width:300px!important;max-width:100%!important;min-height:250px!important;margin:0 auto!important}
+@media(max-width:480px){.task1-btn{margin:8px auto!important}.sl-adsterra-popup{width:min(360px,calc(100vw - 16px))!important}#task-completion-area.task-completion-area{padding:10px}}
+
+/* Sponsor download buttons: centered beside the step controls. */
+.task1-download-actions{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:9px;width:100%;margin:8px auto}
+.task1-download-actions .task1-btn{margin:0!important}
+.task1-external-download{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;box-sizing:border-box}
+.task1-external-download:hover{background:#c62828!important;color:#fff!important}
+/* Give the centered sponsor popup more room while preserving the provider's 300x250 creative. */
+.sl-adsterra-popup{width:min(430px,calc(100vw - 20px))!important}
+.sl-adsterra-content{min-height:310px!important;padding:12px!important}
+.sl-adsterra-content iframe{transform:scale(1.08);transform-origin:center center;margin:8px auto!important}
+@media(max-width:480px){.task1-download-actions{gap:7px}.task1-download-actions .task1-btn{min-width:120px}.sl-adsterra-popup{width:min(370px,calc(100vw - 16px))!important}.sl-adsterra-content{min-height:290px!important}.sl-adsterra-content iframe{transform:scale(1.02)}}
