@@ -105,13 +105,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       return false;
     }
   }
+  // Only mark a view as recorded after Supabase confirms it. If the request fails,
+  // a reload can retry instead of silently losing the view for this tab session.
   try {
     const viewKey = `sl_final_view_recorded_${slug}`;
     if (slug && sessionStorage.getItem(viewKey) !== 'true') {
-      await recordFinalEvent('view');
-      sessionStorage.setItem(viewKey, 'true');
+      const viewRecorded = await recordFinalEvent('view');
+      if (viewRecorded) sessionStorage.setItem(viewKey, 'true');
     }
-  } catch (_) { if (slug) await recordFinalEvent('view'); }
+  } catch (error) {
+    console.warn('Shortlink Final view will be retried on reload:', error?.message || error);
+  }
 
   const initialLoading = countdown(initialStatus, 5000, 'Menyiapkan pemeriksaan awal');
 
