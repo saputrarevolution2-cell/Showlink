@@ -127,20 +127,9 @@
     });
     noticeClose?.addEventListener('click', () => notice?.classList.remove('is-visible'));
 
-    // Dua unit iklan dengan jalur animasi berbeda: iklan pertama turun dari atas, iklan kedua naik dari bawah.
-    // Unit pertama muncul tiap 5 detik, unit kedua tiap 7 detik.
-    const adPopup1 = $('#sl-adsterra-popup'), adClose1 = $('#sl-adsterra-close'), adContent1 = $('#sl-adsterra-content');
+    // Iklan popup 5 detik telah dihapus sesuai permintaan. Iklan 7 detik dan fullscreen 3 detik tetap berjalan.
     const adPopup2 = $('#sl-adsterra-popup-2'), adClose2 = $('#sl-adsterra-close-2'), adContent2 = $('#sl-adsterra-content-2'), adRestore2 = $('#sl-adsterra-restore-2');
-    let ad1Loaded = false, ad2Loaded = false, ad2Collapsed = false;
-    function loadAd1() {
-      if (ad1Loaded || !adContent1) return;
-      ad1Loaded = true;
-      const script = document.createElement('script');
-      script.async = true;
-      script.setAttribute('data-cfasync', 'false');
-      script.src = 'https://pl31626334.profitableratecpmnetwork.com/ef7f0e942fbcf5b02dd491deb0f7ac5f/invoke.js';
-      adContent1.appendChild(script);
-    }
+    let ad2Loaded = false, ad2Collapsed = false;
     function loadAd2() {
       if (ad2Loaded || !adContent2) return;
       ad2Loaded = true;
@@ -162,23 +151,11 @@
         window.setTimeout(() => { if (fallback.isConnected && adContent2.querySelector('iframe')) fallback.remove(); }, 2500);
       }
     }
-    function showAd1() {
-      if (!adPopup1 || document.visibilityState === 'hidden') return;
-      if (adPopup2) { adPopup2.hidden = true; adPopup2.classList.remove('sl-ad2-slide-in'); }
-      adPopup1.hidden = true;
-      adPopup1.classList.remove('sl-ad1-slide-in');
-      void adPopup1.offsetWidth;
-      adPopup1.hidden = false;
-      void adPopup1.offsetWidth;
-      adPopup1.classList.add('sl-ad1-slide-in');
-      loadAd1();
-    }
     function showAd2() {
       if (!adPopup2 || document.visibilityState === 'hidden') return;
       // Kemunculan otomatis berikutnya mengembalikan iklan meskipun sebelumnya diminimalkan.
       ad2Collapsed = false;
       if (adRestore2) adRestore2.hidden = true;
-      if (adPopup1) adPopup1.hidden = true;
       adPopup2.hidden = true;
       // Reset the entrance animation so every 7-second appearance slides up again.
       void adPopup2.offsetWidth;
@@ -188,12 +165,6 @@
       adPopup2.classList.add('sl-ad2-slide-in');
       loadAd2();
     }
-    // Tombol X benar-benar independen: X pertama hanya menutup popup pertama.
-    adClose1?.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (adPopup1) { adPopup1.hidden = true; adPopup1.classList.remove('sl-ad1-slide-in'); }
-    });
     // X kedua meminimalkan iklan kedua ke tombol ^ di bawah; iklan pertama tidak terpengaruh.
     adClose2?.addEventListener('click', (event) => {
       event.preventDefault();
@@ -216,8 +187,6 @@
       if (event.target?.closest?.('#sl-adsterra-restore-2, #sl-adsterra-close-2')) return;
       showAd2();
     }, { passive: true });
-    window.setTimeout(showAd1, 5000);
-    window.setInterval(showAd1, 5000);
     window.setTimeout(showAd2, 7000);
     window.setInterval(showAd2, 7000);
 
