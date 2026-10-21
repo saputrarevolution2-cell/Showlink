@@ -331,3 +331,32 @@ html:not([data-theme="dark"]) .sl-nav-notification:not(.has-notifications) {
   color: #64748b !important; background: #ffffff !important; border-color: rgba(148,163,184,.35) !important; box-shadow: 0 4px 14px rgba(15,23,42,.06) !important;
 }
 .sl-nav-notification:not(.has-notifications) .sl-nav-notification-pulse { display:none !important; }
+
+
+/* SHOWLINK BRAND — full wordmark, transparent/no badge background, theme-aware */
+.sl-brand{gap:0;min-width:0;line-height:0}
+.sl-brand-logo{display:block;width:clamp(164px,20vw,236px);height:auto;max-height:none;object-fit:contain;object-position:center;flex:0 1 auto}
+.sl-brand .sl-logo-dark,.sl-drawer-brand .sl-logo-dark{display:none}
+[data-theme="dark"] .sl-brand .sl-logo-light,
+[data-theme="dark"] .sl-drawer-brand .sl-logo-light{display:none}
+[data-theme="dark"] .sl-brand .sl-logo-dark,
+[data-theme="dark"] .sl-drawer-brand .sl-logo-dark{display:block}
+.sl-brand-mark{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
+.sl-drawer-brand{gap:0;min-width:0}
+.sl-drawer-logo{display:block;width:clamp(150px,58vw,190px);height:auto;max-height:46px;object-fit:contain;object-position:left center}
+@media(max-width:420px){
+ .sl-brand-logo{width:clamp(148px,42vw,184px);height:auto;max-height:none;object-fit:contain}
+ .sl-nav-shell{gap:7px}
+}
+
+/* Logo/favicons correction: preserve complete ShowLink wordmark without cropping. */
+.sl-brand{min-width:0;max-width:calc(100vw - 150px);overflow:visible}
+.sl-brand-logo{max-width:100%;min-width:0;object-fit:contain;object-position:center}
+.sl-drawer-logo{display:block;width:clamp(170px,62vw,220px);height:auto;max-height:none;object-fit:contain;object-position:center}
+.sl-drawer-brand{min-width:0;overflow:visible}
+.sl-brand .sl-logo-dark,.sl-drawer-brand .sl-logo-dark{display:none}
+html[data-theme="dark"] .sl-brand .sl-logo-light,
+html[data-theme="dark"] .sl-drawer-brand .sl-logo-light{display:none}
+html[data-theme="dark"] .sl-brand .sl-logo-dark,
+html[data-theme="dark"] .sl-drawer-brand .sl-logo-dark{display:block}
+@media(max-width:420px){.sl-brand-logo{width:clamp(132px,40vw,164px)}.sl-nav-shell{gap:6px}}
