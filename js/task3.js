@@ -127,68 +127,7 @@
     });
     noticeClose?.addEventListener('click', () => notice?.classList.remove('is-visible'));
 
-    // Iklan popup 5 detik telah dihapus sesuai permintaan. Iklan 7 detik dan fullscreen 3 detik tetap berjalan.
-    const adPopup2 = $('#sl-adsterra-popup-2'), adClose2 = $('#sl-adsterra-close-2'), adContent2 = $('#sl-adsterra-content-2'), adRestore2 = $('#sl-adsterra-restore-2');
-    let ad2Loaded = false, ad2Collapsed = false;
-    function loadAd2() {
-      if (ad2Loaded || !adContent2) return;
-      ad2Loaded = true;
-      // Set the provider config on window so the external invoke.js can always read it.
-      window.atOptions = { key: 'b2fb4d9766519ed2c5073f02f6610543', format: 'iframe', height: 300, width: 160, params: {} };
-      const config = document.createElement('script');
-      config.textContent = "window.atOptions = { key: 'b2fb4d9766519ed2c5073f02f6610543', format: 'iframe', height: 300, width: 160, params: {} };";
-      adContent2.appendChild(config);
-      const script = document.createElement('script');
-      script.src = 'https://www.highrevenueformat.com/b2fb4d9766519ed2c5073f02f6610543/invoke.js';
-      script.async = false;
-      script.setAttribute('data-cfasync', 'false');
-      adContent2.appendChild(script);
-      if (!adContent2.querySelector('.sl-ad2-fallback')) {
-        const fallback = document.createElement('div');
-        fallback.className = 'sl-ad2-fallback';
-        fallback.textContent = 'Iklan sponsor sedang dimuat…';
-        adContent2.appendChild(fallback);
-        window.setTimeout(() => { if (fallback.isConnected && adContent2.querySelector('iframe')) fallback.remove(); }, 2500);
-      }
-    }
-    function showAd2() {
-      if (!adPopup2 || document.visibilityState === 'hidden') return;
-      // Kemunculan otomatis berikutnya mengembalikan iklan meskipun sebelumnya diminimalkan.
-      ad2Collapsed = false;
-      if (adRestore2) adRestore2.hidden = true;
-      adPopup2.hidden = true;
-      // Reset the entrance animation so every 7-second appearance slides up again.
-      void adPopup2.offsetWidth;
-      adPopup2.hidden = false;
-      adPopup2.classList.remove('sl-ad2-slide-in');
-      void adPopup2.offsetWidth;
-      adPopup2.classList.add('sl-ad2-slide-in');
-      loadAd2();
-    }
-    // X kedua meminimalkan iklan kedua ke tombol ^ di bawah; iklan pertama tidak terpengaruh.
-    adClose2?.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      ad2Collapsed = true;
-      if (adPopup2) { adPopup2.hidden = true; adPopup2.classList.remove('sl-ad2-slide-in'); }
-      if (adRestore2) adRestore2.hidden = false;
-    });
-    // Tombol ^ di bawah menampilkan kembali iklan kedua.
-    adRestore2?.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      ad2Collapsed = false;
-      if (adRestore2) adRestore2.hidden = true;
-      showAd2();
-    });
-    // Jika iklan kedua sedang diminimalkan, sentuhan/klik di halaman juga menampilkannya lagi.
-    document.addEventListener('pointerdown', (event) => {
-      if (!ad2Collapsed) return;
-      if (event.target?.closest?.('#sl-adsterra-restore-2, #sl-adsterra-close-2')) return;
-      showAd2();
-    }, { passive: true });
-    window.setTimeout(showAd2, 7000);
-    window.setInterval(showAd2, 7000);
+    // Iklan popup 5 detik dan iklan kedua 7 detik dihapus. Hanya iklan layar penuh 3 detik yang dipertahankan.
 
     // Iklan sponsor layar penuh: muncul setiap 3 detik, dapat ditutup, tidak mengambil alih tautan tombol.
     const fullAd = $('#sl-task3-fullscreen-ad');
