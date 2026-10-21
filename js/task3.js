@@ -239,6 +239,7 @@
     function showFullscreenAd() {
       if (!fullAd || document.visibilityState === 'hidden') return;
       fullAd.hidden = false;
+      if (fullAdClose) { fullAdClose.style.display = 'flex'; fullAdClose.style.visibility = 'visible'; fullAdClose.style.opacity = '1'; fullAdClose.style.zIndex = '2147483647'; }
       loadFullscreenAdScript();
     }
     function hideFullscreenAd() {
