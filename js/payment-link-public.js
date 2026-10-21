@@ -103,6 +103,25 @@
     return incomingGuestToken || localStorage.getItem('showlink_guest_token') || '';
   }
 
+  const MIN_LOADING_MS = 3000;
+  const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+  async function finishInitialLoading(startedAt) {
+    const remaining = MIN_LOADING_MS - (Date.now() - startedAt);
+    if (remaining > 0) await delay(remaining);
+  }
+
+  async function loadSalesCount(sb, paymentLinkId) {
+    try {
+      const { data, error } = await sb.rpc('get_payment_link_sales_count', { p_payment_link_id: paymentLinkId });
+      if (error) throw error;
+      const value = typeof data === 'number' ? data : Number(data?.sales_count ?? data?.count);
+      return Number.isFinite(value) && value >= 0 ? value : null;
+    } catch (error) {
+      dbg.warn('PAYMENT LINK SALES COUNT UNAVAILABLE', error);
+      return null;
+    }
+  }
+
   function rerenderCurrent(){
     if (!currentData) return;
     if (currentView === 'locked') renderLocked(currentData);
@@ -142,7 +161,7 @@
       server1:'Server 1', server2:'Server 2', cashi:'Cashi', bayarGG:'BayarGG',
       continuePayment:'Lanjut Pembayaran', back:'Kembali', opening:'Menyiapkan pembayaran…',
       gatewaySecure:'Pembayaran diproses melalui server pembayaran yang kamu pilih.' ,
-      titleLabel:'Judul', priceLabel:'Harga', empty:'Konten kosong.',
+      titleLabel:'Judul', priceLabel:'Harga', soldLabel:'Total Terjual', soldUnit:'terjual', empty:'Konten kosong.',
       notAvailable:'Payment Link tidak tersedia',
       ownerNoticeTitle:'Ini Payment Link milik kamu', ownerNotice:'Kamu tidak dapat membeli Payment Link milik sendiri. Kamu tetap bisa membuka pratinjau konten dengan tombol Cek Konten.', ownerBuy:'Buy Now', checkContent:'Cek Konten', previewKicker:'PRATINJAU PEMILIK', previewReady:'Ini adalah pratinjau konten milikmu. Pratinjau tidak membuat order atau transaksi.',
       notFound:'Payment Link tidak ditemukan atau sudah tidak aktif.',
@@ -170,7 +189,7 @@
       server1:'Server 1', server2:'Server 2', cashi:'Cashi', bayarGG:'BayarGG',
       continuePayment:'Continue Payment', back:'Back', opening:'Preparing payment…',
       gatewaySecure:'Payment is processed through your selected payment server.',
-      titleLabel:'Title', priceLabel:'Price', empty:'Content is empty.',
+      titleLabel:'Title', priceLabel:'Price', soldLabel:'Total Sold', soldUnit:'sold', empty:'Content is empty.',
       notAvailable:'Payment Link unavailable',
       ownerNoticeTitle:'This is your Payment Link', ownerNotice:'You cannot buy your own Payment Link. You can still preview the content with Check Content.', ownerBuy:'Buy Now', checkContent:'Check Content', previewKicker:'OWNER PREVIEW', previewReady:'This is your own content preview. Previewing does not create an order or transaction.',
       notFound:'Payment Link was not found or is no longer active.',
@@ -262,9 +281,9 @@
           <div class="pl-owner-notice-icon"><i class="fa-solid fa-circle-info"></i></div>
           <div><strong>${esc(t('ownerNoticeTitle'))}</strong><p>${esc(t('ownerNotice'))}</p></div>
         </div>
-        <div class="pl-meta">
-          <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('titleLabel'))}</span><span class="pl-meta-value">${esc(data.title || 'Payment Link')}</span></div>
-          <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('priceLabel'))}</span><span class="pl-meta-value">${money(Number(data.buyer_amount ?? data.price ?? 0), data.currency || 'IDR')}</span></div>
+        <div class="pl-public-summary">
+          <div class="pl-sales-stat"><span class="pl-sales-label"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> ${esc(t('soldLabel'))}</span><strong>${data.sales_count == null ? '—' : Number(data.sales_count).toLocaleString('id-ID')} <small>${esc(t('soldUnit'))}</small></strong></div>
+          <div class="pl-price-panel"><span class="pl-meta-label"><i class="fa-solid fa-tag" aria-hidden="true"></i> ${esc(t('priceLabel'))}</span><div class="pl-price">${money(Number(data.buyer_amount ?? data.price ?? 0), data.currency || 'IDR')}</div></div>
         </div>
         <div class="pl-owner-actions">
           <button class="pl-buy" id="owner-buy" type="button"><i class="fa-solid fa-cart-shopping"></i> ${esc(t('ownerBuy'))}</button>
@@ -325,12 +344,11 @@
         <span class="pl-kicker"><i class="fa-solid fa-credit-card"></i> ${t('kicker')}</span>
         <h1 class="pl-title">${esc(data.title || 'Payment Link')}</h1>
         ${data.description ? `<p class="pl-desc">${esc(data.description)}</p>` : ''}
-        <div class="pl-meta">
-          <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('titleLabel'))}</span><span class="pl-meta-value">${esc(data.title || 'Payment Link')}</span></div>
-          <div class="pl-meta-box"><span class="pl-meta-label">${esc(t('priceLabel'))}</span><span class="pl-meta-value">${money(Number(data.buyer_amount ?? data.price ?? 0), data.currency || 'IDR')}</span></div>
+        <div class="pl-public-summary">
+          <div class="pl-sales-stat"><span class="pl-sales-label"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> ${esc(t('soldLabel'))}</span><strong>${data.sales_count == null ? '—' : Number(data.sales_count).toLocaleString('id-ID')} <small>${esc(t('soldUnit'))}</small></strong></div>
+          <div class="pl-price-panel"><span class="pl-meta-label"><i class="fa-solid fa-tag" aria-hidden="true"></i> ${esc(t('priceLabel'))}</span><div class="pl-price">${money(Number(data.buyer_amount ?? data.price ?? 0), data.currency || 'IDR')}</div></div>
         </div>
-        <div class="pl-price">${money(Number(data.buyer_amount ?? data.price ?? 0), data.currency || 'IDR')}</div>
-        <button class="pl-buy" id="buy"><i class="fa-solid fa-lock-open"></i> ${t('buy')}</button>
+        <button class="pl-buy" id="buy"><i class="fa-solid fa-cart-shopping"></i> ${t('buy')} <i class="fa-solid fa-arrow-right pl-buy-arrow" aria-hidden="true"></i></button>
         ${renderPaymentGuidance()}
       </div>`;
 
@@ -744,19 +762,25 @@
   function setupControls(){
     const theme=document.getElementById('pl-theme');
     const lang=document.getElementById('pl-lang');
+    // This public checkout page intentionally stays in light mode.
+    document.documentElement.dataset.theme='light';
+    document.documentElement.style.colorScheme='light';
+    theme?.setAttribute('hidden','hidden');
+    if (!window.__showlinkPublicLightThemeObserver) {
+      window.__showlinkPublicLightThemeObserver = new MutationObserver(() => {
+        if (document.documentElement.dataset.theme !== 'light') {
+          document.documentElement.dataset.theme = 'light';
+          document.documentElement.style.colorScheme = 'light';
+        }
+      });
+      window.__showlinkPublicLightThemeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    }
     const sync=()=>{
       const dark=document.documentElement.dataset.theme==='dark';
       if(theme) theme.innerHTML=dark?'<i class="fa-solid fa-sun"></i>':'<i class="fa-solid fa-moon"></i>';
       if(lang) lang.textContent=currentLang()==='en'?'ID':'EN';
     };
-    theme?.addEventListener('click',()=>{
-      const next=document.documentElement.dataset.theme==='dark'?'light':'dark';
-      document.documentElement.dataset.theme=next;
-      document.documentElement.style.colorScheme=next;
-      try{localStorage.setItem('showlink-theme',next);}catch(_){}
-      sync();
-      syncDocumentLanguage();
-    });
+
     lang?.addEventListener('click',()=>{
       try{localStorage.setItem('showlink-language',currentLang()==='en'?'id':'en');}catch(_){}
       sync();
@@ -768,6 +792,7 @@
   }
 
   async function load() {
+    const loadingStartedAt = Date.now();
     try {
       if (!slug) throw new Error(t('loadError'));
 
@@ -786,7 +811,10 @@
       if (error) throw error;
       if (!data) throw new Error(t('notFound'));
 
+      data.sales_count = await loadSalesCount(sb, data.id);
+
       if (data.is_owner === true) {
+        await finishInitialLoading(loadingStartedAt);
         renderOwnerLocked(data);
         return;
       }
@@ -803,13 +831,16 @@
       if (accessError) throw accessError;
 
       if (access?.unlocked === true) {
+        await finishInitialLoading(loadingStartedAt);
         renderUnlocked({ ...data, ...access });
         return;
       }
 
+      await finishInitialLoading(loadingStartedAt);
       renderLocked(data);
     } catch (error) {
       dbg.error('PAYMENT LINK PUBLIC LOAD FAILED', error);
+      await finishInitialLoading(loadingStartedAt);
       renderError(error?.message);
     }
   }
