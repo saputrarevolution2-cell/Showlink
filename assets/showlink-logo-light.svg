@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300">
-<defs><linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#19D4F2"/><stop offset=".48" stop-color="#078BFF"/><stop offset="1" stop-color="#174BFF"/></linearGradient></defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="1248" height="372" viewBox="0 0 1248 372">
+<defs><linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#19D4F2"/><stop offset=".48" stop-color="#078BFF"/><stop offset="1" stop-color="#174BFF"/></linearGradient></defs><g transform="translate(24 36)">
 <g transform="translate(28 24) scale(1.55)"><g fill="none" stroke="url(#blue)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><path d="M77 24 91 38 Q101 48 91 58 L70 79 Q60 89 49 78 L38 67"/><path d="M51 104 37 90 Q27 80 37 70 L58 49 Q68 39 79 50 L90 61"/></g><path d="M47 46 L80 79" stroke="url(#blue)" stroke-width="10" stroke-linecap="round"/></g>
 <text x="255" y="143" font-family="Inter,Arial,sans-serif" font-size="104" font-weight="800" letter-spacing="-4"><tspan fill="#0A1735">Show</tspan><tspan fill="#087BFF">Link</tspan></text>
 <g font-family="Inter,Arial,sans-serif" font-size="25" font-weight="600" fill="#0A1735">
@@ -12,4 +12,4 @@
 <rect x="925" y="192" width="20" height="15" rx="3"/><path d="M930 192v-5a5 5 0 0 1 10 0v5"/>
 </g>
 <path d="M420 181v31 M635 181v31 M905 181v31" stroke="#91A6C7" stroke-width="2" opacity=".7"/>
-</svg>
+</g></svg>
