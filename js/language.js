@@ -175,7 +175,8 @@
   function getTheme() {
     const v = localStorage.getItem(THEME_KEY);
     if (v === "dark" || v === "light") return v;
-    return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    const hour = (() => { try { return Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jakarta", hour: "2-digit", hourCycle: "h23" }).format(new Date())); } catch (_) { return new Date().getHours(); } })();
+    return hour >= 6 && hour < 18 ? "light" : "dark";
   }
 
   function getLanguage() {
@@ -190,10 +191,14 @@
   }
 
   function applyTheme(theme, persist=true) {
-    theme = theme === "dark" ? "dark" : "light";
+    const mode = theme === "dark" || theme === "light" ? theme : "auto";
+    if (mode === "auto") {
+      const hour = (() => { try { return Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jakarta", hour: "2-digit", hourCycle: "h23" }).format(new Date())); } catch (_) { return new Date().getHours(); } })();
+      theme = hour >= 6 && hour < 18 ? "light" : "dark";
+    }
     document.documentElement.setAttribute("data-theme", theme);
     document.documentElement.style.colorScheme = theme;
-    if (persist) localStorage.setItem(THEME_KEY, theme);
+    if (persist) { if (mode === "auto") localStorage.removeItem(THEME_KEY); else localStorage.setItem(THEME_KEY, mode); }
     window.dispatchEvent(new CustomEvent("showlink:theme-change", { detail: { theme } }));
 
     document.querySelectorAll("[data-theme-label]").forEach(el => {
@@ -419,7 +424,8 @@
     window.dispatchEvent(new CustomEvent("showlink:language-change", { detail: { language: getLanguage() } }));
   }, t, translations };
 
-  window.ShowLinkTheme = { getTheme, applyTheme };
+  window.ShowLinkTheme = { getTheme, getMode: () => { const v = localStorage.getItem(THEME_KEY); return v === "dark" || v === "light" ? v : "auto"; }, applyTheme };
+  window.setInterval(() => { if (!localStorage.getItem(THEME_KEY)) applyTheme("auto", false); }, 60000);
 
   document.addEventListener("DOMContentLoaded", boot);
 })();
