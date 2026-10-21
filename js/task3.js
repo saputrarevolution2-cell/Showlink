@@ -229,7 +229,7 @@
     function loadFullscreenAdScript() {
       if (fullAdScriptLoaded || !fullAdContent) return;
       fullAdScriptLoaded = true;
-      fullAdContent.innerHTML = '<p class="sl-full-ad-note">Iklan sedang dimuat…</p>';
+      fullAdContent.replaceChildren();
       const script = document.createElement('script');
       script.async = true;
       script.setAttribute('data-cfasync', 'false');
