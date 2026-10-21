@@ -10,6 +10,7 @@
   const incomingGuestToken = qs.get('guest_token') || '';
   let currentView = '';
   let currentData = null;
+  let publicGatewaySettings = null;
   const dbg = window.ShowLinkDebug || { log:()=>{}, warn:()=>{}, error:()=>{} };
 
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
@@ -157,7 +158,7 @@
     id: {
       kicker:'PAYMENT LINK', locked:'Konten terkunci. Lakukan pembayaran untuk membuka konten.',
       buy:'Beli & Bayar', verified:'Pembayaran terverifikasi. Konten sudah terbuka.',
-      chooseGateway:'Pilih Server Pembayaran', gatewayDesc:'Pilih server pembayaran terlebih dahulu sebelum melanjutkan.',
+      chooseGateway:'Pilih Server Pembayaran', gatewayDesc:'Pilih server pembayaran. Jika satu server gagal atau nominal tidak didukung, sistem otomatis mencoba server lainnya.',
       server1:'Server 1', server2:'Server 2', cashi:'Cashi', bayarGG:'BayarGG',
       continuePayment:'Lanjut Pembayaran', back:'Kembali', opening:'Menyiapkan pembayaran…',
       gatewaySecure:'Pembayaran diproses melalui server pembayaran yang kamu pilih.' ,
@@ -185,7 +186,7 @@
     en: {
       kicker:'PAYMENT LINK', locked:'Content is locked. Complete payment to unlock it.',
       buy:'Buy & Pay', verified:'Payment verified. Content is now unlocked.',
-      chooseGateway:'Choose Payment Server', gatewayDesc:'Choose a payment server before continuing.',
+      chooseGateway:'Choose Payment Server', gatewayDesc:'Choose a payment server. If one server fails or does not support the amount, the other server will be tried automatically.',
       server1:'Server 1', server2:'Server 2', cashi:'Cashi', bayarGG:'BayarGG',
       continuePayment:'Continue Payment', back:'Back', opening:'Preparing payment…',
       gatewaySecure:'Payment is processed through your selected payment server.',
@@ -422,8 +423,10 @@
       const {data:g,error}=await sb.rpc('get_public_gateway_settings');
       if(error || !g) throw error || new Error('Gateway settings are unavailable');
       settings={cashi_enabled:g.cashi_enabled===true,bayargg_enabled:g.bayargg_enabled===true};
+      publicGatewaySettings = settings;
     } catch (error) {
       settingsLoadFailed=true;
+      publicGatewaySettings = null;
       console.error('Unable to load public gateway settings:', error);
     }
     const cashiDisabled=!settings.cashi_enabled, bayarDisabled=!settings.bayargg_enabled;
@@ -435,8 +438,8 @@
         <p class="pl-desc">${esc(t('gatewayDesc'))}</p>
         <div class="pl-meta"><div class="pl-meta-box"><span class="pl-meta-label">${esc(t('titleLabel'))}</span><span class="pl-meta-value">${esc(data.title || 'Payment Link')}</span></div><div class="pl-meta-box"><span class="pl-meta-label">${esc(t('priceLabel'))}</span><span class="pl-meta-value">${money(amount, data.currency || 'IDR')}</span></div></div>
         <div class="pl-gateway-grid">
-          ${cashiDisabled?'':`<button class="pl-gateway-card" data-gateway="CASHI" type="button"><span class="pl-gateway-icon"><i class="fa-solid fa-bolt"></i></span><span class="pl-gateway-copy"><strong>${esc(t('server1'))}</strong><b>${esc(t('cashi'))}</b><small>QRIS &amp; payment gateway</small></span><i class="fa-solid fa-chevron-right"></i></button>`}
-          ${bayarDisabled?'':`<button class="pl-gateway-card" data-gateway="BAYAR_GG" type="button"><span class="pl-gateway-icon"><i class="fa-solid fa-qrcode"></i></span><span class="pl-gateway-copy"><strong>${esc(t('server2'))}</strong><b>${esc(t('bayarGG'))}</b><small>QRIS &amp; hosted checkout</small></span><i class="fa-solid fa-chevron-right"></i></button>`}
+          ${cashiDisabled?'':`<button class="pl-gateway-card" data-gateway="CASHI" type="button"><span class="pl-gateway-icon"><i class="fa-solid fa-bolt"></i></span><span class="pl-gateway-copy"><strong>${esc(t('server1'))}</strong><small>QRIS &amp; payment gateway</small></span><i class="fa-solid fa-chevron-right"></i></button>`}
+          ${bayarDisabled?'':`<button class="pl-gateway-card" data-gateway="BAYAR_GG" type="button"><span class="pl-gateway-icon"><i class="fa-solid fa-qrcode"></i></span><span class="pl-gateway-copy"><strong>${esc(t('server2'))}</strong><small>QRIS &amp; hosted checkout</small></span><i class="fa-solid fa-chevron-right"></i></button>`}
         </div>
         ${cashiDisabled&&bayarDisabled?`<div class="pl-error"><i class="fa-solid fa-circle-exclamation"></i><p>${settingsLoadFailed?'Pengaturan pembayaran gagal dimuat. Silakan muat ulang beberapa saat lagi.':'Semua server pembayaran sedang dinonaktifkan.'}</p></div>`:''}
         <div class="pl-gateway-note"><i class="fa-solid fa-shield-halved"></i> ${esc(t('gatewaySecure'))}</div>
@@ -669,13 +672,13 @@
   }
 
   function proceedWithGateway(data, gateway) {
-    startPayment(data, gateway).catch(error => {
+    startPayment(data, gateway, false).catch(error => {
       dbg.error(`${gateway} PAYMENT FAILED`, error);
       renderPaymentError(error?.message || 'Pembayaran gagal dibuat.');
     });
   }
 
-  async function startPayment(data, gateway = null) {
+  async function startPayment(data, gateway = null, fallbackAttempted = false) {
     if (!gateway) {
       await renderGatewaySelection(data);
       return;
@@ -727,6 +730,19 @@
       renderCashiPayment(data, result, sb, orderId, token, !!user);
     } catch (error) {
       dbg.error(`${gateway} PAYMENT FAILED`, error);
+      const alternate = gateway === 'CASHI' ? 'BAYAR_GG' : 'CASHI';
+      const alternateEnabled = alternate === 'CASHI'
+        ? publicGatewaySettings?.cashi_enabled === true
+        : publicGatewaySettings?.bayargg_enabled === true;
+      if (gateway && !fallbackAttempted && alternateEnabled) {
+        currentView = 'gateway';
+        currentData = data;
+        const message = currentLang() === 'en'
+          ? `Server ${gateway === 'CASHI' ? '1' : '2'} failed. Trying Server ${alternate === 'CASHI' ? '1' : '2'} automatically…`
+          : `Server ${gateway === 'CASHI' ? '1' : '2'} gagal atau nominal tidak didukung. Otomatis mencoba Server ${alternate === 'CASHI' ? '1' : '2'}…`;
+        app.innerHTML = `<div class="pl-body pl-fallback-state"><div class="pl-loading-screen" role="status" aria-live="polite"><div class="pl-loader-card"><div class="pl-loader-orbit"><i class="fa-solid fa-rotate fa-spin" aria-hidden="true"></i></div><strong>${esc(message)}</strong><span class="pl-loader-caption">ShowLink · Payment Link</span><div class="pl-loader-track" aria-hidden="true"><span></span></div></div></div></div>`;
+        return startPayment(data, alternate, true);
+      }
       renderPaymentError(error?.message || 'Pembayaran gagal dibuat.');
     }
   }
