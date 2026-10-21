@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
+<script>try{document.documentElement.dataset.theme="light";document.documentElement.style.colorScheme="light";localStorage.setItem("showlink-theme","light");}catch(e){document.documentElement.dataset.theme="light";document.documentElement.style.colorScheme="light";}</script>
 <script src="/js/theme.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-config.js"></script>
@@ -25,7 +26,14 @@
 <div data-showlink-navbar></div>
 <main class="pl-page payment-public-page">
 <section class="pl-card" id="app">
-    <div class="pl-loading"><i class="fa-solid fa-spinner fa-spin"></i><div data-i18n="loading">Memuat Payment Link…</div></div>
+    <div class="pl-loading-screen" role="status" aria-live="polite" aria-label="Memuat Payment Link">
+      <div class="pl-loader-card">
+        <div class="pl-loader-orbit"><i class="fa-solid fa-robot" aria-hidden="true"></i></div>
+        <strong data-i18n="loading">Memuat Payment Link…</strong>
+        <span class="pl-loader-caption">ShowLink · Payment Link</span>
+        <div class="pl-loader-track" aria-hidden="true"><span></span></div>
+      </div>
+    </div>
   </section>
 </main>
 <div data-showlink-footer></div>
